@@ -1,0 +1,12 @@
+REPLACE INTO products
+(catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4) SELECT catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4 FROM order_products
+GROUP BY catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4;
+
+UPDATE order_products AS OrderProduct
+JOIN products AS Product ON
+OrderProduct.catalog_product_id = Product.catalog_product_id AND
+((OrderProduct.product_option_choice_id_1 IS NULL AND Product.product_option_choice_id_1 IS NULL) OR OrderProduct.product_option_choice_id_1 = Product.product_option_choice_id_1) AND
+((OrderProduct.product_option_choice_id_2 IS NULL AND Product.product_option_choice_id_2 IS NULL) OR OrderProduct.product_option_choice_id_2 = Product.product_option_choice_id_2) AND
+((OrderProduct.product_option_choice_id_3 IS NULL AND Product.product_option_choice_id_3 IS NULL) OR OrderProduct.product_option_choice_id_3 = Product.product_option_choice_id_3) AND
+((OrderProduct.product_option_choice_id_4 IS NULL AND Product.product_option_choice_id_4 IS NULL) OR OrderProduct.product_option_choice_id_4 = Product.product_option_choice_id_4) 
+SET OrderProduct.product_id = Product.id;
