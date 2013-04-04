@@ -1,8 +1,8 @@
 <?php
-$add = !$this->Html->value('Product.id');
+$add = !$this->Html->value('CatalogItem.id');
 
-echo $this->Html->tag('h1', $add ? 'Add a Product' : 'Edit Product Info');
-echo $this->Form->create('Product');
+echo $this->Html->tag('h1', $add ? 'Add a CatalogItem' : 'Edit CatalogItem Info');
+echo $this->Form->create('CatalogItem');
 echo $this->Html->div('span-18');
 echo $this->Form->inputs(array(
 	'id',
@@ -22,11 +22,9 @@ echo $this->FormLayout->submit('Update');
 echo "</div>\n";
 echo $this->Html->div('span-6 last fullFormWidth');
 echo $this->element('form/habtm_select', array(
-	'name' => 'ProductCategory',
+	'name' => 'CatalogItemCategory',
 	'label' => false,
-	'options' => $productCategories,
+	'options' => $catalogItemCategories,
 ));
 echo "</div>\n";
 echo $this->Form->end();
-
-?>

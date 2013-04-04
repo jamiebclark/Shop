@@ -7,6 +7,7 @@ class ShopAppModel extends AppModel {
 	);
 
 	function __construct($id = false, $table = null, $ds = null) {
+		parent::__construct($id, $table, $ds);
 		$aliasFields = array('order', 'virtualFields');
 		foreach ($aliasFields as $field) {
 			if (isset($this->{$field})) {
@@ -14,11 +15,13 @@ class ShopAppModel extends AppModel {
 					$this->{$field} = array($this->{$field});
 				}
 				foreach ($this->{$field} as $key => $val) {
-					$this->{$field}[$key] = str_replace('$ALIAS', $this->alias, $val);
+					unset($this->{$field}[$key]);
+					$key = str_replace('$ALIAS', $this->alias, $key);
+					$val = str_replace('$ALIAS', $this->alias, $val);
+					$this->{$field}[$key] = $val;
 				}
 			}
 		}
-		parent::__construct($id, $table, $ds);
 	}
 	
 	function &getData() {

@@ -70,16 +70,22 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function view($id = null) {
-		if (empty($id) && !empty($this->request->query['prodID'])) {
-			$id = $this->request->query['prodID'];
-		}
+		//Temporary - Remove later
+		$this->CatalogItem->createProducts($id);
+		$this->CatalogItem->updateProductTitles($id);
+		//
 		
-		$catalogItem = $this->FormData->findModel($id);
-		
-		if (empty($catalogItem)) {
-			$this->_redirectMsg(true, 'CatalogItem not found');
-		}
+		$catalogItem = $this->FormData->findModel($id, null, array(
+			'contain' => array(
+				'CatalogItemOption' => array('ProductOptionChoice'),
+				'CatalogItemPackageChild',
+				'CatalogItemImage',
+			)
+		));
+		debug($catalogItem);
+
 		$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemOptions($id);
+		/*
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
 			'CatalogItemImage', 
 			'CatalogItemPackageChild' => array(
@@ -101,6 +107,7 @@ class CatalogItemsController extends ShopAppController {
 				$catalogItemChildOptions[$childId] = $this->CatalogItem->CatalogItemOption->findCatalogItemOptions($childId);
 			}
 		}
+		*/
 		$this->request->data['Order']['id'] = $this->ShoppingCart->getCart();
 		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions'));
 	}
@@ -274,7 +281,7 @@ class CatalogItemsController extends ShopAppController {
 				if (empty($totalsOptions['total'][$calendarItemId][$productId])) {
 					$totalsOptions['total'][$calendarItemId][$productId] = 0;
 				}
-				if (empty($totalsOptions['year'][$year][[$calendarItemId][$productId])) {
+				if (empty($totalsOptions['year'][$year][$calendarItemId][$productId])) {
 					$totalsOptions['year'][$year][$calendarItemId][$productId] = 0;
 				}
 				if (empty($totalsOptions['month'][$year][$month][$calendarItemId][$productId])) {

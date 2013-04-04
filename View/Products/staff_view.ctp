@@ -10,13 +10,21 @@ echo $this->Layout->headerMenu(array(
 ));
 
 $info = array(
+<<<<<<< HEAD
+	'Product' => $this->CatalogItem->link($productInventory['Product']),
+=======
 	'Product' => $this->Product->link($productInventory['Product']),
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 );
 $i = 0;
 while(isset($productInventory['ProductOptionChoice' . ++$i]['id'])) {
 	$info['Option ' . $i] = $productInventory['ProductOptionChoice' . $i]['title'];
 }
+<<<<<<< HEAD
+$info['Total Stock'] = $this->CatalogItem->inventory($productInventory['ProductInventory']['quantity']);
+=======
 $info['Total Stock'] = $this->Product->inventory($productInventory['ProductInventory']['quantity']);
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 
 if (!empty($productInventories)) {
 	$list = array();
@@ -56,7 +64,11 @@ foreach ($productInventoryAdjustments as $productInventoryAdjustment) {
 	);
 	$this->Table->cells(array(
 		array($this->Calendar->niceShort($productInventoryAdjustment['ProductInventoryAdjustment']['available']), 'Date Added'),
+<<<<<<< HEAD
+		array($this->CatalogItem->inventory($productInventoryAdjustment['ProductInventoryAdjustment']['quantity']), 'Amount'),
+=======
 		array($this->Product->inventory($productInventoryAdjustment['ProductInventoryAdjustment']['quantity']), 'Amount'),
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 		array($productInventoryAdjustment['ProductInventoryAdjustment']['title'], 'Description'),
 		array($this->Layout->actionMenu(array('edit', 'delete'), compact('url')), 'Actions'),
 	), true);

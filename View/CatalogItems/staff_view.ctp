@@ -63,7 +63,11 @@ $this->Table->reset();
 if (!empty($product['ProductPackageChild'])) {
 	foreach ($product['ProductPackageChild'] as $ProductPackageChild) {
 		$this->Table->cells(array(
+<<<<<<< HEAD
+			array($this->CatalogItem->thumb($ProductPackageChild['ProductChild'], array('dir' => 'thumb', 'url' => $url))),
+=======
 			array($this->Product->thumb($ProductPackageChild['ProductChild'], array('dir' => 'thumb', 'url' => $url))),
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 			array($this->Html->link($ProductPackageChild['ProductChild']['title'], $url), 'Product'),
 			array($this->Html->link(number_format($ProductPackageChild['quantity']), $url), 'Quantity')
 		), true);
@@ -81,7 +85,11 @@ $this->Table->reset();
 foreach ($product['ProductImage'] as $productImage) {
 	$url = array('controller' => 'product_images', 'action' => 'view', $productImage['id']);
 	$this->Table->cells(array(
+<<<<<<< HEAD
+		array($this->CatalogItem->thumb($productImage, array('url' => $url))),
+=======
 		array($this->Product->thumb($productImage, array('url' => $url))),
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 		array($this->Layout->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url'))),
 	), true);
 }

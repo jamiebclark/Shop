@@ -60,11 +60,11 @@ if (!empty($order['OrderProduct'])) {
 		);
 
 		if (!$hasParent && !$orderProduct['Product']['hidden'] && $orderProduct['Product']['active']) {
-			$url = $this->Product->url($orderProduct['Product']);
+			$url = $this->CatalogItem->url($orderProduct['Product']);
 		} else {
 			$url = null;
 		}
-		$cell = $this->Product->thumb($orderProduct['Product'], array(
+		$cell = $this->CatalogItem->thumb($orderProduct['Product'], array(
 			'url' => $url, 
 			'dir' => 'thumb',
 			'tag' => 'font',

@@ -7,6 +7,8 @@ class ShoppingCartComponent extends Component {
 	var $name = 'ShoppingCart';
 	var $controller;
 	
+	var $components = array('Session');
+	
 	function __construct(ComponentCollection $collection, $settings = array()) {
 		$this->settings = $settings;
 		parent::__construct($collection, $settings);
@@ -18,13 +20,10 @@ class ShoppingCartComponent extends Component {
 	}
 	
 	function getCart($cartId = null) {
-		if (empty($cartId) && $this->controller->Session->check('ShoppingCart.id')) {
-			$cartId = $this->controller->Session->read('ShoppingCart.id');
+		if (empty($cartId)) {
+			$cartId = $this->getCartId();
 		}
-		
-		App::import('Model', 'Shop.Order');
-		$Order = new Order();
-		
+		$Order = ClassRegistry::init('Shop.Order');
 		$shoppingCart = $Order->find('first', array(
 			'joins' => array(
 				array(
@@ -33,18 +32,22 @@ class ShoppingCartComponent extends Component {
 					'conditions' => array('Invoice.id = Order.invoice_id'),
 				),
 			),
-			'conditions' => array(
-				'Invoice.paid' => null,
-				'Order.id' => $cartId,
-			)
+			'conditions' => array('Invoice.paid' => null, 'Order.id' => $cartId)
 		));
-		
 		if (empty($shoppingCart)) {
 			$this->unsetCart($cartId);
 			return false;
 		} else {
 			$this->controller->set(compact('shoppingCart'));
 			$this->setCart($cartId);
+		}
+		return $cartId;
+	}
+
+	function getCartId() {
+		$cartId = null;
+		if ($this->Session->check('ShoppingCart.id')) {
+			$cartId = $this->Session->read('ShoppingCart.id');
 		}
 		return $cartId;
 	}

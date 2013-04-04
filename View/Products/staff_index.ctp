@@ -20,7 +20,11 @@ foreach ($productInventories as $productInventory) {
 		$cell = (!empty($productInventory['ProductOptionChoice' . $i]['title'])) ? $productInventory['ProductOptionChoice' . $i]['title'] : '&nbsp;';
 		$this->Table->cell($cell, 'Option ' . $i);
 	}
+<<<<<<< HEAD
+	$this->Table->cell($this->CatalogItem->inventory($productInventory['ProductInventory']['quantity']), 'Quantity in Stock');
+=======
 	$this->Table->cell($this->Product->inventory($productInventory['ProductInventory']['quantity']), 'Quantity in Stock');
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 	$this->Table->cell($this->Calendar->niceShort($productInventory['ProductInventory']['modified']), 'Last Updated');
 	$this->Table->cell($this->Layout->actionMenu(array(
 		//'view', 

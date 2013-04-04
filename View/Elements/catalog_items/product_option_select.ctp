@@ -33,5 +33,4 @@ if (empty($productOptions)) {
 		);
 	}
 }
-echo "</div>";		
-?>
+echo "</div>";

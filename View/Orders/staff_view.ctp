@@ -84,7 +84,7 @@ foreach ($order['OrderProduct'] as $orderProduct) {
 	$this->Table->cells(array(
 		array($this->Layout->actionMenu($actions, array('url' => $productUrl))),
 		array(
-			$this->Product->thumb($orderProduct['Product'], array('url' => $productUrl, 'dir' => 'thumb')), 
+			$this->CatalogItem->thumb($orderProduct['Product'], array('url' => $productUrl, 'dir' => 'thumb')), 
 			null, 
 			null, 
 			null, 

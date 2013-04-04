@@ -44,13 +44,21 @@ if (!empty($order['OrderProduct'])) {
 		
 		//Product
 		if (!$hasParent && !$productHidden && $productActive && $links) {
+<<<<<<< HEAD
+			$url = $this->CatalogItem->url($orderProduct['Product']);
+=======
 			$url = $this->Product->url($orderProduct['Product']);
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 		} else {
 			$url = null;
 		}
 		$cell = '';
 		if ($images) {
+<<<<<<< HEAD
+			$cell .= $this->CatalogItem->thumb($orderProduct['Product'], array(
+=======
 			$cell .= $this->Product->thumb($orderProduct['Product'], array(
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 				'url' => $url, 
 				'dir' => 'thumb',
 				'tag' => 'font',

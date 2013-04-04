@@ -14,7 +14,11 @@ foreach ($productImages as $productImage) {
 	);
 	$this->Table->cells(array(
 		array(
+<<<<<<< HEAD
+			$this->CatalogItem->thumb($productImage['Product'], array(
+=======
 			$this->Product->thumb($productImage['Product'], array(
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 				'dir' => 'thumb', 
 				'url' => $url
 			)),

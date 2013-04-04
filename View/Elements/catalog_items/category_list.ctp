@@ -1,22 +1,22 @@
+<div class="catalog-item-category-list">
 <?php
-echo $this->Html->div('productCategoryList');
-if (!empty($productCategory)) {
+if (!empty($catalogItemCategory)) {
 	$title = '';
-	if (!empty($productCategory['ProductCategory']['parent_id'])) {
+	if (!empty($catalogItemCategory['CatalogItemCategory']['parent_id'])) {
 		$title .= $this->Html->link(
 			$this->Html->image('icn/16x16/folder_up.png'),
-			array('category' => $productCategory['ProductCategory']['parent_id']),
+			array('category' => $catalogItemCategory['CatalogItemCategory']['parent_id']),
 			array('escape' => false)
 		) . ' ';
-		$title .= $productCategory['ProductCategory']['title'];
+		$title .= $catalogItemCategory['CatalogItemCategory']['title'];
 	} else {
 		$title = 'Categories';
 	}
 	echo $this->Html->tag('h2', $title);
 }
-if (!empty($productCategories)) {
+if (!empty($catalogItemCategories)) {
 	$list = array();
-	foreach ($productCategories as $id => $title) {
+	foreach ($catalogItemCategories as $id => $title) {
 		$list[] = array(
 			$title,
 			array('action' => 'index', $id)
@@ -26,5 +26,5 @@ if (!empty($productCategories)) {
 } else {
 	echo $this->Html->tag('em', 'No Categories');
 }
-echo "</div>\n";
 ?>
+</div>

@@ -1,14 +1,14 @@
 <?php
 class Product extends ShopAppModel {
 	var $name = 'Product';
-	var $hasMany = array ('Shop.OrderProduct');
-	var $belongsTo = array(
-		'Shop.CatalogItem', 
+	var $hasMany = array (
+		'Shop.OrderProduct',
 		'ProductInventoryAdjustment' => array(
 			'className' => 'Shop.ProductInventoryAdjustment',
 			'dependent' => true,
-		)
+		)		
 	);
+	var $belongsTo = array('Shop.CatalogItem');
 	
 	var $optionChoiceCount = 4;
 	
@@ -104,18 +104,23 @@ class Product extends ShopAppModel {
 		$fields = array('CatalogItem.title');
 		$link = array('Shop.CatalogItem');
 		$conditions = array($this->alias . '.id' => $id);
-		$classes = array();
+		$classes = $joins = array();
 		for ($i = 1; $i <= $this->optionChoiceCount; $i++) {
 			$class = 'ProductOptionChoice' . $i;
 			$fields[] = $class . '.title';
-			$link[] = array('Shop.' . $class);
+			$joins[] = array(
+				'type' => 'LEFT',
+				'alias' => $class,
+				'table' => 'product_option_choices',
+				'conditions' => array($class . '.id = ' . $this->alias . '.product_option_choice_id_' . $i),
+			);
 			$classes[] = $class;
 		}
-		$result = $this->find('first', compact('fields', 'link', 'conditions'));
+		$result = $this->find('first', compact('fields', 'joins', 'link', 'conditions'));
 		$title = $result['CatalogItem']['title'];
 		$subTitle = '';
 		foreach ($classes as $class) {
-			if (!empty($result[$class])) {
+			if (!empty($result[$class]['title'])) {
 				if (!empty($subTitle)) {
 					$subTitle .= ', ';
 				}
@@ -126,6 +131,7 @@ class Product extends ShopAppModel {
 			$title .= ': '. $subTitle;
 		}
 		$this->create();
-		return $this->save(compact('id', 'title') + array('sub_title' => $subTitle));
+		$data = compact('id', 'title') + array('sub_title' => $subTitle);
+		return $this->save($data);
 	}
 }

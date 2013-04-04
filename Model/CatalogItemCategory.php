@@ -26,7 +26,7 @@ class CatalogItemCategory extends ShopAppModel {
 			return $this->find('list', array(
 				'joins' => array(
 					array(
-						'table' => 'product_categories',
+						'table' => 'catalog_item_categories',
 						'alias' => 'CatalogItemCategoryChild',
 						'conditions' => array(
 							'CatalogItemCategoryChild.lft BETWEEN CatalogItemCategory.lft AND CatalogItemCategory.rght',

@@ -21,8 +21,7 @@ foreach ($productImages as $productImage) {
 		$productImage['id'],
 	);
 	
-	echo $this->Product->thumb($productImage, compact('dir', 'url'));
-	
+	echo $this->CatalogItem->thumb($productImage, compact('dir', 'url'));
 	$count++;
 	if (!empty($limit) && $count >= $limit) {
 		break;

@@ -2,7 +2,11 @@
 $this->Crumbs->title('Image');
 echo $this->element('products/crumbs', compact('crumbs'));
 
+<<<<<<< HEAD
+echo $this->CatalogItem->thumb($productImage['ProductImage'], array(
+=======
 echo $this->Product->thumb($productImage['ProductImage'], array(
+>>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 	'class' => 'productImageView'
 ));
 

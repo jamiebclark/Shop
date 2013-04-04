@@ -38,4 +38,3 @@ if (!empty($productOptions)) {
 	}
 }
 echo $output;
-?>

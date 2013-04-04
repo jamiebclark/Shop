@@ -1,13 +1,13 @@
 <?php
-echo $this->element('products/crumbs');
+echo $this->element('catalog_items/crumbs');
 //echo $this->Html->tag('h1', 'Online Store');
 echo $this->Html->div('span-4');
-echo $this->element('products/category_list');
+echo $this->element('catalog_items/category_list');
 echo "</div>\n";
 
 echo $this->Html->div('span-12');
-echo $this->element('products/category_path');
-echo $this->element('products/list');
+echo $this->element('catalog_items/category_path');
+echo $this->element('catalog_items/list');
 echo "</div>\n";
 
 echo $this->Html->div('span-8 last');

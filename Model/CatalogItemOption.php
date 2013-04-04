@@ -11,6 +11,25 @@ class CatalogItemOption extends ShopAppModel {
 	
 	var $belongsTo = array('Shop.CatalogItem');
 	
+	/**
+	 * Finds the possible option choices, using the index as keys
+	 * @param int $catalogItemId 
+	 * @return array Array of possible choices with index as keys
+	 */
+	function findCatalogItemIndexes($catalogItemId) {
+		$indexes = array();
+		$choices = $this->ProductOptionChoice->find('all', array(
+			'fields' => '*',
+			'link' => array('Shop.' . $this->alias),
+			'conditions' => array($this->alias . '.catalog_item_id' => $catalogItemId),
+			'order' => $this->alias . '.index',
+		));
+		foreach ($choices as $choice) {
+			$indexes[$choice[$this->alias]['index']][$choice['ProductOptionChoice']['id']] = $choice['ProductOptionChoice']['title'];
+		}
+		return $indexes;
+	}
+	
 	function findCatalogItemOptions($catalogItemId) {
 		$catalogItemOptions = $this->find('all', array(
 			'recursive' => -1,
@@ -68,7 +87,6 @@ class CatalogItemOption extends ShopAppModel {
 			}
 			$catalogItemOptions[$keyLink[$optionId]]['ProductOptionChoice'] = $choice;
 		}
-		debug($catalogItemOptions);
 		return $catalogItemOptions;
 	}
 }

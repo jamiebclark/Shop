@@ -20,23 +20,22 @@ class CatalogItemImage extends ShopAppModel {
 		),
 		'Shop.FieldOrder' => array(
 			'orderField' => 'order',
-			'subKeyFields' => array('product_id'),
+			'subKeyFields' => array('catalog_item_id'),
 		)
 	);
-	var $order = array('CatalogItemImage.product_id', 'CatalogItemImage.order');
-	
+	var $order = array('CatalogItemImage.catalog_item_id', 'CatalogItemImage.order');
 	var $belongsTo = array('Shop.CatalogItem');
 	
 	var $validate = array(
-		'product_id' => array(
+		'catalog_item_id' => array(
 			'rule' => 'notEmpty',
 			'message' => 'Please select a product',
 		)
 	);
 	
 	function afterSave($created) {
-		$result = $this->read('product_id', $this->id);
-		$this->setCatalogItemThumb($result[$this->alias]['product_id']);
+		$result = $this->read('catalog_item_id', $this->id);
+		$this->setCatalogItemThumb($result[$this->alias]['catalog_item_id']);
 	}
 	
 	/**
@@ -45,17 +44,17 @@ class CatalogItemImage extends ShopAppModel {
 	 **/
 	function setCatalogItemThumb($productId = null) {
 		$options = array(
-			'group' => 'product_id'
+			'group' => 'catalog_item_id'
 		);
 		if (!empty($productId)) {
-			$options['product_id'] = $productId;
+			$options['catalog_item_id'] = $productId;
 		}
 		
 		$results = $this->find('all', $options);
 		$data = array();
 		foreach ($results as $result) {
 			$data[] = array(
-				'id' => $result[$this->alias]['product_id'],
+				'id' => $result[$this->alias]['catalog_item_id'],
 				'filename' => $result[$this->alias]['filename'],
 			);
 		}
