@@ -82,8 +82,6 @@ class CatalogItemsController extends ShopAppController {
 				'CatalogItemImage',
 			)
 		));
-		debug($catalogItem);
-
 		$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemOptions($id);
 		/*
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(

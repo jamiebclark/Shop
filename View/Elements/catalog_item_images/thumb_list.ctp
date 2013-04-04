@@ -2,30 +2,26 @@
 if (empty($class)) {
 	$class = '';
 }
-$class .= ' productImageThumbList clearfix';
-?>
-
-<div class="<?php echo $class;?>">
-<?php
+$class .= ' catalog-item-image-thumb-list clearfix';
 $count = 0;
 if (empty($dir)) {
 	$dir = 'thumb';
 }
-foreach ($productImages as $productImage) {
-	if (!empty($productImage['ProductImage'])) {
-		$productImage = $productImage['ProductImage'];
+?>
+<div class="<?php echo $class;?>">
+<?php
+foreach ($catalogItemImages as $catalogItemImage):
+	if (!empty($catalogItemImage['CatalogItemImage'])) {
+		$catalogItemImage = $catalogItemImage['CatalogItemImage'];
 	}
 	$url = array(
 		'controller' => 'product_images',
 		'action' => 'view',
-		$productImage['id'],
+		$catalogItemImage['id'],
 	);
-	
-	echo $this->CatalogItem->thumb($productImage, compact('dir', 'url'));
-	$count++;
-	if (!empty($limit) && $count >= $limit) {
+	echo $this->CatalogItem->thumb($catalogItemImage, compact('dir', 'url'));
+	if (!empty($limit) && ++$count >= $limit) {
 		break;
 	}
-}
-?>
-</div>
+endforeach;
+?></div>

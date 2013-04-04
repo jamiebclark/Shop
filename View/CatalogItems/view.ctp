@@ -1,133 +1,109 @@
-<?php
-echo $this->element('catalog_items/crumbs', array(
-	'crumbs' => $catalogItem['CatalogItem']['title']
-));
-echo $this->Html->div('catalogItem');
-echo $this->Form->create('OrderProduct', array('action' => 'add'));
-
-echo $this->Grid->col('1/4', null, array('class' => 'catalogItemViewImages'));
-echo $this->CatalogItem->thumb(
-	$catalogItem['CatalogItem'], array(
-		'div' => false, 
-		'dir' => 'thumb',
-		'url' => array(
-			'controller' => 'catalog_item_images',
-			'action' => 'index',
-			$catalogItem['CatalogItem']['id'],
-		)
-	)
-);
-if (count($catalogItem['CatalogItemImage']) > 1) {
-	echo $this->element('catalog_item_images/thumb_list', array(
-		'limit' => 3,
-		'catalogItemImages' => $catalogItem['CatalogItemImage'],
-	));
+<style type="text/css">
+.catalog-item-image-thumb-list img {
+	display: block;
+	float: left;
+	width: 33%;
 }
-
-echo $this->Grid->colContinue('1/2');
-echo $this->Html->tag('h1', $catalogItem['CatalogItem']['title']);
-
-echo $this->DisplayText->text($catalogItem['CatalogItem']['description']);
-
-if (!empty($catalogItem['CatalogItemPackageChild'])) {
-	echo $this->Html->tag('h2', 'Packaged Item');
-	echo 'This product contains the following items:';
-	$this->Table->reset();
-	foreach ($catalogItem['CatalogItemPackageChild'] as $k => $catalogItemPackage) {
-		if ($catalogItemPackage['CatalogItemChild']['hidden']) {
-			$url = null;
-			$title = $catalogItemPackage['CatalogItemChild']['title'];
-		} else {
-			$url = $this->CatalogItem->url($catalogItemPackage['CatalogItemChild']);
-			$title = $this->Html->link($catalogItemPackage['CatalogItemChild']['title'], $url);
-		}
-		
-		if (!empty($loggedUserTypes['staff']) && !empty($catalogItemChildOptions[$catalogItemPackage['CatalogItemChild']['id']])) {
-			$childId = $catalogItemPackage['CatalogItemChild']['id'];
-			$title .= $this->Html->div('fullFormWidth', $this->element('catalog_items/product_option_input', array(
-				'productOptions' => $catalogItemChildOptions[$childId],
-				'model' => 'OrderProduct.PackageChild.' . $childId,
-			)));
-		}
-		$this->Table->cells(array(
-			array(
-				$this->CatalogItem->thumb($catalogItemPackage['CatalogItemChild'], array('dir' => 'thumb', 'url' => $url)),
-				null,
-				null,
-				null,
-				array('width' => 40)
-			),
-			array($title, 'Item'),
-			array(
-				number_format($catalogItemPackage['quantity']),
-				'Quantity',
-				null,
-				null,
-				array('width' => 40)
+.catalog-item-images .main {
+	width: 100%;
+}
+</style>
+<div class="catalog-item-view row">
+	<div class="span3 catalog-item-images"><?php
+	echo $this->CatalogItem->thumb(
+		$catalogItem['CatalogItem'], array(
+			'div' => false, 
+			'dir' => 'thumb',
+			'class' => 'main',
+			'url' => array(
+				'controller' => 'catalog_item_images',
+				'action' => 'index',
+				$catalogItem['CatalogItem']['id'],
 			)
-		), true);
+		)
+	);
+	if (count($catalogItem['CatalogItemImage']) > 1) {
+		echo $this->element('catalog_item_images/thumb_list', array(
+			'limit' => 3,
+			'catalogItemImages' => $catalogItem['CatalogItemImage'],
+		));
 	}
-	echo $this->Table->table();
-}
-echo $this->Grid->colContinue('1/4', null, array('class' => 'orderCart'));
+	?></div>
+	
+	<div class="span9">
+		<h1><?php echo $catalogItem['CatalogItem']['title'];?></h1>
+		<?php echo $this->DisplayText->text($catalogItem['CatalogItem']['description']);?>
 
-echo $this->CatalogItem->price($catalogItem['CatalogItem']);
-
-$notes = array();
-if ($catalogItem['CatalogItem']['min_quantity'] > 1) {
-	$notes[] = 'Minimum order of ' . number_format($catalogItem['CatalogItem']['min_quantity']);
-}
-if ($catalogItem['CatalogItem']['quantity_per_pack'] > 1) {
-	$notes[] = 'This is a pack of ' . number_format($catalogItem['CatalogItem']['quantity_per_pack']);
-}
-if ($catalogItem['CatalogItem']['stock'] < 10) {
-	$notes[] = 'Limited stock';
-}
-
-if (!empty($notes)) {
-	echo $this->Html->tag('h3', 'Notes');
-	echo $this->Layout->menu($notes);
-}
-
-if ($catalogItem['CatalogItem']['stock'] <= 0) {
-	echo $this->Html->tag('h3', 'Out of Stock');
-	echo $this->Html->tag('p', 'Sorry, this item is temporarily out of stock. Please check back soon for inventory updates!');
-} else {
-	echo $this->Layout->fieldset('Add to Cart');
-	echo $this->Form->inputs(array(
-		'fieldset' => false,
-		'Order.id' => array(
-			'type' => 'hidden'
-		),
-		'OrderProduct.product_id' => array(
-			'type' => 'hidden', 
-			'value' => $catalogItem['CatalogItem']['id']
-		),
-		'Order.user_id' => array(
-			'type' => 'hidden', 
-			'default' => $loggedUserId
-		),
-	));
-
-	echo $this->element('catalog_items/product_option_input', array(
-		'blank' => true,
-		'label' => false,
-	));
-	echo $this->Form->input('OrderProduct.quantity', array(
-		'default' => !empty($catalogItem['CatalogItem']['min_quantity']) ? $catalogItem['CatalogItem']['min_quantity'] : 1,
-		'class' => 'quantity',
-	));
-	echo $this->FormLayout->submit('Add to Cart');
-	echo "</fieldset>\n";
-}
-
-echo $this->Grid->colClose(true);
-
-echo $this->Form->end();
-echo "</div>\n";	//catalogItem
-
-if (!empty($loggedUserTypes['staff'])) {
-	echo "<hr/>\n";
+		<?php if (!empty($catalogItem['CatalogItemPackageChild'])): ?>
+		<div class="package">
+			<h2>Packaged Item</h2>
+			This product contains the following items:
+			<?php
+			foreach ($catalogItem['CatalogItemPackageChild'] as $k => $catalogItemPackage):
+				$url = null;
+				$title = $catalogItemPackage['CatalogItemChild']['title'];
+				if (!$catalogItemPackage['CatalogItemChild']['hidden']) {
+					$url = $this->CatalogItem->url($catalogItemPackage['CatalogItemChild']);
+					$title = $this->Html->link($title, $url);
+				}
+				$thumb = $this->CatalogItem->thumb($catalogItemPackage['CatalogItemChild'], array(
+					'dir' => 'thumb', 
+					'url' => $url,
+					'class' => 'img',
+				)); 
+				?>
+				<div class="media">
+					<div class="img"><?php echo $thumb;?></div>
+					<div class="rght qty"><?php 
+						echo number_format($catalogItemPackage['quantity']);
+					?></div>
+					<div class="bd"><?php echo $title;?></div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+		<?php endif; ?>
+		<div class="add-cart"><?php 
+			echo $this->CatalogItem->price($catalogItem['CatalogItem']);
+			echo $this->CatalogItem->notes($catalogItem['CatalogItem']);
+			if ($catalogItem['CatalogItem']['stock'] <= 0): ?>
+				<h3>Out of stock</h3>
+				<p>Sorry, this item is temporarily out of stock. Please check back soon for inventory updates</p>
+			<?php else:
+				echo $this->Form->create('OrderProduct', array('action' => 'add')); ?>
+				<fieldset><legend>Add to Cart</legend><?php
+				echo $this->Form->inputs(array(
+					'fieldset' => false,
+					'Order.id' => array(
+						'type' => 'hidden'
+					),
+					'OrderProduct.product_id' => array(
+						'type' => 'hidden', 
+						'value' => $catalogItem['CatalogItem']['id']
+					),
+					'Order.user_id' => array(
+						'type' => 'hidden', 
+						'default' => $loggedUserId
+					),
+				));
+				echo $this->element('catalog_items/product_option_input', array(
+					'blank' => true,
+					'label' => false,
+				));
+				echo $this->Form->input('OrderProduct.quantity', array(
+					'default' => !empty($catalogItem['CatalogItem']['min_quantity']) ? $catalogItem['CatalogItem']['min_quantity'] : 1,
+					'class' => 'quantity',
+				));
+				echo $this->FormLayout->submit('Add to Cart');
+				?>
+				</fieldset>
+				<?php
+				echo $this->Form->end();
+			endif;?>
+		</div>
+	</div>
+</div>
+<?php
+if (!empty($isShopAdmin)) {
 	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
 		'action' => 'view',
 		$catalogItem['CatalogItem']['id'],

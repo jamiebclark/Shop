@@ -21,6 +21,13 @@ class ShopAppController extends AppController {
 		'Layout.Table',
 	);
 	
+	function beforeRender() {
+		parent::beforeRender();
+		$loggedUserId = 1;
+		$isShopAdmin = true;
+		$this->set(compact('loggedUserId', 'isShopAdmin'));
+	}
+	
 	function _redirectMsg($redirect = true, $msg = null) {
 		if (!empty($msg)) {
 			$this->Session->setFlash($msg);

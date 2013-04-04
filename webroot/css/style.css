@@ -1,0 +1,12 @@
+.media, .media .img, .media .bd, .media .rght {
+	overflow: hidden;
+	zoom: 1;
+}
+.media .img {
+	float: left;
+	margin-right: 10px;
+}
+.media .rght {
+	float: right;
+	margin-left: 10px;
+}

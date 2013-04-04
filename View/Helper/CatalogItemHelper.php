@@ -1,21 +1,31 @@
 <?php
+define('SHOP_ROOT', APP . 'Plugin' . DS . 'Shop' . DS);
+define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
+
 class CatalogItemHelper extends AppHelper {
 	var $name = 'CatalogItem';
 	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
 	
 	var $thumbDir = 'catalog_item_images/';
 	
-	function thumb($CatalogItem, $options = array()) {
-		$options['thumbDir'] = $this->thumbDir;
-		if ($url = Param::keyValCheck($options, 'url')) {
-			if ($url === true) {
-				$url = $this->url($CatalogItem);
-			}
-			$options['url'] = $url;
-		}		return "THUMBNAIL";
-		//return $this->Photo->thumb($CatalogItem, $options);
+	function thumb($catalogItem, $options = array()) {
+		$src = $this->thumbDir;
+		if (!empty($options['dir'])) {
+			$options = $this->addClass($options, $options['dir']);
+			$src .= $options['dir'] . '/';
+			unset($options['dir']);
+		}
+		if (!empty($options['url']) && $options['url'] === true) {
+			$options['url'] = $this->url($catalogItem);
+		}
+		$src .= $catalogItem['filename'];
+		$file = str_replace(array('/','\\'), DS, SHOP_WWW_ROOT . 'img' . DS . $src);
+		if (is_file($file)) {
+			return $this->Html->image('Shop.' . $src, $options);
+		} else {
+			return null;
+		}
 	}
-	
 	
 	function link ($CatalogItem, $options = array(), $onClick = null) {
 		$options = array_merge(array(
@@ -35,6 +45,26 @@ class CatalogItemHelper extends AppHelper {
 			$CatalogItem['id'],
 			Inflector::slug($CatalogItem['title'])
 		);
+	}
+	
+	function notes($catalogItem) {
+		$notes = array();
+		if ($catalogItem['min_quantity'] > 1) {
+			$notes[] = 'Minimum order of ' . number_format($catalogItem['min_quantity']);
+		}
+		if ($catalogItem['quantity_per_pack'] > 1) {
+			$notes[] = 'This is a pack of ' . number_format($catalogItem['quantity_per_pack']);
+		}
+		if ($catalogItem['stock'] < 10) {
+			$notes[] = 'Limited stock';
+		}
+		if (empty($notes)) {
+			return '';
+		} else {
+			return $this->Html->div('catalog-item-notes', 
+				'<ul><li>'.implode('</li><li>', $notes).'</li></ul>'
+			);
+		}
 	}
 	
 	function inventory($qty = 0) {
