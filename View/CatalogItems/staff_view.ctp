@@ -1,15 +1,8 @@
+<?php echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id']); ?>
+<div class="row">
+<div class="span8">
 <?php
-echo $this->element('products/staff_heading', array(
-	'crumbs' => $product['Product']['title'],
-));
-
-echo $this->Html->tag('h1', $product['Product']['title'], array('class' => 'topTitle'));
-echo $this->Layout->headerMenu(array(
-	array('Edit Product', array('action' => 'edit', $product['Product']['id'])),
-	array('Remove Product', array('action' => 'delete', $product['Product']['id']), null, 'Delete this product?')
-));
-echo $this->Html->div('span-16');
-echo $this->Layout->infoResultTable($product['Product'], array(
+echo $this->Layout->infoResultTable($catalogItem['CatalogItem'], array(
 		'title',
 		'short_description',
 		'description',
@@ -18,7 +11,7 @@ echo $this->Layout->infoResultTable($product['Product'], array(
 		'stock' => array(
 			'label' => 'Currently In Stock',
 			'format' => 'number',
-			'url' => array('controller' => 'product_inventories', 'action' => 'view', $product['Product']['id'])
+			'url' => array('controller' => 'products', 'action' => 'index', $catalogItem['CatalogItem']['id'])
 		),
 		'unlimited' => array(
 			'format' => 'yesno',
@@ -34,10 +27,10 @@ echo $this->Layout->infoResultTable($product['Product'], array(
 
 $url = array(
 	'action' => 'shipping_rules',
-	$product['Product']['id']
+	$catalogItem['CatalogItem']['id']
 );
 echo $this->Layout->headingActionMenu('Shipping Rules', array(array('edit', $url)));$this->Table->reset();
-foreach ($product['ProductShippingRule'] as $shippingRule) {
+foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 	$range = !empty($shippingRule['min_quantity']) ? $shippingRule['min_quantity'] : '...';
 	$range .= ' - ' . (!empty($shippingRule['max_quantity']) ? $shippingRule['max_quantity'] : '...');
 	$this->Table->cells(array(
@@ -50,49 +43,61 @@ foreach ($product['ProductShippingRule'] as $shippingRule) {
 	), true);
 }
 echo $this->Table->table();
-echo "<hr/>\n";
-
-echo "</div>\n";
-echo $this->Html->div('span-8 last');
-$url = array(
-	'action' => 'packages',
-	$product['Product']['id']
-);
-echo $this->Layout->headingActionMenu('Product Packages', array(array('edit', $url)));
-$this->Table->reset();
-if (!empty($product['ProductPackageChild'])) {
-	foreach ($product['ProductPackageChild'] as $ProductPackageChild) {
-		$this->Table->cells(array(
-<<<<<<< HEAD
-			array($this->CatalogItem->thumb($ProductPackageChild['ProductChild'], array('dir' => 'thumb', 'url' => $url))),
-=======
-			array($this->Product->thumb($ProductPackageChild['ProductChild'], array('dir' => 'thumb', 'url' => $url))),
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
-			array($this->Html->link($ProductPackageChild['ProductChild']['title'], $url), 'Product'),
-			array($this->Html->link(number_format($ProductPackageChild['quantity']), $url), 'Quantity')
-		), true);
-	}
-	echo $this->Table->table();
-}
-echo "<hr/>\n";
-
-echo $this->Layout->headingActionMenu('Product Images', array('index', 'add'), array('url' => array(
-	'controller' => 'product_images',
-	'action' => 'index',
-	$product['Product']['id']
-)));
-$this->Table->reset();
-foreach ($product['ProductImage'] as $productImage) {
-	$url = array('controller' => 'product_images', 'action' => 'view', $productImage['id']);
-	$this->Table->cells(array(
-<<<<<<< HEAD
-		array($this->CatalogItem->thumb($productImage, array('url' => $url))),
-=======
-		array($this->Product->thumb($productImage, array('url' => $url))),
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
-		array($this->Layout->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url'))),
-	), true);
-}
-echo $this->Table->table(array('class' => 'orderProductsForm'));
-echo "</div>\n";
 ?>
+</div><div class="span4">
+	<div class="content-box">
+	<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>
+		<h2><?php echo $this->Html->link('Packages', $url);?></h2>
+		<?php
+		$this->Table->reset();
+		if (!empty($catalogItem['CatalogItemPackageChild'])) {
+			foreach ($catalogItem['CatalogItemPackageChild'] as $CatalogItemPackageChild) {
+				$this->Table->cells(array(
+					array(
+						$this->CatalogItem->thumb(
+							$CatalogItemPackageChild['CatalogItemChild'], 
+							array('dir' => 'thumb', 'url' => $url)
+						)
+					), array(
+						$this->Html->link(
+							$CatalogItemPackageChild['CatalogItemChild']['title'], 
+							$url
+						), 'CatalogItem'
+					), array(
+						$this->Html->link(
+							number_format($CatalogItemPackageChild['quantity']), 
+							$url
+						), 'Quantity')
+				), true);
+			}
+			echo $this->Table->table();
+		}
+		?>
+	</div>
+	<div class="content-box">
+		<?php echo $this->Layout->headingActionMenu(
+			'Photos', 
+			array('index', 'add'), 
+			array('url' => array(
+				'controller' => 'product_images',
+				'action' => 'index',
+				$catalogItem['CatalogItem']['id']
+			))
+		);
+		$this->Table->reset();
+		foreach ($catalogItem['CatalogItemImage'] as $catalogItemImage) {
+			$url = array('controller' => 'product_images', 'action' => 'view', $catalogItemImage['id']);
+			$this->Table->cells(array(
+				array($this->CatalogItem->thumb(
+					$catalogItemImage, 
+					array('dir' => 'thumb', 'url' => $url)
+				)), array($this->Layout->actionMenu(array(
+					'view', 'edit', 'delete', 'move_up', 'move_down'
+				), compact('url'))),
+			), true);
+		}
+		echo $this->Table->table(array('class' => 'orderCatalogItemsForm'));
+	?>
+	</div>
+</div>
+</div>

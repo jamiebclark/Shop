@@ -2,7 +2,7 @@
 	<div class="span2">
 		<?php echo $this->element('catalog_items/category_list');?>
 	</div>
-	<div class="span6">
+	<div class="span10">
 		<div class="catalog-item-list"><?php
 		echo $this->element('catalog_items/category_path');
 		/*

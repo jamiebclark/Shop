@@ -189,13 +189,13 @@ DROP TABLE IF EXISTS `product_handlings_shop_orders`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `product_handlings_shop_orders` (
   `id` int(11) NOT NULL auto_increment,
-  `product_handling_id` int(11) NOT NULL,
+  `handling_method_id` int(11) NOT NULL,
   `shop_order_id` int(11) NOT NULL,
   `title` varchar(128) default NULL,
   `amt` float(10,2) default NULL,
   `pct` float(10,2) default NULL,
   PRIMARY KEY  (`id`),
-  UNIQUE KEY `product_handling_id` (`product_handling_id`,`shop_order_id`)
+  UNIQUE KEY `handling_method_id` (`handling_method_id`,`shop_order_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4661 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -571,7 +571,7 @@ CREATE TABLE `shop_order_products` (
   `shop_order_id` int(11) NOT NULL,
   `parent_id` int(11) default NULL,
   `product_id` int(11) NOT NULL,
-  `parent_product_id` int(11) default NULL,
+  `parent_catalog_item_id` int(11) default NULL,
   `product_option_choice_id_1` int(11) default NULL,
   `product_option_choice_id_2` int(11) default NULL,
   `product_option_choice_id_3` int(11) default NULL,
@@ -586,7 +586,7 @@ CREATE TABLE `shop_order_products` (
   `cost` float(10,2) default NULL,
   `archived` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `parent_product_id` (`parent_product_id`),
+  KEY `parent_catalog_item_id` (`parent_catalog_item_id`),
   KEY `shop_order_id` (`shop_order_id`),
   KEY `product_id` (`product_id`),
   KEY `parent_shop_order_product_id` (`parent_id`),

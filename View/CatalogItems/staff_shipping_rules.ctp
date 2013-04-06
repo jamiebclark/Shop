@@ -1,16 +1,7 @@
+<h1>Shipping Rules</h1>
 <?php
-echo $this->element('products/staff_heading', array(
-	'crumbs' => array(
-		array($this->request->data['Product']['title'], array('action' => 'view', $this->request->data['Product']['id'])),
-		'Shipping Rules'
-	),
-));
-
-echo $this->Html->tag('h1', 'Shipping Rules');
-//echo $this->Html->tag('p', 'If this product is a grouping of other products in the store, list them below');
-echo $this->Html->div('orderProductsForm');
 echo $this->Form->create();
-echo $this->Form->hidden('Product.id', array('value' => $this->request->data['Product']['id']));
+echo $this->Form->hidden('CatalogItem.id', array('value' => $this->request->data['CatalogItem']['id']));
 
 $min = 5;
 $buffer = 2;
@@ -22,14 +13,13 @@ if (!empty($this->request->data['ProductPackageProduct'])) {
 if ($max < $min) {
 	$max = $min;
 }
-
 $this->Table->reset();
 for ($k = 0; $k <= $max; $k++) {
-	$prefix = 'ProductShippingRule.' . $k . '.';
+	$prefix = 'ShippingRule.' . $k . '.';
 	echo $this->Form->inputs(array(
 		'fieldset' => false,
 		$prefix . 'id' => array('type' => 'hidden'),
-		$prefix . 'product_id' => array('type' => 'hidden', 'value' => $this->request->data['Product']['id']),
+		$prefix . 'catalog_item_id' => array('type' => 'hidden', 'value' => $this->request->data['CatalogItem']['id']),
 	));
 	
 	$this->Table->cells(array(
@@ -60,6 +50,3 @@ for ($k = 0; $k <= $max; $k++) {
 echo $this->Table->table();
 echo $this->FormLayout->submit('Update');
 echo $this->Form->end();
-echo "</div>\n";
-
-?>

@@ -77,12 +77,11 @@ class CatalogItemsController extends ShopAppController {
 		
 		$catalogItem = $this->FormData->findModel($id, null, array(
 			'contain' => array(
-				'CatalogItemOption' => array('ProductOptionChoice'),
 				'CatalogItemPackageChild',
 				'CatalogItemImage',
 			)
 		));
-		$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemOptions($id);
+		$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemList($id);
 		/*
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
 			'CatalogItemImage', 
@@ -157,7 +156,7 @@ class CatalogItemsController extends ShopAppController {
 			'CatalogItemPackageChild' => array(
 				'link' => array(
 					'CatalogItemChild' => array(
-						'class' => 'CatalogItem',
+						'class' => 'Shop.CatalogItem',
 						'conditions' => array(
 							'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
 						)
@@ -165,7 +164,7 @@ class CatalogItemsController extends ShopAppController {
 				)
 			),
 			'CatalogItemImage', 
-			'CatalogItemShippingRule',
+			'ShippingRule',
 			'CatalogItemCategory',
 		));
 		$this->set(compact('catalogItem'));
@@ -192,14 +191,8 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function staff_shipping_rules($id = null) {
-		if (!$this->_saveData()) {
-			$this->request->data = $this->CatalogItem->find('first', array(
-				'contain' => array('CatalogItemShippingRule'),
-				'conditions' => array(
-					'CatalogItem.id' => $id
-				)
-			));
-		}
+		$this->FormData->editData($id, null, array('contain' => array('ShippingRule')));
+		debug($this->request->data);
 		//$this->set('catalogItems', $this->CatalogItem->selectList());
 	}
 

@@ -1,7 +1,4 @@
 <?php
-$this->Asset->css('products');
-$this->Asset->js('product');
-
 //Settings
 if (empty($form)) {
 	$form = false;
@@ -22,21 +19,22 @@ if ($order['Order']['archived']) {
 	$archived = false;
 }
 
-echo $this->Html->div('orderCart ' . ($form ? 'orderForm' : ''));
+echo $this->Html->div('order-cart ' . ($form ? 'order-form' : ''));
 
 if ($form) {
-	echo $this->Form->create('Order');
-	echo $this->Form->hidden('id');
+	echo $this->Form->create('Order', array('action' => 'edit'));
+	echo $this->Form->hidden('id', array('value' => $order['Order']['id']));
 }
 
 $this->Table->reset();
 if (!empty($order['OrderProduct'])) {
 	foreach ($order['OrderProduct'] as $k => $orderProduct) {
+		$catalogItem = $orderProduct['Product']['CatalogItem'];
 		$prefix = 'OrderProduct.' . $k . '.';
 		$hasParent = !empty($orderProduct['ParentProduct']['id']);
 		
-		$productHidden = $orderProduct['Product']['hidden'];
-		$productActive = $orderProduct['Product']['active'];
+		$productHidden = $catalogItem['hidden'];
+		$productActive = $catalogItem['active'];
 		
 		//One last post-fix from moving the old system over
 		$orderProduct['title'] = html_entity_decode($orderProduct['title']);
@@ -44,21 +42,13 @@ if (!empty($order['OrderProduct'])) {
 		
 		//Product
 		if (!$hasParent && !$productHidden && $productActive && $links) {
-<<<<<<< HEAD
-			$url = $this->CatalogItem->url($orderProduct['Product']);
-=======
-			$url = $this->Product->url($orderProduct['Product']);
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
+			$url = $this->CatalogItem->url($catalogItem);
 		} else {
 			$url = null;
 		}
 		$cell = '';
 		if ($images) {
-<<<<<<< HEAD
-			$cell .= $this->CatalogItem->thumb($orderProduct['Product'], array(
-=======
-			$cell .= $this->Product->thumb($orderProduct['Product'], array(
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
+			$cell .= $this->CatalogItem->thumb($catalogItem, array(
 				'url' => $url, 
 				'dir' => 'thumb',
 				'tag' => 'font',
@@ -75,10 +65,6 @@ if (!empty($order['OrderProduct'])) {
 		if ($form) {
 			echo $this->Form->hidden($prefix . 'id');
 			echo $this->Form->hidden($prefix . 'product_id');
-			for ($i = 1; $i <= 4; $i++) {
-				echo $this->Form->hidden($prefix . 'product_option_choice_id_' . $i);
-			}
-			
 			$fieldName = $prefix . 'quantity';
 			if ($hasParent) {
 				$cell = $this->Form->hidden($fieldName) . number_format($orderProduct['quantity']);
@@ -164,44 +150,43 @@ if (!empty($order['OrderProduct'])) {
 	$totals[] = array(
 		'Total',
 		$this->DisplayText->cash($order['Order']['total'], false),
-		array('class' => 'finalTotal')
+		array('class' => 'final')
 	);
 	foreach ($totals as $rowCount => $totalRow) {
 		list($label, $value, $options) = $totalRow + array(null, null, array());
-		$class = Param::keyCheck($options, 'class', false, '');
+		$trOptions = array('class' => 'cart-total');
+		if ($class = Param::keyCheck($options, 'class')) {
+			$trOptions = $this->Html->addClass($trOptions, $class);
+		}
 		if ($rowCount == 0) {
-			$class .= ' topRow';
+			$trOptions = $this->Html->addClass($trOptions, 'topRow'); 
 		}
 		$this->Table->cells(array(
 			array($label,
 				null, null, null, array(
-					'class' => 'cartTotal label ' . $class,
+					'class' => 'total-label' . $class,
 					'colspan' => $colspan,
 				)
 			), array(
 				$value,
 				null, null, null, array(
-					'class' => 'cartTotal value totalColumn ' . $class
+					'class' => 'total' . $class
 				)
 			)
-		), true);
+		), $trOptions);
 	}
-	echo $this->Table->table(array(
-		'blank' => 'Cart is empty'
-	));
+	echo $this->Table->output(array('blank' => 'Cart is empty'));
 } else {
 	echo $this->Html->div('pageMessage',
-		'Your cart is empty. ' . $this->Html->link('Add some stuff to it!', array('controller' => 'products', 'action' => 'index'))
+		'Your cart is empty. ' . $this->Html->link('Add some stuff to it!', array('controller' => 'catalog_items', 'action' => 'index'))
 	);
 }
 if ($form) {
-	echo $this->element('orders/shipping_cutoff_msg');
-
 	echo $this->FormLayout->buttons(array(
 		'Continue Shopping' => array(
 			'class' => 'prev',
 			'url' => array(
-				'controller' => 'products',
+				'controller' => 'catalog_items',
 				'action' => 'index'
 			),
 			'align' => 'left',
@@ -218,18 +203,18 @@ if ($form) {
 	));
 
 	echo $this->Layout->fieldset('Promotional Codes', null, array('class' => 'promos'));
-	echo $this->Form->input('ProductPromosOrder.0.code', array(
+	echo $this->Form->input('PromoCode.0.code', array(
 		'label' => 'Promotional Code',
 		'value' => '',
 		'div' => 'input text promoInput',
 		'after' => $this->FormLayout->submit('Submit', array('div' => false))
 	));
-	if (!empty($this->request->data['ProductPromosOrder'])) {
+	if (!empty($this->request->data['Order']['PromoCode'])) {
 		echo $this->Html->div('promoCodeList');
 		echo 'Currently Using: ';
 		echo $this->Html->tag('span');
-		foreach ($this->request->data['ProductPromosOrder'] as $productPromosOrder) {
-			echo $productPromosOrder['code'] . ' ';
+		foreach ($this->request->data['Order']['PromoCode'] as $promoCode) {
+			echo $promoCode['code'] . ' ';
 		}
 		echo "</span>\n";
 		echo "</div>\n";
@@ -238,4 +223,3 @@ if ($form) {
 	echo $this->Form->end();
 }
 echo "</div>\n";
-?>

@@ -1,38 +1,58 @@
+<style type="text/css">
+tr.negative td {
+	color: red;
+}
+tr.warning td {
+	color: orange;
+}
+tr.positive td {
+	color: green;
+}
+tr.inactive td {
+	color: #CCC;
+}
+</style>
+<h1>Products</h1>
 <?php
-echo $this->element('product_inventories/staff_heading');
-
-if (!empty($product)) {
-	echo $this->Html->tag('h1', $product['Product']['title']);
-} else {
-	echo $this->Html->tag('h1', 'Product Inventory');
-}
-
 $this->Table->reset();
-foreach ($productInventories as $productInventory) {
-	$id = $productInventory['ProductInventory']['id'];
-	$url = array('controller' => 'product_inventories', 'action' => 'view', $id);
-	$active = $productInventory['Product']['active'];
+foreach ($products as $product) {
+	$id = $product['Product']['id'];
+	$qty = $product['Product']['stock'];
 	
-	$title = html_entity_decode($productInventory['Product']['title']);
-	$this->Table->cell($this->Html->link($title, $url, array('class' => $active ? 'active': 'inactive')), 'Product');
-	$i = 0;
-	while(isset($productInventory['ProductOptionChoice' . ++$i])) {
-		$cell = (!empty($productInventory['ProductOptionChoice' . $i]['title'])) ? $productInventory['ProductOptionChoice' . $i]['title'] : '&nbsp;';
-		$this->Table->cell($cell, 'Option ' . $i);
+	$url = array('controller' => 'products', 'action' => 'view', $id);
+	$active = $product['Product']['active'];
+	$title = html_entity_decode($product['Product']['title']);
+	
+	if ($active) {
+		$rowClass = $this->CatalogItem->getInventoryClass($qty);
+	} else {
+		$rowClass = 'inactive';
 	}
-<<<<<<< HEAD
-	$this->Table->cell($this->CatalogItem->inventory($productInventory['ProductInventory']['quantity']), 'Quantity in Stock');
-=======
-	$this->Table->cell($this->Product->inventory($productInventory['ProductInventory']['quantity']), 'Quantity in Stock');
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
-	$this->Table->cell($this->Calendar->niceShort($productInventory['ProductInventory']['modified']), 'Last Updated');
-	$this->Table->cell($this->Layout->actionMenu(array(
-		//'view', 
-		//'edit', 
-		'add' => array('url' => array('controller' => 'product_inventory_adjustments', 'action' => 'add', $id)), 
-		//'delete'
-	), compact('url')), 'Actions');
-	$this->Table->rowEnd();
+	$this->Table->cells(array(
+		array(
+			$this->Html->link(
+				$product['CatalogItem']['title'], 
+				array(
+					'controller' => 'catalog_items', 'aciton' => 'view', $product['CatalogItem']['id']
+				)
+			),
+			'Catalog Item'
+		), array(
+			$this->Html->link($product['Product']['sub_title'], $url, array('class' => 'secondary')),
+			'Product',
+		), 
+		array($this->CatalogItem->inventory($qty), 'Quantity in Stock'), 
+		array($this->Calendar->niceShort($product['Product']['modified']), 'Last Updated'), 
+		array(
+			$this->Layout->actionMenu(array(
+				'add' => array(
+					'url' => array(
+						'controller' => 'product_inventory_adjustments', 'action' => 'add', $id
+					)
+				),
+			), compact('url')),
+			'Actions'
+		)
+	), array('class' => $rowClass));
 }
-echo $this->Table->table(array('paginate'));
-?>
+echo $this->Table->output(array('paginate' => true));

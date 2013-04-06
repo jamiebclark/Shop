@@ -82,14 +82,14 @@ class AppSchema extends CakeSchema {
 	);
 	public $product_handlings_shop_orders = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-		'product_handling_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
+		'handling_method_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
 		'shop_order_id' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'title' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'amt' => array('type' => 'float', 'null' => true, 'default' => null, 'length' => '10,2'),
 		'pct' => array('type' => 'float', 'null' => true, 'default' => null, 'length' => '10,2'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'product_handling_id' => array('column' => array('product_handling_id', 'shop_order_id'), 'unique' => 1)
+			'handling_method_id' => array('column' => array('handling_method_id', 'shop_order_id'), 'unique' => 1)
 		),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
 	);
@@ -251,7 +251,7 @@ class AppSchema extends CakeSchema {
 		'shop_order_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
 		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'product_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-		'parent_product_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
+		'parent_catalog_item_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'product_option_choice_id_1' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'product_option_choice_id_2' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'product_option_choice_id_3' => array('type' => 'integer', 'null' => true, 'default' => null),
@@ -267,7 +267,7 @@ class AppSchema extends CakeSchema {
 		'archived' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'parent_product_id' => array('column' => 'parent_product_id', 'unique' => 0),
+			'parent_catalog_item_id' => array('column' => 'parent_catalog_item_id', 'unique' => 0),
 			'shop_order_id' => array('column' => 'shop_order_id', 'unique' => 0),
 			'product_id' => array('column' => 'product_id', 'unique' => 0),
 			'parent_shop_order_product_id' => array('column' => 'parent_id', 'unique' => 0),

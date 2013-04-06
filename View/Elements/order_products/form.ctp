@@ -10,7 +10,7 @@ echo $this->Form->inputs(array(
 	'id' => array('type' => 'hidden'),
 	'order_id' => array('type' => 'hidden'),
 	'product_id' => array('type' => 'hidden'),
-	'parent_product_id' => array('type' => 'hidden'),
+	'parent_catalog_item_id' => array('type' => 'hidden'),
 	'quantity' => array(
 		'default' => !empty($product['Product']['min_quantity']) ? $product['Product']['min_quantity'] : 1,
 	),

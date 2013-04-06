@@ -157,7 +157,9 @@ class CatalogItem extends ShopAppModel {
 	function findPackageChildren($id) {
 		return $this->CatalogItemPackageChild->CatalogItemChild->find('all', array(
 			'fields' => array('*'),
-			'link' => array(				'Shop.CatalogItemPackageChild' => array('Shop.CatalogItemParent' => array('table' => 'products'))			),
+			'link' => array(				'Shop.CatalogItemPackageChild' => array(
+					'Shop.CatalogItemParent' => array('table' => 'catalog_items')
+				)			),
 			'conditions' => array('CatalogItemParent.id' => $id)
 		));
 	}

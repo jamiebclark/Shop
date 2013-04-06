@@ -67,14 +67,24 @@ class CatalogItemHelper extends AppHelper {
 		}
 	}
 	
-	function inventory($qty = 0) {
-		 return $this->Html->tag(
-			'font', 
-			number_format($qty), 
-			array(
-				'class' => ($qty > 0 ? 'positive' : 'negative') . ' inventory'
-			)
-		);
+	function getInventoryClass($qty, $unlimited = false) {
+		$warning = 10;
+		if ($qty <= 0 && !$unlimited) {
+			$class = 'negative';
+		} else {
+			$class = ($unlimited || $qty > $warning) ? 'positive' : 'warning';
+		}
+		return $class;
+	}
+	
+	function inventory($qty = 0, $unlimited = false) {
+		$out = number_format($qty);
+		if ($unlimited) {
+			$out = 'Unlimited';
+			$qty = 1;
+		}
+		$class = $this->getInventoryClass($qty, $unlimited);
+		return $this->Html->tag('font', $out, compact('class'));
 	}
 	
 	function price($CatalogItem) {

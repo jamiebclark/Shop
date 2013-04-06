@@ -76,7 +76,7 @@
 					'Order.id' => array(
 						'type' => 'hidden'
 					),
-					'OrderProduct.product_id' => array(
+					'OrderProduct.catalog_item_id' => array(
 						'type' => 'hidden', 
 						'value' => $catalogItem['CatalogItem']['id']
 					),
@@ -85,10 +85,7 @@
 						'default' => $loggedUserId
 					),
 				));
-				echo $this->element('catalog_items/product_option_input', array(
-					'blank' => true,
-					'label' => false,
-				));
+				echo $this->element('catalog_item_options/input', array('prefix' => 'OrderProduct.'));
 				echo $this->Form->input('OrderProduct.quantity', array(
 					'default' => !empty($catalogItem['CatalogItem']['min_quantity']) ? $catalogItem['CatalogItem']['min_quantity'] : 1,
 					'class' => 'quantity',

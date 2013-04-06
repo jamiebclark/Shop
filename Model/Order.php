@@ -34,7 +34,13 @@ class Order extends ShopAppModel {
 			'className' => 'Shop.ShippingMethod',
 		),
 	);
-	var $hasAndBelongsToMany = array('Shop.PromoCode', 'Shop.HandlingMethod');
+	var $hasAndBelongsToMany = array(
+		'Shop.PromoCode', 
+		'HandlingMethod' => array(
+			'className' => 'Shop.HandlingMethod',
+			'with' => 'Shop.OrdersHandlingMethod',
+		)
+	);
 
 	var $validate = array(
 		'first_name' => array(
@@ -68,27 +74,26 @@ class Order extends ShopAppModel {
 		$archived = round(!empty($order['Invoice']['paid']) || !empty($order['Order']['shipped']));
 		$this->updateAll(compact('archived'), array($this->alias . '.id' => $this->id));
 		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $this->id));
-		$this->updateProductInventory($this->id);
+		$this->updateProductStock($this->id);
 		
 		return parent::afterSave($created);
 	}
 	
-	function updateProductInventory($id) {
-		$orderProducts = $this->OrderProduct->find('list', array(
+	function updateProductStock($id) {
+		$orderProducts = $this->OrderProduct->find('all', array(
+			'fields' => 'OrderProduct.product_id',
 			'link' => array($this->alias),
-			'conditions' => array(
-				$this->alias . '.id' => $id,
-			)
+			'conditions' => array($this->alias . '.id' => $id),
+			'group' => 'OrderProduct.product_id',
 		));
-		foreach ($orderProducts as $orderProductId => $orderProductTitle) {
-			$this->OrderProduct->updateProductInventory($orderProductId);
+		foreach ($orderProducts as $orderProduct) {
+			$this->OrderProduct->Product->updateStock($orderProduct['OrderProduct']['product_id']);
 		}
 	}
 	
 	function updateTotal($id = null) {
-		$result = $this->findSubTotal($id);
 		//Finds sub-total first
-		$subTotal = !empty($result[0]['sub_total']) ? round($result[0]['sub_total']) : 0;
+		$subTotal = $this->findSubTotal($id);
 
 		$result = $this->read(null, $id);
 		
@@ -162,7 +167,7 @@ class Order extends ShopAppModel {
 		$data = array();
 		foreach ($handlingMethods as $handlingMethod) {
 			$insert = array(
-				'product_handling_id' => $handlingMethod['HandlingMethod']['id'],
+				'handling_method_id' => $handlingMethod['HandlingMethod']['id'],
 				'order_id' => $id,
 				'title' => $handlingMethod['HandlingMethod']['title'],
 				'amt' => $handlingMethod['HandlingMethod']['amt'],
@@ -176,19 +181,18 @@ class Order extends ShopAppModel {
 		return $this->OrdersHandlingMethod->saveAll($data);
 	}
 	
-	function findSubTotal($id = null) {
+	function findSubTotal($id) {
 		$options = array(
 			'fields' => array(
 				'Order.id', 
 				'SUM(OrderProduct.sub_total) AS sub_total',
 			),
+			'conditions' => array('Order.id' => $id),
 			'link' => array('Shop.Order'),
 			'group' => 'Order.id'
 		);
-		if (!empty($id)) {
-			$options['conditions']['Order.id'] = $id;
-		}
-		return $this->OrderProduct->find(!empty($id) ? 'first' : 'all', $options);
+		$result = $this->OrderProduct->find(!empty($id) ? 'first' : 'all', $options);
+		return !empty($result) ? $result[0]['sub_total'] : 0;
 	}
 
 	function findOrder($id) {

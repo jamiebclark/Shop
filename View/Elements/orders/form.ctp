@@ -97,7 +97,7 @@ for ($k = 0; $k <= count($this->request->data['ProductHandlingsOrder']); $k++) {
 		$total = 0;
 	}
 	echo $this->Form->hidden($prefix . 'id');
-	echo $this->Form->hidden($prefix . 'product_handling_id');
+	echo $this->Form->hidden($prefix . 'handling_method_id');
 	$this->Table->cells(array(
 		array($this->Form->input($prefix . 'title', array('label' => false)), 'Title'),
 		array($this->Form->input($prefix . 'amt', array('label' => '$')), 'Amount'),

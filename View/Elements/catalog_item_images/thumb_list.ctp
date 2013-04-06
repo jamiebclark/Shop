@@ -15,7 +15,7 @@ foreach ($catalogItemImages as $catalogItemImage):
 		$catalogItemImage = $catalogItemImage['CatalogItemImage'];
 	}
 	$url = array(
-		'controller' => 'product_images',
+		'controller' => 'catalog_item_images',
 		'action' => 'view',
 		$catalogItemImage['id'],
 	);

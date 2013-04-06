@@ -1,5 +1,5 @@
 <?php
-Configure::write('debug', 2);
+//Configure::write('debug', 0);
 App::import('Lib', 'Shop.Param');
 App::import('Lib', 'Shop.InflectorPlus');
 class ShopAppController extends AppController {
@@ -35,6 +35,9 @@ class ShopAppController extends AppController {
 		if ($redirect !== false) {
 			if ($redirect === true) {
 				$redirect = $this->referer();
+			}
+			if (headers_sent($file, $line)) {
+				throw new Exception("Cannot redirect. Headers were already sent in $file on line $line");
 			}
 			return $this->redirect($redirect);
 		}

@@ -29,13 +29,14 @@ class ShoppingCartComponent extends Component {
 				array(
 					'table' => 'invoices',
 					'alias' => 'Invoice',
+					'type' => 'LEFT',
 					'conditions' => array('Invoice.id = Order.invoice_id'),
 				),
 			),
 			'conditions' => array('Invoice.paid' => null, 'Order.id' => $cartId)
 		));
 		if (empty($shoppingCart)) {
-			$this->unsetCart($cartId);
+			$this->unsetCart();
 			return false;
 		} else {
 			$this->controller->set(compact('shoppingCart'));
@@ -57,8 +58,8 @@ class ShoppingCartComponent extends Component {
 		$this->controller->set('shoppingCartId', $cartId);
 	}
 	
-	function unsetCart($cartId) {
-		$this->controller->Session->delete('ShoppingCart.id', $cartId);
+	function unsetCart() {
+		$this->controller->Session->delete('ShoppingCart.id');
 		$this->controller->set('shoppingCartId', null);
 	}
 }

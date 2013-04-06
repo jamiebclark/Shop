@@ -4,30 +4,45 @@ class OrderProductsController extends ShopAppController {
 	var $components = array('Shop.ShoppingCart',);
 	
 	function add() {
+		$redirect = true;
+		$msg = null;
+		$invalid = array();
 		if (!empty($this->request->data)) {
-			//Checks if item already exists in the cart
-			$this->OrderProduct->quantityExists($this->request->data);
+			//Finds Product ID
+			if (!$this->OrderProduct->setProductIdFromData($this->request->data)) {
+				$invalid['quanitity'] = 'Please select all product options';
+			} else {			
+				//Checks if product already exists in the cart
+				$this->OrderProduct->quantityExists($this->request->data);
+				$this->OrderProduct->Order->validate = array();
+			}
 			
-			$this->OrderProduct->Order->validate = array();
-			if (!$this->OrderProduct->saveAll($this->request->data)) {
+			if (!empty($invalid) || !$this->OrderProduct->saveAll($this->request->data)) {
 				//$this->PersistValidation->store('OrderProduct');
-				$this->_redirectMsg(true, 'Sorry, there was an error adding the product to your order');
+				$msg = 'Sorry, there was an error adding the product to your order';
+				foreach ($invalid as $key => $errorMsg) {
+					$this->OrderProduct->invalidate($key, $errorMsg);
+				}
+				debug($this->OrderProduct->invalidFields());
 			} else {
 				$order = $this->OrderProduct->Order->find('first', array(
 					'link' => array('Shop.OrderProduct'),
 					'conditions' => array('OrderProduct.id' => $this->OrderProduct->id)
 				));
+				
 				$this->ShoppingCart->setCart($order['Order']['id']);
 				//return true;
-				$this->_redirectMsg(array(
+				$redirect = array(
 					'controller' => 'orders',
 					'action' => 'view',
 					$order['Order']['id']
-				));
+				);
 			}
 		} else {
 			$this->_redirectMsg(array('controller' => 'products', 'action' => 'index'));
 		}
+		//debug(compact('redirect', 'msg'));
+		$this->_redirectMsg($redirect, $msg);
 	}
 	
 	//Removes an item from a cart

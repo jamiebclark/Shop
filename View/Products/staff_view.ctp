@@ -1,52 +1,27 @@
 <?php
-echo $this->element('product_inventories/staff_heading');
-echo $this->Html->tag('h1', 'Product Inventory');
-echo $this->Layout->headerMenu(array(
-	array('Add More Inventory', array(
+echo $this->Layout->defaultHeader($product['Product']['id'],array(
+	array('Add More Stock', array(
 		'controller' => 'product_inventory_adjustments', 
 		'action' => 'add', 
-		$productInventory['ProductInventory']['id']
+		$product['Product']['id']
 	))
 ));
 
 $info = array(
-<<<<<<< HEAD
-	'Product' => $this->CatalogItem->link($productInventory['Product']),
-=======
-	'Product' => $this->Product->link($productInventory['Product']),
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
+	'Catalog Item' => $this->CatalogItem->link($product['CatalogItem']),
+	'Options' => $product['Product']['sub_title'],
 );
-$i = 0;
-while(isset($productInventory['ProductOptionChoice' . ++$i]['id'])) {
-	$info['Option ' . $i] = $productInventory['ProductOptionChoice' . $i]['title'];
-}
-<<<<<<< HEAD
-$info['Total Stock'] = $this->CatalogItem->inventory($productInventory['ProductInventory']['quantity']);
-=======
-$info['Total Stock'] = $this->Product->inventory($productInventory['ProductInventory']['quantity']);
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
+$info['Total Stock'] = $this->CatalogItem->inventory($product['Product']['stock']);
 
-if (!empty($productInventories)) {
+if (!empty($products)) {
 	$list = array();
-	foreach ($productInventories as $inventory) {
-		$title = '';
-		$i = 0;
-		while(isset($inventory['ProductOptionChoice' . ++$i]['id'])) {
-			if (!empty($title)) {
-				$title .= ', ';
-			}
-			$title .= $inventory['ProductOptionChoice' . $i]['title'];
-		}
-		if (empty($title)) {
-			$title = $this->Html->tag('em', 'No option');
-		}
-		$title .= '(' . number_format($inventory['ProductInventory']['quantity']) . ')';
-		
-		$class = $inventory['ProductInventory']['id'] == $productInventory['ProductInventory']['id'] ? 'selected' : false;
-		
+	foreach ($products as $product) {
+		$title = $product['Product']['title'];
+		$title .= ' (' . number_format($product['Product']['stock']) . ')';
+		$class = $product['Product']['id'] == $product['Product']['id'] ? 'selected' : false;
 		$list[] = array(
 			$title, 
-			array('action' => 'view', $inventory['ProductInventory']['id']), 
+			array('action' => 'view', $product['Product']['id']), 
 			array('escape' => false, 'class' => $class)
 		);
 	}
@@ -64,14 +39,9 @@ foreach ($productInventoryAdjustments as $productInventoryAdjustment) {
 	);
 	$this->Table->cells(array(
 		array($this->Calendar->niceShort($productInventoryAdjustment['ProductInventoryAdjustment']['available']), 'Date Added'),
-<<<<<<< HEAD
 		array($this->CatalogItem->inventory($productInventoryAdjustment['ProductInventoryAdjustment']['quantity']), 'Amount'),
-=======
-		array($this->Product->inventory($productInventoryAdjustment['ProductInventoryAdjustment']['quantity']), 'Amount'),
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 		array($productInventoryAdjustment['ProductInventoryAdjustment']['title'], 'Description'),
 		array($this->Layout->actionMenu(array('edit', 'delete'), compact('url')), 'Actions'),
 	), true);
 }
 echo $this->Table->table(array('paginate'));
-?>

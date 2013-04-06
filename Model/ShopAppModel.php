@@ -26,11 +26,11 @@ class ShopAppModel extends AppModel {
 	
 	function &getData() {
 		$data = null;
-		if (isset($this->request->data)) {
-			if (isset($this->request->data[$this->alias])) {
-				$data =& $this->request->data[$this->alias];
+		if (isset($this->data)) {
+			if (isset($this->data[$this->alias])) {
+				$data =& $this->data[$this->alias];
 			} else {
-				$data =& $this->request->data;
+				$data =& $this->data;
 			}
 		}
 		return $data;

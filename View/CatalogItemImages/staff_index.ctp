@@ -1,6 +1,4 @@
 <?php
-echo $this->element('product_images/staff_heading');
-
 echo $this->Html->tag('h1', 'Product Images');
 echo $this->Layout->headerMenu(array(
 	array('Add a new image', array('action' => 'add')),
@@ -14,11 +12,7 @@ foreach ($productImages as $productImage) {
 	);
 	$this->Table->cells(array(
 		array(
-<<<<<<< HEAD
 			$this->CatalogItem->thumb($productImage['Product'], array(
-=======
-			$this->Product->thumb($productImage['Product'], array(
->>>>>>> 7f1010ba1dfec77e6fe69120dbda39b9bea5eb76
 				'dir' => 'thumb', 
 				'url' => $url
 			)),
@@ -36,4 +30,3 @@ foreach ($productImages as $productImage) {
 	), true);
 }
 echo $this->Table->table(array('paginate'));
-?>
