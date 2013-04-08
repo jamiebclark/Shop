@@ -1,34 +1,47 @@
 <?php
-$add = !$this->Html->value('ProductPromo.id');
-if ($add) {
-	$crumbs = array(
-		'Add Promo',
-	);
-} else {
-	$crumbs = array(
-		array($this->Html->value('ProductPromo.title'), array('action' => 'view', $this->Html->value('ProductPromo.id'))),
-		'Edit Promo',
-	);
-}
-
+$year = date('Y') + 1;
 $dateOptions = array(
-	'minYear' => REGISTER_YEAR - 30,
-	'maxYear' => REGISTER_YEAR,
+	'minYear' => $year - 30,
+	'maxYear' => $year,
 	'empty' => true,
 );
 
-echo $this->Form->create('ProductPromo');
+echo $this->Form->create('PromoCode');
 echo $this->Form->inputs(array(
-	'legend' => 'Handling Charge',
+	'legend' => 'Promo Code',
 	'id',
-	'title',
-	'code' => array('label' => 'Promo Code'),
-	'pct' => array('label' => 'Discount Percent'),
-	'amt' => array('label' => 'Discount Amount $'),
-	'started' => $dateOptions,
-	'stopped' => $dateOptions,
-	'active' => array('default' => 1),
+	'title' => array(
+		'helpBlock' => 'An internal name (i.e. "Spring sale" or "Weekend Clearance")',
+	),
+	'code' => array(
+		'label' => 'Promo Code',
+		'helpBlock' => 'The code users will enter.',
+	),
+	'pct' => array(
+		'label' => 'Discount Percent',
+		'append' => '%',
+		'helpBlock' => 'Percentage the total will be reduced',
+		'step' => 'any',
+	),
+	'amt' => array(
+		'label' => 'Discount Amount',
+		'prepend' => '$',
+		'helpBlock' => 'Flat rate the total will be reduced',
+		'step' => 'any',
+	),
+	'started' => $dateOptions + array(
+		'helpBlock' => 'When this promo will start going into effect (blank for right now)',
+		'type' => 'text',
+		'class' => 'datetimepicker',
+	),
+	'stopped' => $dateOptions + array(
+		'helpBlock' => 'When this promo will stop (blank for always on)',
+		'type' => 'text',
+		'class' => 'datepicker',
+	),
+	'active' => array(
+		'label' => 'Active',
+		'helpBlock' => 'Is this promo code be usable now?',
+	),
 ));
-echo $this->FormLayout->submit($add ? 'Add New Promotion' : 'Update Promotion');
-echo $this->Form->end();
-?>
+echo $this->Form->end('Submit');

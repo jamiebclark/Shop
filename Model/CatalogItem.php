@@ -37,11 +37,22 @@ class CatalogItem extends ShopAppModel {
 	);
 	var $hasAndBelongsToMany = array('Shop.CatalogItemCategory');
 	
+	var $validate = array(
+		'title' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please give your item a title',
+		),
+		'price' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please enter a price for the item',
+		)
+	);
+	
 	function afterSave($created) {
 		$id = $this->id;
 		$this->createProducts($id);
 		$this->updateProductTitles($id);
-		$this->read($id);
+		$this->read(null, $id);
 		return parent::afterSave($created);	
 	}
 	

@@ -70,9 +70,9 @@ class CatalogItemHelper extends AppHelper {
 	function getInventoryClass($qty, $unlimited = false) {
 		$warning = 10;
 		if ($qty <= 0 && !$unlimited) {
-			$class = 'negative';
+			$class = 'error';
 		} else {
-			$class = ($unlimited || $qty > $warning) ? 'positive' : 'warning';
+			$class = ($unlimited || $qty > $warning) ? 'success' : 'warning';
 		}
 		return $class;
 	}
@@ -84,7 +84,11 @@ class CatalogItemHelper extends AppHelper {
 			$qty = 1;
 		}
 		$class = $this->getInventoryClass($qty, $unlimited);
-		return $this->Html->tag('font', $out, compact('class'));
+		if ($class == 'error') {
+			$class = 'important';
+		}
+		$class = 'label label-' . $class;
+		return $this->Html->tag('span', $out, compact('class'));
 	}
 	
 	function price($CatalogItem) {

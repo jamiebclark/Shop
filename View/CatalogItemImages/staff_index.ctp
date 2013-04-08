@@ -1,32 +1,26 @@
 <?php
-echo $this->Html->tag('h1', 'Product Images');
-echo $this->Layout->headerMenu(array(
-	array('Add a new image', array('action' => 'add')),
-));
-
+echo $this->Layout->defaultHeader();
 $this->Table->reset();
-foreach ($productImages as $productImage) {
-	$url = array(
-		'action' => 'view',
-		$productImage['ProductImage']['id'],
-	);
+foreach ($catalogItemImages as $catalogItemImage) {
+	$url = array('action' => 'view', $catalogItemImage['CatalogItemImage']['id']);
 	$this->Table->cells(array(
 		array(
-			$this->CatalogItem->thumb($productImage['Product'], array(
-				'dir' => 'thumb', 
-				'url' => $url
-			)),
-			'Image',
-			null,
-			null,
-			array('width' => 40)
+			$this->CatalogItem->thumb($catalogItemImage['CatalogItem'], array(
+				'dir' => 'thumb', 'url' => $url
+			)), 'Image', array('width' => 40)
 		), array(
-			$this->Html->link($productImage['Product']['title'], $url, array('class' => 'secondary')),
-			'Product',
+			$this->Html->link($catalogItemImage['CatalogItem']['title'], 
+				array(
+					'controller' => 'catalog_items', 
+					'action' => 'view', 
+					$catalogItemImage['CatalogItem']['id']
+				), array('class' => 'secondary')),
+			'Catalog Item',
 		), array(
 			$this->Layout->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url')),
 			'Actions',
 		)
 	), true);
 }
-echo $this->Table->table(array('paginate'));
+echo $this->Table->output(array('paginate' => true));
+echo $this->Paginator->pagination();

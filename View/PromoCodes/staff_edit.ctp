@@ -1,3 +1,2 @@
 <?php
-echo $this->element('product_promos/form');
-?>
+echo $this->element('promo_codes/form');

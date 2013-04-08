@@ -2,7 +2,7 @@
 $title = 'Payment Information';
 $info = array();
 if (!empty($order['Invoice']['addline1'])) {
-	$info['Billing Address'] = $this->Contact->location($order['Invoice'], array('beforeField' => array('name')));
+	$info['Billing Address'] = $this->AddressBook->location($order['Invoice'], array('beforeField' => array('name')));
 } else {
 	$info['Billing Address'] = $this->Html->link('<em>Not set yet</em>', array(
 		'controller' => 'orders',
@@ -20,4 +20,3 @@ if (!empty($order['Invoice']['paid'])) {
 	), array('escape' => false));
 }
 echo $this->element('orders/status', compact('info', 'blank', 'title', 'mode', 'tag'));
-?>

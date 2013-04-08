@@ -65,7 +65,6 @@ class OrderProduct extends ShopAppModel {
 		if (empty($data['product_id'])) {
 			if (!empty($data['catalog_item_id'])) {
 				if (!$this->setProductIdFromData($data)) {
-					debug($data);
 					$this->invalidate('product_id', 'Please select all options');
 					return false;
 				}
@@ -80,7 +79,6 @@ class OrderProduct extends ShopAppModel {
 			$this->packageChild = $data['PackageChild'];
 		}
 		
-
 		$inventoryConditions = array();
 		$catalogItem = $this->Product->findCatalogItem($data['product_id']);
 		if (!empty($catalogItem)) {
@@ -153,7 +151,6 @@ class OrderProduct extends ShopAppModel {
 				$this->updateShipping($id);
 			}
 		}
-
 		$this->updateProductStock($id);
 		$this->updatePackageChildren($id);
 		$this->updateTotal($id);
@@ -203,7 +200,7 @@ class OrderProduct extends ShopAppModel {
 			$price = $result['CatalogItem']['price'];
 		}
 		$this->create();
-		return $this->save(compact('id', 'title', 'price', 'cost'), array('callbacks' => false));
+		return $this->save(compact('id', 'title', 'price', 'cost'), array('callbacks' => false, 'validate' => false));
 	}
 	
 	function updateShipping($id = null) {
@@ -254,7 +251,7 @@ class OrderProduct extends ShopAppModel {
 			'link' => array('Shop.Order'),
 			'conditions' => array(
 				$this->alias . '.product_id' => $productId,
-				'Order.cancelled' => 0,
+				'Order.canceled' => 0,
 				'Order.archived' => 1,
 			)
 		));
@@ -303,8 +300,6 @@ class OrderProduct extends ShopAppModel {
 			'link' => array('Shop.Product' => array('Shop.CatalogItem')),
 			'conditions' => array($this->alias . '.id' => $id),
 		));
-		debug(compact('id', 'result'));
-		
 		$quantity = $result[$this->alias]['quantity'];
 
 		//Finds any children already in the order

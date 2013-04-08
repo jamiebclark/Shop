@@ -4,12 +4,8 @@ class InvoiceHelper extends AppHelper {
 	var $helpers = array(
 		'Layout.Asset',		'Html',		'Form', 		'Layout.Layout', 		'Shop.PaypalForm', 		'Layout.FormLayout'	);
 	
-	var $companyName = 'Souper Bowl of Caring';
-	var $mailingAddress = array(
-		'Souper Bowl of Caring',
-		'PO Box 23224',
-		'Columbia, SC 29224'
-	);
+	var $companyName = COMPANY_NAME;
+	var $mailingAddress = COMPANY_ADDRESS;
 	
 	function beforeRender($viewFile) {
 		$this->Asset->css('development');
@@ -119,6 +115,7 @@ class InvoiceHelper extends AppHelper {
 		} 
 		return $output;
 	}
+	
 	function paypalFormClose() {
 		return $this->PaypalForm->end();
 	}
@@ -148,7 +145,7 @@ class InvoiceHelper extends AppHelper {
 	}
 	
 	function getMailingAddress() {
-		return implode("<br/>\n", $this->mailingAddress);
+		return $this->mailingAddress;
 	}
 	
 	function paymentForm($Invoice, $options = array()) {
@@ -172,39 +169,31 @@ class InvoiceHelper extends AppHelper {
 		
 		if (!empty($paypal)) {
 			$payments[] = array(
-				'title' => 'Pay with Credit Card / Paypal',
-				'action' => $paypalButton,
-				'description' => 'Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment ',
+				'Pay with Credit Card / Paypal',
+				$paypalButton,
+				'Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment ',
 			);
 		}
-
 		if (!empty($check)) {
 			$payments[] = array(
-				'title' => 'Pay by Check',
-				'action' => $this->Html->div(
+				'Pay by Check',
+				$this->Html->div(
 					'mailingAddress', 
 					$this->Html->tag('h4', 'Mail to:') . $this->getMailingAddress()
 				),
-				'description' => $this->checkPaymentSteps($Invoice),
+				$this->checkPaymentSteps($Invoice),
 			);
 		}
-
 		//Begin Output
-		$output = $this->Html->div('invoicePayments');
+		$out = '';
 		foreach ($payments as $k => $payment) {
-			$output .= $this->Html->div('invoicePayment');
-			$output .= $this->Html->tag('h3', $payment['title']);
-			$output .= $this->Html->div('invoicePaymentWrapper');
-
-			$output .= $this->Html->div('paymentAction', $payment['action']);
-			$output .= $this->Html->div('paymentInfo', $payment['description']);
-			
-			$output .= $this->Layout->clearFix();
-			
-			$output .= "</div>\n";
-			$output .= "</div>\n";
+			list($title, $action, $info) = $payment + array(null, null, null);
+			$out .= $this->Html->div('invoice-payment',
+				$this->Html->tag('h3', $title) . $this->Html->div('invoice-payment-wrap',
+					$this->Html->div('action', $action) . $this->Html->div('info', $info)
+				)
+			);
 		}
-		$output .= "</div>\n";
-		return $output;
+		return $this->Html->div('invoice-payments', $out);;
 	}
 }

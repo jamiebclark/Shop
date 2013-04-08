@@ -1,11 +1,12 @@
 <?php
 class ProductsController extends ShopAppController {
 	var $name = 'Products';
+	var $components = array('Layout.Activate');
 	
 	function staff_index($catalogItemId = null) {
 		$this->paginate = array(
 			'fields' => '*',
-			'recursive' => 1,
+			'recursive' => 0,
 			'order' => array(
 				'Product.active DESC', 'Product.title', 'Product.id', 'ProductOptionChoice1.id'
 			),

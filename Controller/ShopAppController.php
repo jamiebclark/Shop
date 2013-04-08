@@ -2,6 +2,9 @@
 //Configure::write('debug', 0);
 App::import('Lib', 'Shop.Param');
 App::import('Lib', 'Shop.InflectorPlus');
+
+require_once '../Config/core.php';
+
 class ShopAppController extends AppController {
 	var $components = array(
 		'FormData.FormData' => array('plugin' => 'Shop'),
@@ -26,6 +29,10 @@ class ShopAppController extends AppController {
 		$loggedUserId = 1;
 		$isShopAdmin = true;
 		$this->set(compact('loggedUserId', 'isShopAdmin'));
+		
+		if (!empty($this->request->params['prefix'])) {
+			$this->layout = 'admin';
+		}
 	}
 	
 	function _redirectMsg($redirect = true, $msg = null) {

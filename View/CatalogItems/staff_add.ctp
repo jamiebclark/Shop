@@ -1,6 +1,2 @@
 <?php
-echo $this->element('products/staff_heading', array(
-	'crumbs' => 'Add Product',
-));
-echo $this->element('products/form');
-?>
+echo $this->element('catalog_items/form');

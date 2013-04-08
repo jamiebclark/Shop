@@ -18,16 +18,15 @@ if ($order['Order']['archived']) {
 } else {
 	$archived = false;
 }
-
-echo $this->Html->div('order-cart ' . ($form ? 'order-form' : ''));
-
+?>
+<div class="order-cart <?php echo ($form ? 'order-form' : '');?>">
+<?php
 if ($form) {
 	echo $this->Form->create('Order', array('action' => 'edit'));
 	echo $this->Form->hidden('id', array('value' => $order['Order']['id']));
 }
-
 $this->Table->reset();
-if (!empty($order['OrderProduct'])) {
+if (!empty($order['OrderProduct'])):
 	foreach ($order['OrderProduct'] as $k => $orderProduct) {
 		$catalogItem = $orderProduct['Product']['CatalogItem'];
 		$prefix = 'OrderProduct.' . $k . '.';
@@ -176,50 +175,43 @@ if (!empty($order['OrderProduct'])) {
 		), $trOptions);
 	}
 	echo $this->Table->output(array('blank' => 'Cart is empty'));
-} else {
-	echo $this->Html->div('pageMessage',
-		'Your cart is empty. ' . $this->Html->link('Add some stuff to it!', array('controller' => 'catalog_items', 'action' => 'index'))
-	);
-}
-if ($form) {
-	echo $this->FormLayout->buttons(array(
-		'Continue Shopping' => array(
-			'class' => 'prev',
-			'url' => array(
-				'controller' => 'catalog_items',
-				'action' => 'index'
-			),
-			'align' => 'left',
-		),
-		'Checkout' => array(
-			'name' => 'checkout',
-			'class' => 'next',
-			'img' => 'icn/16x16/cart_go.png',
-			'disabled' => $order['Order']['total'] <= 0,
-			'align' => 'right',
-		)
-	), array(
-		'secondary' => false,
-	));
+else: ?>
+	<span class="message">
+	Your cart is empty. <?php echo $this->Html->link('Add some stuff to it!', array('controller' => 'catalog_items', 'action' => 'index'));?>
+	</span>
+<?php
+endif;
 
-	echo $this->Layout->fieldset('Promotional Codes', null, array('class' => 'promos'));
+if ($form):
+	echo $this->FormLayout->buttons(array(
+		'Checkout' => array(
+			'class' => 'btn btn-primary',
+			'name' => 'checkout',
+		),
+		'Continue Shopping' => array(
+			'url' => array('controller' => 'catalog_items', 'action' => 'index'),
+			'class' => 'btn',
+		)
+	));
+	?>
+	<fieldset><legend>Promotional Codes</legend>
+	<?php 
 	echo $this->Form->input('PromoCode.0.code', array(
 		'label' => 'Promotional Code',
 		'value' => '',
 		'div' => 'input text promoInput',
 		'after' => $this->FormLayout->submit('Submit', array('div' => false))
 	));
-	if (!empty($this->request->data['Order']['PromoCode'])) {
-		echo $this->Html->div('promoCodeList');
-		echo 'Currently Using: ';
-		echo $this->Html->tag('span');
+	if (!empty($this->request->data['Order']['PromoCode'])): ?>
+		<div class="promo-code-list">
+			Currently Using: <span><?php
 		foreach ($this->request->data['Order']['PromoCode'] as $promoCode) {
 			echo $promoCode['code'] . ' ';
-		}
-		echo "</span>\n";
-		echo "</div>\n";
-	}
-	echo "</fieldset>\n";
+		}?></span>
+		</div>
+	<?php endif; ?>
+	</fieldset><?php
 	echo $this->Form->end();
-}
-echo "</div>\n";
+endif;
+?>
+</div>

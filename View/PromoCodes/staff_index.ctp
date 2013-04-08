@@ -1,29 +1,23 @@
 <?php
-echo $this->element('product_promos/staff_heading');
-echo $this->Html->tag('h1', 'Promotional Codes');
-echo $this->Layout->headerMenu(array(
-	array('Add New Promo', array('action' => 'add'))
-));
-
-$this->Table->reset();
-foreach ($productPromos as $productPromo) {
+echo $this->Layout->defaultHeader();
+foreach ($promoCodes as $promoCode) {
 	$url = array(
-		'controller' => 'product_promos',
+		'controller' => 'promo_codes',
 		'action' => 'view',
-		$productPromo['ProductPromo']['id'],
+		$promoCode['PromoCode']['id'],
 	);
-	$active = $productPromo['ProductPromo']['active'];
+	$active = $promoCode['PromoCode']['active'];
 	
-	$past = !empty($productPromo['ProductPromo']['stopped']) && ($productPromo['ProductPromo']['stopped'] < date('Y-m-d H:i:s'));
+	$past = !empty($promoCode['PromoCode']['stopped']) && ($promoCode['PromoCode']['stopped'] < date('Y-m-d H:i:s'));
 	$class = $active && !$past ? 'active' : 'inactive';
 	
 	$this->Table->cells(array(
-		array($this->Html->link($productPromo['ProductPromo']['title'],$url, compact('class')), 'Title'),
-		array($productPromo['ProductPromo']['code'], 'Code'),
-		array(($productPromo['ProductPromo']['pct'] * 100) . '%', 'Percent'),
-		array($this->DisplayText->cash($productPromo['ProductPromo']['amt']), 'Amount'),
-		array($this->Calendar->niceShort($productPromo['ProductPromo']['started']), 'Starts'),
-		array($this->Calendar->niceShort($productPromo['ProductPromo']['stopped']), 'Ends'),
+		array($this->Html->link($promoCode['PromoCode']['title'],$url), 'Title'),
+		array($promoCode['PromoCode']['code'], 'Code'),
+		array(($promoCode['PromoCode']['pct'] * 100) . '%', 'Percent'),
+		array($this->DisplayText->cash($promoCode['PromoCode']['amt']), 'Amount'),
+		array($this->Calendar->niceShort($promoCode['PromoCode']['started']), 'Starts'),
+		array($this->Calendar->niceShort($promoCode['PromoCode']['stopped']), 'Ends'),
 		array(
 			$this->Layout->actionMenu(array('view', 'edit', 'delete', 'active'), compact('url', 'active')), 
 			'Actions',
@@ -31,7 +25,6 @@ foreach ($productPromos as $productPromo) {
 			null,
 			array('width' => 120)
 		),
-	), true);
+	), compact('class'));
 }
-echo $this->Table->table(array('paginate'));
-?>
+echo $this->Table->output(array('paginate' => true));

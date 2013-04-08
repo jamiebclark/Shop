@@ -22,7 +22,10 @@ if (!empty($catalogItemCategories)) {
 			array('action' => 'index', $id)
 		);
 	}
-	echo $this->Layout->menu($list, array('class' => 'blankList secondary'));
+	echo $this->Layout->menu($list, array(
+		'tag' => false,
+		'class' => 'nav nav-pills nav-stacked'
+	));
 } else {
 	echo $this->Html->tag('em', 'No Categories');
 }

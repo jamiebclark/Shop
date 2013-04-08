@@ -5,10 +5,13 @@ foreach ($catalogItems as $catalogItem) {
 	$url = array('action' => 'view', $catalogItem['CatalogItem']['id']);
 	$active = $catalogItem['CatalogItem']['active'];
 	$this->Table->cells(array(
-		array($this->CatalogItem->thumb($catalogItem['CatalogItem'], compact('url', 'dir')), null, null, null, array('width' => 80)),
-		array($this->CatalogItem->link($catalogItem['CatalogItem'], compact('url'))),
-		array($this->DisplayText->positiveNumber($catalogItem['CatalogItem']['stock']), 'In Stock'),
+		array(
+			$this->CatalogItem->thumb($catalogItem['CatalogItem'], compact('url', 'dir')), 
+			array('width' => 80)
+		), array($this->CatalogItem->link($catalogItem['CatalogItem'], compact('url')),
+			'Catalog Item'
+		), array($this->CatalogItem->inventory($catalogItem['CatalogItem']['stock']), 'Stock'),
 		array($this->Layout->actionMenu(array('view', 'edit', 'active', 'delete'), compact('url', 'active')), 'Actions')
-	), true);
+	), array('class' => $active ? null : 'inactive'));
 }
-echo $this->Table->table(array('paginate' => true));	
+echo $this->Table->output(array('paginate' => true));	

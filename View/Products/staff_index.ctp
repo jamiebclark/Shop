@@ -1,17 +1,3 @@
-<style type="text/css">
-tr.negative td {
-	color: red;
-}
-tr.warning td {
-	color: orange;
-}
-tr.positive td {
-	color: green;
-}
-tr.inactive td {
-	color: #CCC;
-}
-</style>
 <h1>Products</h1>
 <?php
 $this->Table->reset();
@@ -22,7 +8,6 @@ foreach ($products as $product) {
 	$url = array('controller' => 'products', 'action' => 'view', $id);
 	$active = $product['Product']['active'];
 	$title = html_entity_decode($product['Product']['title']);
-	
 	if ($active) {
 		$rowClass = $this->CatalogItem->getInventoryClass($qty);
 	} else {
@@ -45,12 +30,13 @@ foreach ($products as $product) {
 		array($this->Calendar->niceShort($product['Product']['modified']), 'Last Updated'), 
 		array(
 			$this->Layout->actionMenu(array(
+				'active',
 				'add' => array(
 					'url' => array(
 						'controller' => 'product_inventory_adjustments', 'action' => 'add', $id
 					)
 				),
-			), compact('url')),
+			), compact('url', 'active')),
 			'Actions'
 		)
 	), array('class' => $rowClass));

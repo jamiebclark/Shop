@@ -1,23 +1,19 @@
 <?php
-echo $this->element('product_handlings/staff_heading');
-echo $this->Html->tag('h1', 'Handling Charges');
-echo $this->Layout->headerMenu(array(
-	array('Add New Charge', array('action' => 'add'))
-));
+echo $this->Layout->defaultHeader();
 $this->Table->reset();
-foreach ($productHandlings as $productHandling) {
+foreach ($handlingMethods as $handlingMethod) {
 	$url = array(
-		'controller' => 'product_handlings',
+		'controller' => 'handling_methods',
 		'action' => 'view',
-		$productHandling['ProductHandling']['id'],
+		$handlingMethod['HandlingMethod']['id'],
 	);
-	$active = $productHandling['ProductHandling']['active'];
+	$active = $handlingMethod['HandlingMethod']['active'];
 	$class = $active ? 'active' : 'inactive';
 	
 	$this->Table->cells(array(
-		array($this->Html->link($productHandling['ProductHandling']['title'],$url, compact('class')), 'Title'),
-		array(($productHandling['ProductHandling']['pct'] * 100) . '%', 'Percent'),
-		array($this->DisplayText->cash($productHandling['ProductHandling']['amt']), 'Amount'),
+		array($this->Html->link($handlingMethod['HandlingMethod']['title'],$url), 'Title'),
+		array(($handlingMethod['HandlingMethod']['pct'] * 100) . '%', 'Percent'),
+		array($this->DisplayText->cash($handlingMethod['HandlingMethod']['amt']), 'Amount'),
 		array(
 			$this->Layout->actionMenu(array('view', 'edit', 'delete', 'active'), compact('url', 'active')), 
 			'Actions',
@@ -25,7 +21,7 @@ foreach ($productHandlings as $productHandling) {
 			null,
 			array('width' => 120)
 		),
-	), true);
+	), compact('class'));
 }
-echo $this->Table->table(array('paginate'));
+echo $this->Table->output(array('paginate' => true));
 ?>

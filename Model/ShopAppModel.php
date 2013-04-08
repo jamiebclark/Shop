@@ -4,8 +4,11 @@ class ShopAppModel extends AppModel {
 		'Containable',
 		'Shop.Linkable',
 		'Shop.PostContain',
+		'Shop.DateValidate',
 	);
 
+	var $recursive = 0;
+	
 	function __construct($id = false, $table = null, $ds = null) {
 		parent::__construct($id, $table, $ds);
 		$aliasFields = array('order', 'virtualFields');

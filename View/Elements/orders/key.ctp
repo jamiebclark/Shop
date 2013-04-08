@@ -4,25 +4,24 @@ $keys = array(
 	'Paid' => array(0, 1),
 	'Shipped Not Paid' => array(1, 0),
 	'Shipped and Paid' => array(1, 1),
-	'Cancelled' => false
+	'Canceled' => false
 );
 $this->Table->reset();
 $cells = array();
+$width = round(100 / count($keys)) . '%';
 foreach ($keys as $label => $key) {
+	$class = 'order';
 	if (is_array($key)) {
-		$cancelled = 0;
+		$canceled = 0;
 		list($shipped, $paid) = $key;
-		$class = ($shipped ? 'shipped' : 'notShipped') . ($paid ? 'Paid' : 'NotPaid');
+		$class .= ($shipped ? '-shipped' : '-not-shipped') . ($paid ? '-paid' : '-not-paid');
 	} else {
-		$cancelled = true;
+		$canceled = true;
 		list($shipped, $paid) = array(false, false);
-		$class = 'cancelled';
+		$class .= '-canceled';
 	}
-	$url = compact('shipped', 'paid', 'cancelled');
-	$width = round(100 / count($keys)) . '%';
-	$cells[] = array($this->Html->link($label, $url), null, null, null, compact('class', 'width'));
+	$url = compact('shipped', 'paid', 'canceled');
+	$cells[] = array($this->Html->link($label, $url), compact('class', 'width'));
 }
-
 $this->Table->cells($cells, true);
-echo $this->Table->table(array('class' => 'orders key'));
-?>
+echo $this->Table->output(array('class' => 'orders key'));

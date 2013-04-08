@@ -79,14 +79,14 @@ echo $this->Table->table();
 			'Photos', 
 			array('index', 'add'), 
 			array('url' => array(
-				'controller' => 'product_images',
+				'controller' => 'catalog_item_images',
 				'action' => 'index',
 				$catalogItem['CatalogItem']['id']
 			))
 		);
 		$this->Table->reset();
 		foreach ($catalogItem['CatalogItemImage'] as $catalogItemImage) {
-			$url = array('controller' => 'product_images', 'action' => 'view', $catalogItemImage['id']);
+			$url = array('controller' => 'catalog_item_images', 'action' => 'view', $catalogItemImage['id']);
 			$this->Table->cells(array(
 				array($this->CatalogItem->thumb(
 					$catalogItemImage, 

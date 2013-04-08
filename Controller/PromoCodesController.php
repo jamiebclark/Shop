@@ -1,26 +1,24 @@
 <?php
-class ProductPromosController extends ShopAppController {
-	var $name = 'ProductPromos';
+class PromoCodesController extends ShopAppController {
+	var $name = 'PromoCodes';
 	
 	function staff_index() {
-		$productPromos = $this->paginate();
-		$this->set(compact('productPromos'));
+		$promoCodes = $this->paginate();
+		$this->set(compact('promoCodes'));
 	}
 	function staff_view($id = null) {
 		$this->FormData->findModel($id);
 	}
 	
 	function staff_add() {
-		$this->_saveData();
+		$this->FormData->addData(array('default' => array('PromoCode' => array('active' => 1))));
 	}
 	
 	function staff_edit($id = null) {
-		if ($this->_saveData() === null) {
-			$this->request->data = $this->FormData->findModel($id);
-		}
+		$this->FormData->editData($id);
 	}
 	
 	function staff_delete($id = null) {
-		$this->_deleteData($id);
+		$this->FormData->deleteData($id);
 	}
 }

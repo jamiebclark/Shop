@@ -1,9 +1,6 @@
 <?php
-echo $this->element('products/staff_heading');
-echo $this->element('products/admin_heading');
 echo $this->Layout->defaultHeader(null, null, array(
 	'title' => 'Online Store Products',
 ));
-
-echo $this->element('products/admin_list');
-?>
+echo $this->element('catalog_items/admin_nav');
+echo $this->element('catalog_items/admin_list');

@@ -6,10 +6,8 @@ class CatalogItemImagesController extends ShopAppController {
 	function index($catalogItemId = null) {
 		$catalogItemImages = $this->CatalogItemImage->find('all', array(
 			'fields' => '*',
-			'link' => array('CatalogItem'),
-			'conditions' => array(
-				'CatalogItem.id' => $catalogItemId,
-			)
+			'link' => array('Shop.CatalogItem'),
+			'conditions' => array('CatalogItem.id' => $catalogItemId)
 		));
 		$catalogItem = $this->CatalogItemImage->CatalogItem->findById($catalogItemId);
 		
@@ -25,7 +23,7 @@ class CatalogItemImagesController extends ShopAppController {
 		$catalogItemImage = $this->FormData->findModel($id);
 		$catalogItemImages = $this->CatalogItemImage->find('all', array(
 			'fields' => '*',
-			'link' => array('CatalogItem'),
+			'link' => array('Shop.CatalogItem'),
 			'conditions' => array(
 				'CatalogItem.id' => $catalogItemImage['CatalogItemImage']['catalog_item_id'],
 			)
@@ -35,7 +33,7 @@ class CatalogItemImagesController extends ShopAppController {
 	
 	function staff_index($catalogItemId = null) {
 		$fields = '*';
-		$link = array('CatalogItem');
+		$link = array('Shop.CatalogItem');
 		$conditions = array();
 		if (!empty($catalogItemId)) {
 			$conditions['CatalogItem.id'] = $catalogItemId;
@@ -47,27 +45,25 @@ class CatalogItemImagesController extends ShopAppController {
 	}
 	
 	function staff_view($id = null) {
-		$catalogItem = $this->FormData->findModel($id);
-		$this->set(compact('catalogItem'));
+		$this->FormData->findModel($id);
 	}
 	
 	function staff_add($catalogItemId = null) {
-		if ($this->_saveData() === null) {
-			$this->request->data['CatalogItemImage']['catalog_item_id'] = $catalogItemId;
-		}
-		$this->set('catalogItems', $this->CatalogItemImage->CatalogItem->selectList());
+		$this->FormData->addData(array(
+			'default' => array('CatalogItemImage' => array('catalog_item_id' => $catalogItemId))
+		));
 		$this->set('catalogItem', $this->CatalogItemImage->CatalogItem->findById($catalogItemId));
 	}
 	
 	function staff_edit($id = null) {
-		if ($this->_saveData() === null) {
-			$this->CatalogItemImage->recursive = 1;
-			$this->request->data = $this->CatalogItemImage->findById($id);
-		}
-		$this->set('catalogItems', $this->CatalogItemImage->CatalogItem->selectList());
+		$this->FormData->editData($id);
 	}
 	
 	function staff_delete($id = null) {
-		$this->_deleteData($id);
+		$this->FormData->deleteData($id);
+	}
+	
+	function _setFormElements() {
+		$this->set('catalogItems', $this->CatalogItemImage->CatalogItem->selectList());
 	}
 }

@@ -107,7 +107,7 @@ class ProductInventory extends ShopAppModel {
 			'conditions' => array(
 				'ProductInventory.id' => $id,
 				'Order.archived' => 1,
-				'Order.cancelled' => 0,
+				'Order.canceled' => 0,
 			)
 		));
 		$totalSold = !empty($result) ? $result[0]['total_sold'] : 0;

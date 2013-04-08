@@ -1,7 +1,6 @@
 <?php
-echo $this->element('products/admin_heading', array(
-	'crumbs' => 'Inactive Products',
+echo $this->Layout->defaultHeader(null, null, array(
+	'title' => 'Inactive Store Products',
 ));
-echo $this->Html->tag('h1', 'Inactive Store Products');
-echo $this->element('products/admin_list');
-?>
+echo $this->element('catalog_items/admin_nav');
+echo $this->element('catalog_items/admin_list');

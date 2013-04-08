@@ -3,11 +3,8 @@ class PaypalFormHelper extends AppHelper {
 	var $name = 'PaypalForm';
 	var $helpers = array('Form', 'Html');
 	
-	var $business = 'webmaster@souperbowl.org';
-	
-	var $returnUrl = 'http://www.souperbowl.org';
-	var $cancelReturnUrl = 'http://www.souperbowl.org';
-	var $cbt = 'Return to SouperBowl.org';
+	var $returnUrl = PAYPAL_RETURN_URL;
+	var $cancelReturnUrl = PAYPAL_CANCEL_URL;
 	var $imageUrl = 'http://souperbowl.org/images/logos/sboc/paypal.gif';
 	
 	var $cmd = '_xclick'; 	//Alternated: '_cart'
@@ -65,11 +62,11 @@ class PaypalFormHelper extends AppHelper {
 	
 	function end() {
 		$this->addSetting('cmd',$this->cmd,false);
-		$this->addSetting('upload','1',false);
-		$this->addSetting('business',$this->business,false);
+		$this->addSetting('upload', '1', false);
+		$this->addSetting('business', PAYPAL_USER_NAME, false);
 		$this->addSetting('no_shipping','0',false);
 		$this->addSetting('return',$this->returnUrl,false);
-		$this->addSetting('cbt',$this->cbt,false);
+		$this->addSetting('cbt', "Return to {COMPANY_NAME}",false);
 		$this->addSetting('cancel_return',$this->cancelReturnUrl,false);
 		$this->addSetting('image_url',$this->imageUrl,false);
 		$this->addSetting('currency_code','USD',false);

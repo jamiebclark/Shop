@@ -11,7 +11,7 @@ class HandlingMethodsController extends ShopAppController {
 	}
 	
 	function staff_add() {
-		$this->FormData->addData();
+		$this->FormData->addData(array('default' => array('HandlingMethod' => array('active' => 1))));
 	}
 	
 	function staff_edit($id = null) {

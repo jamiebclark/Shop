@@ -2,6 +2,7 @@
 class OrderProductsController extends ShopAppController {
 	var $name = 'OrderProducts';
 	var $components = array('Shop.ShoppingCart',);
+	var $helpers = array('Shop.Order');
 	
 	function add() {
 		$redirect = true;
@@ -10,7 +11,7 @@ class OrderProductsController extends ShopAppController {
 		if (!empty($this->request->data)) {
 			//Finds Product ID
 			if (!$this->OrderProduct->setProductIdFromData($this->request->data)) {
-				$invalid['quanitity'] = 'Please select all product options';
+				$invalid['OrderProduct.quanitity'] = 'Please select all product options';
 			} else {			
 				//Checks if product already exists in the cart
 				$this->OrderProduct->quantityExists($this->request->data);
@@ -23,7 +24,7 @@ class OrderProductsController extends ShopAppController {
 				foreach ($invalid as $key => $errorMsg) {
 					$this->OrderProduct->invalidate($key, $errorMsg);
 				}
-				debug($this->OrderProduct->invalidFields());
+				//debug($this->OrderProduct->invalidFields());
 			} else {
 				$order = $this->OrderProduct->Order->find('first', array(
 					'link' => array('Shop.OrderProduct'),

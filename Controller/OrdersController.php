@@ -7,6 +7,7 @@ class OrdersController extends ShopAppController {
 		'Shop.Invoice',
 		'Shop.CatalogItem', 
 		'Shop.PaypalForm',
+		'Layout.AddressBook',
 		'Layout.Crumbs' => array(
 			'controllerCrumbs' => array(array(
 				'Store',
@@ -25,7 +26,7 @@ class OrdersController extends ShopAppController {
 		$this->FindFilter->filter = array(
 			'shipped' => array('options' => array('' => ' -- Either -- ', 1 => 'Shipped', 0 => 'Not Shipped')),
 			'paid' => array('options' => array('' => ' -- Either -- ', 1 => 'Paid', 0 => 'Not Paid')),
-			'cancelled' => array('type' => 'checkbox', 'default' => 0),
+			'canceled' => array('type' => 'checkbox', 'default' => 0),
 			'email' => array('type' => 'text', 'label' => 'Email Address'),
 			'name' => array('type' => 'text'),
 		);
@@ -72,20 +73,18 @@ class OrdersController extends ShopAppController {
 			}
 		}
 
-		$this->FormData->editData($id, null, null, array(
+		$this->FormData->editData($id, null, array('contain' => 'Invoice'), array(
 			'success' => array(
 				'messages' => 'Successfully updated shipping information for your Order',
 				'redirect' => array('action' => 'checkout', 'ID')
 			)
 		));
-		
 		//$this->set('states', $this->Order->State->selectList());
 		//$this->set('countries', $this->Order->Country->selectList());
 	}
 	
 	function checkout($id = null) {
 		$order = $this->FormData->editData($id);
-
 		//Before displaying checkout screen, checks if order is complete
 		if (empty($order['Order']['addline1']) || empty($order['Order']['invoice_id'])) {
 			//Shipping information has not been entered yet
@@ -94,6 +93,7 @@ class OrdersController extends ShopAppController {
 			//Order has been paid already
 			$this->redirect(array('action' => 'view', $id));
 		}
+		$this->set('isArchived', $order['Order']['archived']);
 	}
 	
 	function staff_index() {
@@ -105,6 +105,7 @@ class OrdersController extends ShopAppController {
 				$this->_redirectMsg(true, 'Could not find Order #' . $this->request->data['Order']['id']);
 			}
 		}
+
 		$this->paginate = $this->_findFilter($this->paginate);
 		$orders = $this->paginate();
 		$this->set(compact('orders'));
@@ -233,23 +234,23 @@ class OrdersController extends ShopAppController {
 	}
 	
 	function _findFilter($options = array()) {
-		if (isset($this->findFilterVal['shipped'])) {
-			if (!empty($this->findFilterVal['shipped'])) {
-				$options['conditions']['Order.shipped <>'] = null;
-			} else {
-				$options['conditions']['Order.shipped'] = null;
-			}
+		$search = array('shipped', 'paid', 'canceled');
+		$named = $this->request->named;
+		if (isset($named['canceled'])) {
+			$options['conditions']['Order.canceled'] = round($named['canceled']);
 		}
-		if (isset($this->findFilterVal['paid'])) {
-			if (!empty($this->findFilterVal['paid'])) {
-				$options['conditions']['Invoice.paid <>'] = null;
+		if (isset($named['paid'])) {
+			$options['link']['Shop.Invoice'] = array();
+			if ($named['paid']) {
+				$options['conditions']['NOT']['Invoice.paid'] = null;
 			} else {
 				$options['conditions']['Invoice.paid'] = null;
 			}
 		}
-		if (isset($this->findFilterVal['cancelled'])) {
-			$options['conditions']['Order.cancelled'] = $this->findFilterVal['cancelled'];
+		if (isset($named['shipped'])) {
+			$options['conditions']['Order.shipped'] = round($named['shipped']);
 		}
+	
 		if (isset($this->findFilterVal['email'])) {
 			$options['conditions']['Invoice.email LIKE'] = trim($this->findFilterVal['email']);
 		}

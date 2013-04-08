@@ -52,7 +52,7 @@ class Product extends ShopAppModel {
 			$conditions["{$this->alias}.$key"] = isset($data[$key]) ? $data[$key] : null;
 		}
 		$result = $this->find('first', 
-			array('fields' => $this->alias.'.id') + compact('conditions'));
+			array('fields' => $this->alias.'.*') + compact('conditions'));
 		return !empty($result) ? $result[$this->alias]['id'] : false;
 	}
 	
@@ -132,7 +132,7 @@ class Product extends ShopAppModel {
 						'type' => 'INNER',
 						'conditions' => array(
 							'Order.id = ProductOrder.order_id',
-							'Order.cancelled' => 0
+							'Order.canceled' => 0
 				),
 			),
 			'conditions' => array(

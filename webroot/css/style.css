@@ -10,3 +10,20 @@
 	float: right;
 	margin-left: 10px;
 }
+
+.order-not-shipped-not-paid, tr.order-not-shipped-not-paid td {
+	background-color: white;
+}
+.order-not-shipped-paid, tr.order-not-shipped-paid td {
+	background-color: yellow;
+}
+.order-shipped-not-paid, tr.order-shipped-not-paid td {
+	background-color: red;
+}
+.order-shipped-paid, tr.order-shipped-paid td {
+	background-color: green;
+}
+.order-canceled, tr.order-canceled td {
+	background-color: black;
+	color: #CCC;
+}

@@ -3,6 +3,7 @@ class CatalogItemImage extends ShopAppModel {
 	var $name = 'CatalogItemImage';
 	var $actsAs = array(
 		'Uploadable.ImageUploadable' => array(
+			'plugin' => 'Shop',
 			'bypass_is_uploaded' => true,
 			'upload_dir' => 'img/catalog_item_images/',
 			'update' => array('filename'),
@@ -32,6 +33,17 @@ class CatalogItemImage extends ShopAppModel {
 			'message' => 'Please select a product',
 		)
 	);
+	
+	function beforeSave2() {
+		if (
+			isset($this->data[$this->alias]) && 
+			empty($this->data[$this->alias]['id']) &&
+			empty($this->data[$this->alias]['add_file']['tmp_name'])
+		) {
+			unset($this->data[$this->alias]['add_file']);
+		}
+		return parent::beforeSave();
+	}
 	
 	function afterSave($created) {
 		$result = $this->read('catalog_item_id', $this->id);

@@ -110,44 +110,27 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function staff_index() {
-		$this->paginate = array(
-			'conditions' => array(
-				'CatalogItem.active' => 1
-			)
-		);
+		$this->paginate = array('conditions' => array('CatalogItem.active' => 1));
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 	
 	function staff_inactive() {
-		$this->paginate = array(
-			'conditions' => array(
-				'CatalogItem.active' => 0
-			)
-		);
+		$this->paginate = array('conditions' => array('CatalogItem.active' => 0));
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 
 	function staff_add() {
-		$this->_saveData();
-		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
+		$this->FormData->addData(array('default' => array('CatalogItem' => array('active' => 1))));
 	}
 	
 	function staff_edit($id = null) {
-		if (!$this->_saveData()) {
-			$this->request->data = $this->CatalogItem->find('first', array(
-				'postContain' => array('CatalogItemCategory'),
-				'conditions' => array(
-					'CatalogItem.id' => $id
-				)
-			));
-		}
-		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
+		$this->FormData->editData($id, null, array('contain' => 'CatalogItemCategory'));
 	}
-	
+
 	function staff_delete($id = null) {
-		$this->_deleteData($id);
+		$this->FormData->deleteData($id);
 	}
 	
 	function staff_view($id = null) {
@@ -192,7 +175,6 @@ class CatalogItemsController extends ShopAppController {
 	
 	function staff_shipping_rules($id = null) {
 		$this->FormData->editData($id, null, array('contain' => array('ShippingRule')));
-		debug($this->request->data);
 		//$this->set('catalogItems', $this->CatalogItem->selectList());
 	}
 
@@ -209,7 +191,7 @@ class CatalogItemsController extends ShopAppController {
 			'fields' => array(
 				'CatalogItem.*',
 				'Product.id',
-				'Product.title',
+				'Product.sub_title',
 				'COUNT(CatalogItem.id) AS catalog_item_count',
 				'MONTH(Invoice.paid) AS order_month',
 				$orderYearField,
@@ -233,12 +215,12 @@ class CatalogItemsController extends ShopAppController {
 				'CatalogItem.title',
 			),
 		);
-		$result = $this->Product->find('all', $options);
+		$result = $this->CatalogItem->find('all', $options);
 		//debug($result);
 		$totals = array();
 		$totalsOptions = array();
 		
-		$calendarItems = array();
+		$catalogItems = array();
 		$products = array();
 		
 		foreach ($result as $row) {
@@ -246,45 +228,43 @@ class CatalogItemsController extends ShopAppController {
 			$month = $row[0]['order_month'];
 			$count = $row[0]['catalog_item_count'];
 			
-			$calendarItem = $row['CalendarItem'];
-			$calendarItemId = $calendarItem['id'];
+			$catalogItem = $row['CatalogItem'];
+			$catalogItemId = $catalogItem['id'];
 
 			$productId = $row['Product']['id'];
 			
-			$calendarItems[$calendarItemId] = $calendarItem['title'];
-			$products[$calendarItem][$productId] = $row['Product']['title'];
+			$catalogItems[$catalogItemId] = $catalogItem;
+			$products[$catalogItemId][$productId] = $row['Product']['sub_title'];
 			
-			if (empty($totals['total'][$calendarItemId])) {
-				$totals['total'][$calendarItemId] = 0;
+			if (empty($totals['total'][$catalogItemId])) {
+				$totals['total'][$catalogItemId] = 0;
 			}
-			if (empty($totals['year'][$year][$calendarItemId])) {
-				$totals['year'][$year][$calendarItemId] = 0;
+			if (empty($totals['year'][$year][$catalogItemId])) {
+				$totals['year'][$year][$catalogItemId] = 0;
 			}
-			if (empty($totals['month'][$year][$month][$calendarItemId])) {
-				$totals['month'][$year][$month][$calendarItemId] = 0;
+			if (empty($totals['month'][$year][$month][$catalogItemId])) {
+				$totals['month'][$year][$month][$catalogItemId] = 0;
 			}
 			
-			$totals['total'][$calendarItemId] += $count;
-			$totals['year'][$year][$calendarItemId] += $count;
-			$totals['month'][$year][$month][$calendarItemId] += $count;
+			$totals['total'][$catalogItemId] += $count;
+			$totals['year'][$year][$catalogItemId] += $count;
+			$totals['month'][$year][$month][$catalogItemId] += $count;
 			
-			if ($productOptionId != $productId) {
-				if (empty($totalsOptions['total'][$calendarItemId][$productId])) {
-					$totalsOptions['total'][$calendarItemId][$productId] = 0;
-				}
-				if (empty($totalsOptions['year'][$year][$calendarItemId][$productId])) {
-					$totalsOptions['year'][$year][$calendarItemId][$productId] = 0;
-				}
-				if (empty($totalsOptions['month'][$year][$month][$calendarItemId][$productId])) {
-					$totalsOptions['month'][$year][$month][$calendarItemId][$productId] = 0;
-				}
-				$totalsOptions['total'][$calendarItemId][$productId] += $count;
-				$totalsOptions['year'][$year][$calendarItemId][$productId] += $count;
-				$totalsOptions['month'][$year][$month][$calendarItemId][$productId] += $count;
+			if (empty($totalsOptions['total'][$catalogItemId][$productId])) {
+				$totalsOptions['total'][$catalogItemId][$productId] = 0;
 			}
+			if (empty($totalsOptions['year'][$year][$catalogItemId][$productId])) {
+				$totalsOptions['year'][$year][$catalogItemId][$productId] = 0;
+			}
+			if (empty($totalsOptions['month'][$year][$month][$catalogItemId][$productId])) {
+				$totalsOptions['month'][$year][$month][$catalogItemId][$productId] = 0;
+			}
+			$totalsOptions['total'][$catalogItemId][$productId] += $count;
+			$totalsOptions['year'][$year][$catalogItemId][$productId] += $count;
+			$totalsOptions['month'][$year][$month][$catalogItemId][$productId] += $count;
 
 		}
-		$this->set(compact('totals', 'totalsOptions', 'calendarItems', 'products', 'monthShift'));
+		$this->set(compact('totals', 'totalsOptions', 'catalogItems', 'products', 'monthShift'));
 	}
 	/*
 	function ajax_product_option_select($id = null, $key = null) {
@@ -300,4 +280,7 @@ class CatalogItemsController extends ShopAppController {
 		$this->set(compact('productOptions', 'key'));
 	}
 	*/
+	function _setFormElements() {
+		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
+	}
 }

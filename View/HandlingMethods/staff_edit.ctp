@@ -1,3 +1,2 @@
 <?php
-echo $this->element('product_handlings/form');
-?>
+echo $this->element('handling_methods/form');

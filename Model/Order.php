@@ -1,15 +1,13 @@
 <?php
 class Order extends ShopAppModel {
 	var $name = 'Order';
-	/*
 	var $actsAs = array(
-		'Location',
-		'InvoiceSync' => array(
+		//'Location',
+		'Shop.InvoiceSync' => array(
 		//	'paid',
 			'total' => 'amt',
 		),
 	);
-	*/
 	
 	var $order = array('Order.created DESC');
 	var $recursive = -1;
@@ -60,6 +58,7 @@ class Order extends ShopAppModel {
 		}
 		return parent::beforeSave();
 	}
+	
 	
 	function afterSave($created) {
 		$this->updateTotal($this->id);

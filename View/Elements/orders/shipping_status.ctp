@@ -8,11 +8,11 @@ if (empty($order['Order']['addline1'])) {
 		$order['Order']['id'],
 	), array('escape' => false));
 } else {
-	$info['Shipping Address'] = $this->Contact->location($order['Order'], array(
+	$info['Shipping Address'] = $this->AddressBook->location($order['Order'], array(
 		'beforeField' => array('name'),
 	));
-	$info['Email'] = $this->Contact->email($order['Order']['email']);
-	$info['Phone'] = $this->Contact->phone($order['Order']['phone']);
+	$info['Email'] = $this->AddressBook->email($order['Order']['email']);
+	$info['Phone'] = $this->AddressBook->phone($order['Order']['phone']);
 	if (!empty($order['Order']['shipped'])) {
 		$info['Status'] = $this->Html->tag('strong', 'Shipped ' . $this->Calendar->niceShort($order['Order']['shipped']));
 		if (!empty($order['OrderShippingMethod']['title'])) {
@@ -35,4 +35,3 @@ if (empty($order['Order']['addline1'])) {
 	}
 }
 echo $this->element('orders/status', compact('info', 'blank', 'title', 'mode', 'tag'));
-?>
