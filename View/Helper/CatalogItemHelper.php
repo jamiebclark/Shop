@@ -20,8 +20,9 @@ class CatalogItemHelper extends AppHelper {
 		}
 		$src .= $catalogItem['filename'];
 		$file = str_replace(array('/','\\'), DS, SHOP_WWW_ROOT . 'img' . DS . $src);
+		$filename = 'Shop.' . $src;
 		if (is_file($file)) {
-			return $this->Html->image('Shop.' . $src, $options);
+			return isset($options['filename']) ? $filename : $this->Html->image($filename, $options);
 		} else {
 			return null;
 		}

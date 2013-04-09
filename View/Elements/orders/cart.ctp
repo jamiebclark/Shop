@@ -45,16 +45,23 @@ if (!empty($order['OrderProduct'])):
 		} else {
 			$url = null;
 		}
-		$cell = '';
+		$cell = $thumb = '';
+		$title = !empty($url) ? $this->Html->link($orderProduct['title'], $url) : $orderProduct['title'];
+		$mediaOptions = compact('title', 'url');
 		if ($images) {
-			$cell .= $this->CatalogItem->thumb($catalogItem, array(
-				'url' => $url, 
-				'dir' => 'thumb',
-				'tag' => 'font',
-			));
+			$thumb = $this->CatalogItem->thumb($catalogItem, 
+				array('dir' => 'thumb', 'class' => 'media-object'));
+			if (!empty($url)) {
+				$thumb = $this->Html->link($thumb, $url, array('class' => 'pull-left', 'escape' => false));
+			}
 		}
-		$cell .= !empty($url) ? $this->Html->link($orderProduct['title'], $url) : $orderProduct['title'];
-		$this->Table->cell($cell, 'Product', null, null, array('class' => $hasParent ? 'hasParent' : null));
+		$cell = $this->Html->div('media', $thumb . $this->Html->div('media-body', $title));
+		debug($mediaOptions);
+		$this->Table->cell(
+			$cell,
+			'Product', 
+			array('class' => $hasParent ? 'hasParent' : null)
+		);
 		
 		//Price
 		$price = $hasParent ? '&nbsp;' : $this->DisplayText->cash($orderProduct['price']);
@@ -70,12 +77,18 @@ if (!empty($order['OrderProduct'])):
 			} else {
 				$cell = $this->Form->input($fieldName, array(
 					'label' => false,
-					'div' => 'quantity',
+					'div' => false,
+					'class' => 'qty',
+					'append' => $this->Iconic->icon('x', array('url' => array(
+						'controller' => 'order_products',
+						'action' => 'delete',
+						$orderProduct['id'],
+					)))
 				));
 			}
 			$this->Table->cell(
 				$cell,
-				$this->FormLayout->submit('Update', array('name' => 'update', 'img' => false, 'div' => false)), 
+				$this->Form->submit('Update', array('name' => 'update', 'div' => false)), 
 				null, 
 				null, 
 				array(
@@ -93,28 +106,10 @@ if (!empty($order['OrderProduct'])):
 			);
 		}
 
-		//Delete Option
-		if (!$hasParent && !$archived && $form) {
-			$cell = $this->Html->link(
-				$this->Html->image('btn/20x20/black_trans/delete.png'),
-				array(
-					'controller' => 'order_products',
-					'action' => 'delete',
-					$orderProduct['id'],
-				), array(
-					'escape' => false,
-				)
-			);
-
-		}  else {
-			$cell = '&nbsp;';
-		}
-		$this->Table->cell($cell, '&nbsp;', null, null, array('width' => 40));
-		
 		$this->Table->cell(
 			$hasParent ? '&nbsp;' : $this->DisplayText->cash($orderProduct['sub_total']),
 			'Total', null, null, array(
-				'class' => 'totalColumn'
+				'class' => 'row-total'
 			)
 		);
 		$this->Table->rowEnd();
@@ -158,18 +153,18 @@ if (!empty($order['OrderProduct'])):
 			$trOptions = $this->Html->addClass($trOptions, $class);
 		}
 		if ($rowCount == 0) {
-			$trOptions = $this->Html->addClass($trOptions, 'topRow'); 
+			$trOptions = $this->Html->addClass($trOptions, 'top-total'); 
 		}
 		$this->Table->cells(array(
 			array($label,
 				null, null, null, array(
-					'class' => 'total-label' . $class,
+					'class' => 'total-label',
 					'colspan' => $colspan,
 				)
 			), array(
 				$value,
 				null, null, null, array(
-					'class' => 'total' . $class
+					'class' => 'row-total',
 				)
 			)
 		), $trOptions);

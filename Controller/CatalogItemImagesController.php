@@ -31,7 +31,7 @@ class CatalogItemImagesController extends ShopAppController {
 		$this->set(compact('catalogItemImages'));
 	}
 	
-	function staff_index($catalogItemId = null) {
+	function admin_index($catalogItemId = null) {
 		$fields = '*';
 		$link = array('Shop.CatalogItem');
 		$conditions = array();
@@ -44,22 +44,22 @@ class CatalogItemImagesController extends ShopAppController {
 		$this->set('catalogItem', $this->CatalogItemImage->CatalogItem->findById($catalogItemId));
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$this->FormData->findModel($id);
 	}
 	
-	function staff_add($catalogItemId = null) {
+	function admin_add($catalogItemId = null) {
 		$this->FormData->addData(array(
 			'default' => array('CatalogItemImage' => array('catalog_item_id' => $catalogItemId))
 		));
 		$this->set('catalogItem', $this->CatalogItemImage->CatalogItem->findById($catalogItemId));
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		$this->FormData->editData($id);
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	

@@ -3,7 +3,7 @@ class ProductsController extends ShopAppController {
 	var $name = 'Products';
 	var $components = array('Layout.Activate');
 	
-	function staff_index($catalogItemId = null) {
+	function admin_index($catalogItemId = null) {
 		$this->paginate = array(
 			'fields' => '*',
 			'recursive' => 0,
@@ -30,7 +30,7 @@ class ProductsController extends ShopAppController {
 		}
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$this->paginate = array(
 			'ProductInventoryAdjustment' => array(
 				'fields' => '*',
@@ -55,13 +55,13 @@ class ProductsController extends ShopAppController {
 		$this->set(compact('productInventoryAdjustments', 'product', 'products'));
 	}
 	
-	function staff_add($catalogItemId = null) {
+	function admin_add($catalogItemId = null) {
 		$this->FormData->addData(array(
 			'default' => array('Product' => array('id' => $catalogItemId))
 		));
 	}
 
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	

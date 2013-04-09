@@ -62,7 +62,7 @@ class OrderProductsController extends ShopAppController {
 		$this->_redirectMsg(true, 'There was an error deleting the item. Please try again');
 	}
 	
-	function staff_add($orderId = null, $productId = null) {
+	function admin_add($orderId = null, $productId = null) {
 		if (!empty($this->request->data['OrderProduct']['order_id'])) {
 			$orderId = $this->request->data['OrderProduct']['order_id'];
 			$productId = $this->request->data['OrderProduct']['product_id'];
@@ -110,7 +110,7 @@ class OrderProductsController extends ShopAppController {
 		$this->set(compact('order', 'product', 'productOptions'));
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		if (!$this->_saveData(null, array(
 			'success' => array(
 				'redirect' => array(
@@ -138,7 +138,7 @@ class OrderProductsController extends ShopAppController {
 		$this->set(compact('order', 'product', 'productOptions'));
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 }

@@ -11,7 +11,7 @@ if ($add) {
 		array('Edit'),
 	);
 }
-echo $this->element('product_images/staff_heading', compact('crumbs'));
+echo $this->element('product_images/admin_heading', compact('crumbs'));
 
 echo $this->Form->create('ProductImage', array('type' => 'file'));
 echo $this->Form->inputs(array(

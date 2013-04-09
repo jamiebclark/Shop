@@ -1,6 +1,6 @@
 <?php
 if (!$isAjax) {
-	echo $this->element('product_categories/staff_heading');
+	echo $this->element('product_categories/admin_heading');
 	echo $this->Html->tag('h1', 'Categories');
 	echo $this->Layout->headerMenu(array(
 		array('Add New Category', array('action' => 'add'))

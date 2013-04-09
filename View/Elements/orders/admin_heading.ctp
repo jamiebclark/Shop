@@ -6,4 +6,4 @@ $defaultCrumbs = array_merge(array(
 	array('Orders', array('controller' => 'orders', 'action' => 'index'))
 ), $defaultCrumbs);
 
-echo $this->element('staff_heading', compact('defaultCrumbs', 'crumbs'));
+echo $this->element('admin_heading', compact('defaultCrumbs', 'crumbs'));

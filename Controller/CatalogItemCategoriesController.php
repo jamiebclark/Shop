@@ -2,7 +2,7 @@
 class CatalogItemCategoriesController extends ShopAppController {
 	var $name = 'CatalogItemCategories';
 	
-	function staff_index() {
+	function admin_index() {
 		$this->CatalogItemCategory->recover('tree');
 		$catalogItemCategories = $this->CatalogItemCategory->find('threaded');
 		$this->set(compact('catalogItemCategories'));
@@ -21,19 +21,19 @@ class CatalogItemCategoriesController extends ShopAppController {
 		$this->set('isAjax', round($this->request->is('ajax')));
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$this->FormData->findModel($id);
 	}
 	
-	function staff_add() {
+	function admin_add() {
 		$this->FormData->addData();
 		$this->set('catalogItems', $this->CatalogItemCategory->CatalogItem->find('list'));
 	}
 	
-	function staff_edit($id = null) {		$this->FormData->editData($id);
+	function admin_edit($id = null) {		$this->FormData->editData($id);
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	

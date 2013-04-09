@@ -1,5 +1,5 @@
 <?php
-echo $this->element('products/staff_heading', array(
+echo $this->element('products/admin_heading', array(
 	'crumbs' => array(
 		array($this->request->data['Product']['title'], array('action' => 'view', $this->request->data['Product']['id'])),
 		'Packages'

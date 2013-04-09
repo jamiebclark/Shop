@@ -1,5 +1,5 @@
 <?php
-echo $this->element('product_handlings/staff_heading', array(
+echo $this->element('product_handlings/admin_heading', array(
 	'crumbs' => array(
 		$productHandling['ProductHandling']['title'],
 	)

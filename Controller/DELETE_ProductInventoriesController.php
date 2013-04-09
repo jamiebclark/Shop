@@ -3,7 +3,7 @@ class ProductInventoriesController extends ShopAppController {
 	var $name = 'ProductInventories';
 	var $helpers = array('Shop.Product');
 	
-	function staff_index($productId = null) {
+	function admin_index($productId = null) {
 		$this->paginate = array(
 			'fields' => '*',
 			'recursive' => 1,
@@ -26,7 +26,7 @@ class ProductInventoriesController extends ShopAppController {
 		}
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$this->paginate = array(
 			'ProductInventoryAdjustment' => array(
 				'fields' => '*',
@@ -59,7 +59,7 @@ class ProductInventoriesController extends ShopAppController {
 		$this->set(compact('productInventoryAdjustments', 'productInventory', 'productInventories'));
 	}
 	
-	function staff_add($productId = null) {
+	function admin_add($productId = null) {
 		if ($this->_saveData() === null) {
 			$this->request->data['Product']['id'] = $productId;
 		}
@@ -70,11 +70,11 @@ class ProductInventoriesController extends ShopAppController {
 		$this->set(compact('product'));
 		$this->set('productOptions', $this->ProductInventory->Product->ProductOption->findProductOptions($this->request->data['Product']['id']));
 	}
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->_deleteData($id);
 	}
 	
-	function staff_rebuild($id = null) {
+	function admin_rebuild($id = null) {
 		$this->ProductInventory->rebuildQuantity($id);
 		$this->_redirectMsg(array('action' => 'view', $id), 'Rebuilt inventory');
 	}

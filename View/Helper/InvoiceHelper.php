@@ -32,7 +32,7 @@ class InvoiceHelper extends AppHelper {
 						'controller' => Inflector::tableize($model),
 						'action' => 'view',
 						$Result[$model]['id'],
-						'staff' => true,
+						'admin' => true,
 					),
 					$options
 				);

@@ -41,7 +41,7 @@ class InvoiceEmailComponent extends Component {
 		}
 	}
 	
-	function staffNotify($invoiceId = null, $test = false) {
+	function adminNotify($invoiceId = null, $test = false) {
 		$invoice = $this->Invoice->findById($invoiceId);
 		$to = array();
 		$itemName = $invoice['Invoice']['item_name'];
@@ -74,7 +74,7 @@ class InvoiceEmailComponent extends Component {
 		
 		$users = $this->Invoice->User->find('all', array(
 			'fields' => array('User.email', 'User.full_name'),
-			'link' => array('StaffMember' => array('table' => 'staff.staff_members')),
+			'link' => array('StaffMember' => array('table' => 'admin.admin_members')),
 			'userType' => $userTypes,
 			'conditions' => array(
 				'User.active' => 1,

@@ -9,7 +9,7 @@ if ($add) {
 		array('Edit')
 	);
 }
-echo $this->element('product_inventories/staff_heading', compact('crumbs'));
+echo $this->element('product_inventories/admin_heading', compact('crumbs'));
 
 echo $this->Form->create('ProductInventory');
 echo $this->Html->div('text input');

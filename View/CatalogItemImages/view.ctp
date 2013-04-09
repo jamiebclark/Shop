@@ -9,12 +9,12 @@ if (count($catalogItemImages) > 1) {
 	echo $this->element('catalog_item_images/thumb_list');
 }
 
-if (!empty($loggedUserTypes['staff'])) {
+if (!empty($loggedUserTypes['admin'])) {
 	echo $this->Layout->adminMenu(array('view', 'edit', 'add', 'delete'), array(
 		'url' => array(
 			'action' => 'view', 
 			$catalogItemImage['CatalogItemImage']['id'],
-			'staff' => true
+			'admin' => true
 		)
 	));
 }

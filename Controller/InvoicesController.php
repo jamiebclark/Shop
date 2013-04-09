@@ -25,7 +25,7 @@ class InvoicesController extends AppController {
 		$this->set(compact('invoice'));
 	}
 	
-	function staff_index() {
+	function admin_index() {
 		if (!empty($this->request->data['Invoice']['id'])) {
 			$invoice = $this->Invoice->findById($this->request->data['Invoice']['id']);
 			if (!empty($invoice)) {
@@ -39,9 +39,9 @@ class InvoicesController extends AppController {
 		$this->set(compact('invoices'));
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		if (!empty($this->request->params['named']['notify'])) {
-			$msg = $this->InvoiceEmail->staffNotify($id) ? 'Email sent' : 'Error sending email';
+			$msg = $this->InvoiceEmail->adminNotify($id) ? 'Email sent' : 'Error sending email';
 			$this->_redirectMsg(array($id), $msg);
 		}
 
@@ -55,7 +55,7 @@ class InvoicesController extends AppController {
 		$this->set('back_link', array('Back to Invoices', array('action' => 'index')));
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		if ($this->_saveData(null, null, array('validate' => false)) === null) {
 			$this->request->data = $this->Invoice->findById($id);
 			
@@ -88,22 +88,22 @@ class InvoicesController extends AppController {
 		$this->set('invoicePaymentMethods', $this->Invoice->InvoicePaymentMethod->selectList());
 	}
 	
-	function staff_add() {
+	function admin_add() {
 		$this->_saveData();
 		
 		$this->set('states', $this->Invoice->State->selectList());
 		$this->set('countries', $this->Invoice->Country->selectList());
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->_deleteData($id);
 	}
 	
-	function staff_filter() {
+	function admin_filter() {
 		$this->render('/FindFilters/filter');
 	}
-		function staff_resend_email($id = null, $test = false) {		$this->FormData->findModel($id);				if ($this->InvoiceEmail->staffNotify($id, $test)) {			$msg = 'Email successfully sent';		} else {			$msg = 'There was an error sending email';		}				$this->_redirectMsg(array('action' => 'view', $id), $msg);	}	
-	function staff_copy_payment($id = null) {
+		function admin_resend_email($id = null, $test = false) {		$this->FormData->findModel($id);				if ($this->InvoiceEmail->adminNotify($id, $test)) {			$msg = 'Email successfully sent';		} else {			$msg = 'There was an error sending email';		}				$this->_redirectMsg(array('action' => 'view', $id), $msg);	}	
+	function admin_copy_payment($id = null) {
 		$invoice = $this->Invoice->find('first', array(
 			'fields' => array('*'),
 			'link' => array('PaypalPayment'),

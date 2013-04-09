@@ -2,11 +2,11 @@
 class ProductInventoryAdjustmentsController extends ShopAppController {
 	var $name = 'ProductInventoryAdjustments';
 
-	function staff_index() {
+	function admin_index() {
 		$this->redirect(array('controller' => 'products'));
 	}
 	
-	function staff_add($productId = null) {
+	function admin_add($productId = null) {
 		$default = array(
 			'ProductInventoryAdjustment' => array('product_id' => $productId)
 		);
@@ -22,11 +22,11 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 		$this->set(compact('product'));
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		$this->FormData->editData($id);
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$result = $this->FormData->findModel($id);
 		if (!empty($result)) {
 			$this->redirect(array('controller' => 'products', 'action' => 'view', $result['Product']['id']));
@@ -35,7 +35,7 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 		}
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 

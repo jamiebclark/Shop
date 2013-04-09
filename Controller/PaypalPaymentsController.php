@@ -85,8 +85,8 @@ class PaypalPaymentsController extends ShopAppController {
 							if (empty($invoice)) {
 								$this->_log('Could not load Invoice to send notification email');
 							} else {
-								if ($this->InvoiceEmail->staffNotify($invoice['Invoice']['id'])) {
-									$this->_log('Sent notification email to staff');
+								if ($this->InvoiceEmail->adminNotify($invoice['Invoice']['id'])) {
+									$this->_log('Sent notification email to admin');
 								} else {
 									$this->_log('Error sending notification email');
 								}
@@ -107,7 +107,7 @@ class PaypalPaymentsController extends ShopAppController {
 		exit();
 	}
 	
-	function staff_fix() {
+	function admin_fix() {
 		$paypalPayments = $this->PaypalPayment->find('all', array(
 			'fields' => '*',
 			'link' => array('Invoice')

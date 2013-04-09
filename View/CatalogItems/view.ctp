@@ -104,6 +104,6 @@ if (!empty($isShopAdmin)) {
 	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
 		'action' => 'view',
 		$catalogItem['CatalogItem']['id'],
-		'staff' => true
+		'admin' => true
 	)));
 }

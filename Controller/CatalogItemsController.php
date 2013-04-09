@@ -12,7 +12,7 @@ class CatalogItemsController extends ShopAppController {
 	/*
 	function beforeFilter() {
 		parent::beforeFilter();
-		if (!$this->_loggedUserType('staff')) {
+		if (!$this->_loggedUserType('admin')) {
 			$this->offline = array(
 				'title' => 'Store Offline',
 				'content' => 'While we get the site up and running, the store is temporarily down. Check back soon!',
@@ -109,31 +109,31 @@ class CatalogItemsController extends ShopAppController {
 		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions'));
 	}
 	
-	function staff_index() {
+	function admin_index() {
 		$this->paginate = array('conditions' => array('CatalogItem.active' => 1));
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 	
-	function staff_inactive() {
+	function admin_inactive() {
 		$this->paginate = array('conditions' => array('CatalogItem.active' => 0));
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 
-	function staff_add() {
+	function admin_add() {
 		$this->FormData->addData(array('default' => array('CatalogItem' => array('active' => 1))));
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		$this->FormData->editData($id, null, array('contain' => 'CatalogItemCategory'));
 	}
 
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		$catalogItem = $this->CatalogItem->findById($id);
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
 			'CatalogItemPackageChild' => array(
@@ -153,7 +153,7 @@ class CatalogItemsController extends ShopAppController {
 		$this->set(compact('catalogItem'));
 	}
 	
-	function staff_packages($id = null) {
+	function admin_packages($id = null) {
 		if ($this->_saveData() === null) {
 			$this->request->data = $this->CatalogItem->find('first', array(
 				'postContain' => array(
@@ -173,12 +173,12 @@ class CatalogItemsController extends ShopAppController {
 		$this->set('catalogItems', $this->CatalogItem->selectList());
 	}
 	
-	function staff_shipping_rules($id = null) {
+	function admin_shipping_rules($id = null) {
 		$this->FormData->editData($id, null, array('contain' => array('ShippingRule')));
 		//$this->set('catalogItems', $this->CatalogItem->selectList());
 	}
 
-	function staff_totals() {
+	function admin_totals() {
 		$monthShift = 2;
 		
 		if (!empty($monthShift)) {

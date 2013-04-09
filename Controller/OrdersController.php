@@ -96,7 +96,7 @@ class OrdersController extends ShopAppController {
 		$this->set('isArchived', $order['Order']['archived']);
 	}
 	
-	function staff_index() {
+	function admin_index() {
 		if (!empty($this->request->data['Order']['id'])) {
 			$order = $this->Order->findById($this->request->data['Order']['id']);
 			if (!empty($order)) {
@@ -111,11 +111,11 @@ class OrdersController extends ShopAppController {
 		$this->set(compact('orders'));
 	}
 	
-	function staff_filter() {
+	function admin_filter() {
 		$this->render('/FindFilters/filter');
 	}
 	
-	function staff_view($id = null) {
+	function admin_view($id = null) {
 		if ($this->_saveData() === null) {
 			$this->request->data = $this->FormData->findModel($id);
 		} else {
@@ -130,7 +130,7 @@ class OrdersController extends ShopAppController {
 
 	}
 	
-	function staff_edit($id = null) {
+	function admin_edit($id = null) {
 		$this->FormData->editData($id);
 		/*
 		null, array(), array('validate' => false)) === null) {
@@ -173,15 +173,15 @@ class OrdersController extends ShopAppController {
 		$this->set('orderShippingMethods', $this->Order->OrderShippingMethod->selectList());
 	}
 	
-	function staff_add() {
+	function admin_add() {
 		$this->FormData->addData();
 	}
 	
-	function staff_delete($id = null) {
+	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	
-	function staff_total() {
+	function admin_total() {
 		$orders = $this->Order->find('all', array(
 			'fields' => array(
 				'SUBSTRING(Invoice.paid, 1, 10) AS paid_day',

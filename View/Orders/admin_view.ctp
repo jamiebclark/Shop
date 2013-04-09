@@ -2,7 +2,7 @@
 
 $archived = !empty($order['Order']['archived']);
 
-echo $this->element('orders/staff_heading', array(
+echo $this->element('orders/admin_heading', array(
 	'crumbs' => 'Order #'. $order['Order']['id']
 ));
 
