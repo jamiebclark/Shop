@@ -7,8 +7,15 @@
 .catalog-item-images .main {
 	width: 100%;
 }
+.add-cart .catalog-item-price {
+	line-height: 80px;
+}
+.add-cart .catalog-item-price .cash {
+	font-size: 40px;
+}
 </style>
 <div class="catalog-item-view row">
+<?php echo $this->Form->create('OrderProduct', array('action' => 'add')); ?>
 	<div class="span3 catalog-item-images"><?php
 	echo $this->CatalogItem->thumb(
 		$catalogItem['CatalogItem'], array(
@@ -30,7 +37,7 @@
 	}
 	?></div>
 	
-	<div class="span9">
+	<div class="span6">
 		<h1><?php echo $catalogItem['CatalogItem']['title'];?></h1>
 		<?php echo $this->DisplayText->text($catalogItem['CatalogItem']['description']);?>
 
@@ -39,67 +46,57 @@
 			<h2>Packaged Item</h2>
 			This product contains the following items:
 			<?php
-			foreach ($catalogItem['CatalogItemPackageChild'] as $k => $catalogItemPackage):
-				$url = null;
-				$title = $catalogItemPackage['CatalogItemChild']['title'];
-				if (!$catalogItemPackage['CatalogItemChild']['hidden']) {
-					$url = $this->CatalogItem->url($catalogItemPackage['CatalogItemChild']);
-					$title = $this->Html->link($title, $url);
-				}
-				$thumb = $this->CatalogItem->thumb($catalogItemPackage['CatalogItemChild'], array(
-					'dir' => 'thumb', 
-					'url' => $url,
-					'class' => 'img',
-				)); 
-				?>
-				<div class="media">
-					<div class="img"><?php echo $thumb;?></div>
-					<div class="rght qty"><?php 
-						echo number_format($catalogItemPackage['quantity']);
-					?></div>
-					<div class="bd"><?php echo $title;?></div>
-				</div>
-			<?php endforeach; ?>
+			echo $this->element('catalog_item_packages/child_table', array(
+				'result' => $catalogItem['CatalogItemPackageChild'],
+			));
+			?>
 		</div>
 		<?php endif; ?>
-		<div class="add-cart"><?php 
+	</div>
+	<div class="span3 add-cart">
+		<?php 
+		if ($catalogItem['CatalogItem']['stock'] <= 0): ?>
+			<h3>Out of stock</h3>
+			<p>Sorry, this item is temporarily out of stock. Please check back soon for inventory updates</p><?php 
+		else: ?>
+			<?php
 			echo $this->CatalogItem->price($catalogItem['CatalogItem']);
 			echo $this->CatalogItem->notes($catalogItem['CatalogItem']);
-			if ($catalogItem['CatalogItem']['stock'] <= 0): ?>
-				<h3>Out of stock</h3>
-				<p>Sorry, this item is temporarily out of stock. Please check back soon for inventory updates</p>
-			<?php else:
-				echo $this->Form->create('OrderProduct', array('action' => 'add')); ?>
-				<fieldset><legend>Add to Cart</legend><?php
-				echo $this->Form->inputs(array(
-					'fieldset' => false,
-					'Order.id' => array(
-						'type' => 'hidden'
-					),
-					'OrderProduct.catalog_item_id' => array(
-						'type' => 'hidden', 
-						'value' => $catalogItem['CatalogItem']['id']
-					),
-					'Order.user_id' => array(
-						'type' => 'hidden', 
-						'default' => $loggedUserId
-					),
-				));
-				echo $this->element('catalog_item_options/input', array('prefix' => 'OrderProduct.'));
-				echo $this->Form->input('OrderProduct.quantity', array(
-					'default' => !empty($catalogItem['CatalogItem']['min_quantity']) ? $catalogItem['CatalogItem']['min_quantity'] : 1,
-					'class' => 'quantity',
-				));
-				echo $this->FormLayout->submit('Add to Cart');
-				?>
-				</fieldset>
-				<?php
-				echo $this->Form->end();
-			endif;?>
-		</div>
+
+			echo $this->Form->inputs(array(
+				'fieldset' => false,
+				'Order.id' => array('type' => 'hidden'),
+				'OrderProduct.catalog_item_id' => array(
+					'type' => 'hidden', 
+					'value' => $catalogItem['CatalogItem']['id']
+				),
+				'Order.user_id' => array(
+					'type' => 'hidden', 
+					'default' => $loggedUserId
+				),
+			));
+
+			echo $this->element('catalog_item_options/input', array(
+				'prefix' => 'OrderProduct.',
+				'catalogItemOptions' => $catalogItem['CatalogItemOption']
+			));
+
+			$default = 1;
+			if (!empty($catalogItem['CatalogItem']['min_quantity'])) {
+				$default = $catalogItem['CatalogItem']['min_quantity'];
+			}
+			echo $this->Form->input('OrderProduct.quantity', compact('default') + array(
+				'class' => 'quantity input-small',
+			));
+			echo $this->Form->submit('Add to Cart', array(
+				'class' => 'btn btn-primary',
+			));
+		endif;?>
 	</div>
+	<?php echo $this->Form->end(); ?>
 </div>
 <?php
+
 if (!empty($isShopAdmin)) {
 	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
 		'action' => 'view',

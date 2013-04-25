@@ -25,8 +25,8 @@ DROP TABLE IF EXISTS `invoices`;
 CREATE TABLE `invoices` (
   `id` int(8) NOT NULL auto_increment,
   `user_id` int(11) default NULL,
-  `item_name` varchar(28) NOT NULL,
-  `item_number` int(11) NOT NULL,
+  `model_title` varchar(28) NOT NULL,
+  `model_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `invoice_payment_method_id` int(11) default NULL,

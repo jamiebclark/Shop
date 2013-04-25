@@ -1,16 +1,23 @@
 <?php
+App::uses('OrderEmail', 'Shop.Network/Email');
+
 class Order extends ShopAppModel {
 	var $name = 'Order';
+	var $displayField = 'title';
 	var $actsAs = array(
-		//'Location',
+		'Layout.DateValidate',
+		'Location.Mappable',
 		'Shop.InvoiceSync' => array(
-		//	'paid',
-			'total' => 'amt',
+			'title' => 'Store Order',
+			'fields' => array(
+			//	'paid',
+				'total' => 'amt',
+			),
 		),
-	);
-	
+	);	
 	var $order = array('Order.created DESC');
 	var $recursive = -1;
+	var $virtualFields = array('title' => 'CONCAT("Order #", $ALIAS.id)');
 	
 	var $hasMany = array(
 		'OrderProduct' => array(
@@ -51,11 +58,19 @@ class Order extends ShopAppModel {
 		)
 	);
 	
+	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
+	private $sendShippedEmail = false;	
+	
 	function beforeSave() {
 		$data =& $this->getData();
 		if (empty($data['country'])) {
 			$data['country'] = 'US';
 		}
+		
+		if (!empty($data['send_shipped_email'])) {
+			$this->sendShippedEmail = true;
+		}
+
 		return parent::beforeSave();
 	}
 	
@@ -68,6 +83,11 @@ class Order extends ShopAppModel {
 			'link' => array('Invoice'),
 			'conditions' => array('Order.id' => $this->id)
 		));
+		
+		//Updates invoice with billing address if set
+		if (!empty($order[$this->alias]['same_billing'])) {
+			$this->setSameBilling($this->id);
+		}
 
 		//Archives or Un-Archives order products based on payment and shipping status
 		$archived = round(!empty($order['Invoice']['paid']) || !empty($order['Order']['shipped']));
@@ -75,6 +95,9 @@ class Order extends ShopAppModel {
 		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $this->id));
 		$this->updateProductStock($this->id);
 		
+		if ($this->sendShippedEmail && !empty($order['Order']['shipped'])) {
+			$this->sendShippedEmail($this->id);
+		}
 		return parent::afterSave($created);
 	}
 	
@@ -140,23 +163,16 @@ class Order extends ShopAppModel {
 			'link' => array('Shop.OrderProduct' => 'Shop.' . $this->alias),
 			'conditions' => array($this->alias . '.id' => $id)
 		));
-		$productOptions = array();
-		foreach ($products as $productId => $productTitle) {
-			$productOptions[$productId] = $this->OrderProduct->Product->ProductOption->findProductOptions($productId);
-		}
-		return $productOptions;
+		return $products;
 	}
 	
 	function updateHandling($id = null) {
 		//Removes de-activated or deleted handling rules
-		$this->OrdersHandlingMethod->deleteAll(array(
-			'OrdersHandlingMethod.order_id' => $id,
-			'OR' => array('HandlingMethod.active' => 0, 'HandlingMethod.id' => null)
-		));
+		$this->OrdersHandlingMethod->removeUnused();
 		
 		$handlingIds = $this->OrdersHandlingMethod->find('list', array(
 			'fields' => array('HandlingMethod.id', 'OrdersHandlingMethod.id'),
-			'link' => array('HandlingMethod'),
+			'link' => array('Shop.HandlingMethod'),
 			'conditions' => array('OrdersHandlingMethod.order_id' => $id)
 		));
 
@@ -208,6 +224,31 @@ class Order extends ShopAppModel {
 		));
 	}
 	
+	public function setSameBilling($id) {
+		$fields = array(
+			'first_name', 'last_name', 'addline1', 'addline2', 'city', 'state', 'zip', 'country',
+			'email', 'phone',
+		);
+		$result = $this->read(null, $id);
+		if (!empty($result[$this->alias]['same_billing'])) {
+			return $this->copyModelToInvoice($id, $fields);
+		}
+		return null;
+	}
+	
+	function sendShippedEmail($id) {
+		$order = $this->findOrder($id);
+		$Email = new OrderEmail();
+		if ($Email->sendShipped($order) !== false) {
+			$this->sendShippedEmail = false;
+			return $this->updateAll(
+				array("{$this->alias}.shipped_email" => 'NOW()'), 
+				array("{$this->alias}.id" => $id)
+			);
+		}
+		return false;
+	}
+
 	/*OLD FIND ORDER
 	function findOrder($id) {
 		$order = $this->find('first', array(

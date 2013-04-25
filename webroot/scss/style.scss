@@ -1,3 +1,33 @@
+.qty, .cash {
+	font-size: 20px;
+}
+
+form.canceled {
+	background-color: #CCC;
+	input, select, textarea {
+		background-color: #EEE;
+	}
+	&, label, input, select, textarea {
+		color: #999;
+	}
+}
+
+@mixin trackBadge($class, $bg, $color) {
+	&.#{$class} {
+		background-color: $bg;
+		color: $color;
+	}
+}
+.badge.tracking {
+	a {
+		color: white;
+	}
+	@include trackBadge(fedex, #472F91, #F57921);
+	@include trackBadge(ups, #1A110E, #DEA72E);
+	@include trackBadge(usps, #013490, #663F3C);
+	@include trackBadge(dhl, #D80612, #FFCB01);
+}
+
 .media {
 	.img, .bd,.rght {
 		overflow: hidden;
@@ -13,11 +43,21 @@
 	}
 }
 
+.catalog-item-package-children {
+	.thumb {
+		width: 40px;
+		img {
+			width: 100%;
+		}
+	}
+	td {
+		line-height: 40px;
+	}
+}
 //Shopping Cart
 .order-cart {
 	td, th {
 		border: 0;
-		line-height: 40px;
 	}
 	th {
 		border-bottom: 1px solid;
@@ -25,13 +65,43 @@
 	img {
 		width: 50px;
 	}
-	.qty {
-		width: 80px;
+	td {
+		&.row-total {
+			font-size: 1.5em;
+			width: 120px;
+		}
+		&.quantity, &.price {
+			font-size: 20px;
+		}
 	}
-	.row-total {
-		font-size: 1.5em;
-		text-align: right;
-		width: 120px;
+	td, th {
+		&.row-total {
+			text-align: right;
+		}
+		&.quantity, &.price, &.delete {
+			width: 80px;
+			text-align: center;
+		}
+	}
+
+	.order-product {
+		td {
+			line-height: 40px;
+		}
+		&.child-order-product {
+			background-color: #EEE;
+			td {
+				font-size: 90%;
+				line-height: normal;
+				font-style: italic;
+				&.product {
+					padding-left: 40px;
+				}
+				img {
+					width: 25px;
+				}
+			}
+		}
 	}
 	.cart-total {
 		td {
@@ -50,11 +120,32 @@
 			text-align: right;
 		}
 	}
+	.promo-code {
+		float: right;
+	}
+	.form-actions {
+		clear: both;
+	}
+	&.condensed {
+		td {
+			line-height: normal;
+			&.quantity {
+				text-align: center;
+				width: 40px;
+			}
+			&.row-total {
+				width: 80px;
+			}
+		}
+	}
 }
 
 @mixin order-style($name, $color) {
 	.#{$name}, tr.#{$name} td {
 		background-color: $color;
+	}
+	.badge.#{$name}, .label.#{$name} {
+		color: black;
 	}
 }
 @include order-style(order-not-shipped-not-paid, white);
@@ -72,5 +163,14 @@
 			display: block;
 			padding: .5em;
 		}
+	}
+}
+
+.shipping-rules {
+	.title div {
+		text-align: center;
+	}
+	.right-border {
+		border-right: 1px solid #CCC;
 	}
 }

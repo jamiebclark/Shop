@@ -1,27 +1,15 @@
 <?php
-$add = !$this->Html->value('ProductCategory.id');
-if ($add) {
-	$crumbs = array(
-		'Add Category',
-	);
-} else {
-	$crumbs = array(
-		array($this->Html->value('ProductCategory.title'), array('action' => 'view', $this->Html->value('ProductCategory.id'))),
-		'Edit Category',
-	);
-}
+$add = !$this->Html->value('CatalogItemCategory.id');
 
-echo $this->Form->create('ProductCategory');
+echo $this->Form->create('CatalogItemCategory');
 echo $this->Form->inputs(array(
-	'legend' => 'Product Category',
+	'legend' => 'Category',
 	'id',
 	'parent_id',
 	'title',
-	'Product.Product' => array(
+	'CatalogItem.CatalogItem' => array(
 		'multiple' => 'checkbox',
-		'options' => $products,
+		'options' => $catalogItems,
 	)
 ));
-echo $this->FormLayout->submit($add ? 'Add New Category' : 'Update Category');
-echo $this->Form->end();
-?>
+echo $this->Form->end($add ? 'Add New Category' : 'Update Category');

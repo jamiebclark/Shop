@@ -8,4 +8,11 @@ class ShippingMethod extends ShopAppModel {
 	var $hasMany = array('Order' => array(
 		'className' => 'Shop.Order',
 	));
+	
+	var $validate = array(
+		'title' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please name your shipping method',
+		)
+	);
 }

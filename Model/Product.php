@@ -1,6 +1,7 @@
 <?php
 class Product extends ShopAppModel {
 	var $name = 'Product';
+	var $actsAs = array('Shop.SelectList');
 	var $hasMany = array (
 		'Shop.OrderProduct',
 		'ProductInventoryAdjustment' => array(
@@ -69,11 +70,18 @@ class Product extends ShopAppModel {
 		$result = $this->read(null, $id);
 		$catalogItemId = $result[$this->alias]['catalog_item_id'];
 		
+		/*
 		//If the product is a package, check all the child elements in the package
 		$catalogItemChildren = $this->CatalogItem->findPackageChildren($catalogItemId);
 		if (!empty($catalogItemChildren)) {
 //			debug($catalogItemChildren);
+
 			foreach ($catalogItemChildren as $key => $catalogItemChild) {
+			debug(array(
+				'Found Children',
+				$catalogItemChild['CatalogItemChild']['id'], 
+				$catalogItemChild['CatalogItemPackageChild']['quantity'] * $quantity
+			));
 				if (!$this->checkStock(
 					$catalogItemChild['CatalogItemChild']['id'], 
 					$catalogItemChild['CatalogItemPackageChild']['quantity'] * $quantity
@@ -84,6 +92,7 @@ class Product extends ShopAppModel {
 			}
 			return true;
 		}
+		*/
 		
 		$result = $this->CatalogItem->find('first', array(
 			'fields' => '*', //$this->alias . '.quantity',
@@ -100,6 +109,8 @@ class Product extends ShopAppModel {
 			$result[$this->alias]['stock'] = 0;
 		}
 		$checkQuantity = $result[$this->alias]['stock'] - $quantity;
+		
+		//debug(compact('result', 'checkQuantity'));
 		if (!empty($result['CatalogItem']['unlimited'])) {
 			return true;
 		} else if (!empty($checkQuantity)) {

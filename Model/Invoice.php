@@ -1,4 +1,5 @@
 <?php
+App::uses('InvoiceEmail', 'Shop.Network\Email');
 class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
@@ -59,6 +60,9 @@ class Invoice extends ShopAppModel {
 		)
 	);
 
+	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
+	private $sendPaidEmail = false;
+	
 	function beforeFind($queryData) {
 		$queryData['fields'] = array_merge(array('*'), (array) $queryData['fields']);
 		foreach ($this->hasOne as $alias) {
@@ -67,17 +71,45 @@ class Invoice extends ShopAppModel {
 		return parent::beforeFind($queryData);
 	}
 	
+	function beforeSave() {
+		$data =& $this->getData();
+		if (!empty($data['send_paid_email'])) {
+			$this->sendPaidEmail = true;
+		}
+	}
 	function afterSave($created) {
-		if (1 || $created || array_search('paid', $this->changedFields)) {
+		$result = $this->read(null, $this->id);
+		$data =& $this->getData();
+		
+		$this->copyToModels($this->id);
+		
+		if ($created || array_search('paid', $this->changedFields)) {
 			$this->updatePaid($this->id);
 		}
+		
+		if ($this->sendPaidEmail && !empty($result[$this->alias]['paid'])) {
+			$this->sendPaidEmail($this->id);
+		}
+		
 		return parent::afterSave($created);
 	}
 	
 	function updatePaid($id = null) {
-		$contain = array();
+		return true;
+	}
+	
+/**
+ * Finds any related models using the InvoiceSyncBehavior and updates them with the new Invoice information
+ *
+ * @param int $id Invoice id
+ * @return void
+ **/
+	private function copyToModels($id) {
+		$fn = 'copyInvoiceToModel';
+		$contain = $fields = array();
 		$models = array_merge($this->hasOne, $this->hasMany);
 		foreach ($models as $model => $config) {
+			$fields[] = "$model.*";
 			if (is_numeric($model)) {
 				$model = $config;
 				$config = null;
@@ -85,18 +117,28 @@ class Invoice extends ShopAppModel {
 			$contain[] = $model;
 		}
 		$conditions = array($this->alias . '.id' => $id);
-		$invoice = $this->find('first', compact('contain', 'conditions'));
-		
-		if (!empty($invoice)) {
-			foreach ($invoice as $model => $vals) {
-				if ($model == $this->alias) {
+		$result = $this->find('first', compact('fields', 'contain', 'conditions'));
+		if (!empty($result)) {
+			foreach ($result as $model => $vals) {
+				if ($model == $this->alias) {	//Avoids Invoice results
 					continue;
 				}
-				if (method_exists($this->{$model}, 'syncInvoiceToModel')) {
-					$this->{$model}->syncInvoiceToModel($vals[$this->{$model}->primaryKey], $invoice['Invoice']);
+				if (method_exists($this->{$model}, $fn)) {
+					$this->{$model}->$fn($vals[$this->{$model}->primaryKey], $id);
 				}
 			}
+		}		
+	}
+	
+	function sendPaidEmail($id = null) {
+		$Email = new InvoiceEmail();
+		$result = $this->read(null, $id);
+		if ($result[$this->alias]['paid'] && ($Email->sendPaid($result) !== false)) {
+			return $this->updateAll(
+				array("{$this->alias}.paid_email" => 'NOW()'), 
+				array("{$this->alias}.id" => $id)
+			);
 		}
-		return true;
-	}	
+		return null;
+	}
 }

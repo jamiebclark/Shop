@@ -1,7 +1,7 @@
 <?php
 class ProductsController extends ShopAppController {
 	var $name = 'Products';
-	var $components = array('Layout.Activate');
+	var $components = array('Layout.Activate', 'Layout.Table');
 	
 	function admin_index($catalogItemId = null) {
 		$this->paginate = array(

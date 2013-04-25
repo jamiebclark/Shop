@@ -4,12 +4,13 @@ class OrderProduct extends ShopAppModel {
 	var $actsAs = array('Shop.BlankDelete' => 'quantity');
 	var $belongsTo = array(
 		'Shop.Product', 
-		'ParentProduct' => array(
+		/*'ParentProduct' => array(
 			'className' => 'Shop.Product',
 			'foreignKey' => 'parent_catalog_item_id',
 		),
-		'ParentOrder' => array(
-			'className' => 'OrderProduct',
+		*/
+		'ParentOrderProduct' => array(
+			'className' => 'Shop.OrderProduct',
 			'foreignKey' => 'parent_id',
 		),
 		'Order' => array(
@@ -24,9 +25,10 @@ class OrderProduct extends ShopAppModel {
 			'className' => 'Shop.OrderProductsShippingRule',
 			'dependent' => true
 		),
-		'ChildOrder' => array(
-			'className' => 'OrderProduct',
-			'foreignkey' => 'parent_id',
+		'ChildOrderProduct' => array(
+			'className' => 'Shop.OrderProduct',
+			'foreignKey' => 'parent_id',
+			'dependent' => true,
 		)
 	);
 	var $hasAndBelongsToMany = array('Shop.ShippingRule',);
@@ -49,6 +51,11 @@ class OrderProduct extends ShopAppModel {
 		)
 	);
 	
+	var $order = array(
+		'IF($ALIAS.parent_id IS NULL, $ALIAS.id, $ALIAS.parent_id)', //Sorts by parent_id
+		'IF($ALIAS.parent_id IS NULL, 0, 1)',	//Puts parents at the top of the list
+	);		
+	
 	var $current;
 	
 	var $packageChild;
@@ -64,7 +71,7 @@ class OrderProduct extends ShopAppModel {
 		//If only catalog_item_id is passed, finds the appropriate product ID
 		if (empty($data['product_id'])) {
 			if (!empty($data['catalog_item_id'])) {
-				if (!$this->setProductIdFromData($data)) {
+				if (!$this->setProductIdFromData($this->data)) {
 					$this->invalidate('product_id', 'Please select all options');
 					return false;
 				}
@@ -74,40 +81,42 @@ class OrderProduct extends ShopAppModel {
 			}
 		}
 		
+		if (!empty($data['parent_id'])) {
+			$parent = $this->find('first', array('conditions' => array(
+				"{$this->alias}.id" => $data['parent_id']
+			)));
+			//debug(array($parent, $data['parent_id'], $data));
+			$data['quantity'] = $parent[$this->alias]['quantity'];
+			if (isset($data['package_quantity'])) {
+				$data['quantity'] *= $data['package_quantity'];
+			}
+		}
+
+//		debug(array($this->data, $data));
+		
+		//Checks if product already exists in the cart
+		$this->quantityExists($this->data);
+		
+		/*
 		//Stores package children options for later
 		if (!empty($data['PackageChild'])) {
 			$this->packageChild = $data['PackageChild'];
 		}
+		*/
+		
 		
 		$inventoryConditions = array();
 		$catalogItem = $this->Product->findCatalogItem($data['product_id']);
 		if (!empty($catalogItem)) {
-			if (!empty($data['id']) && $data['quantity'] == 0) {
+			/*if (!empty($data['id']) && $data['quantity'] == 0) {
 				$this->create();
 				$this->delete($data['id']);
 				unset($data);
 				return true;
-			} else if ($data['quantity'] < $catalogItem['CatalogItem']['min_quantity']) {
+			} else */if ($data['quantity'] < $catalogItem['CatalogItem']['min_quantity']) {
 				$this->invalidate('quantity', 'Please enter a quantity of at least ' . $catalogItem['CatalogItem']['min_quantity']);
 			}
 		}
-		
-		/*
-		//Makes sure all options are selected
-		$productOptions = $this->Product->ProductOption->find('all', array(
-			'link' => array('Shop.Product'),
-			'conditions' => array('Product.id' => $data['product_id'])
-		));
-		//$this->debug = true;
-		if (!empty($productOptions)) {
-			foreach ($productOptions as $productOption) {
-				$key = 'product_option_choice_id_' . $productOption['ProductOption']['index'];
-				if (empty($data[$key])) {
-					$this->invalidate($key, 'Please select a ' . $productOption['ProductOption']['title']);
-				}
-			}
-		}
-		*/
 		
 		//Makes sure there is enough inventory to handle the order
 		if (!$this->Product->checkStock($data['product_id'], $data['quantity'])) {
@@ -135,14 +144,29 @@ class OrderProduct extends ShopAppModel {
 	function afterSave($created) {
 		$id = $this->id;
 
+		$result = $this->find('first', array(
+			'fields' => '*',
+			'link' => array('Shop.ParentOrderProduct' => array(
+				'conditions' => array('ParentOrderProduct.id = ' . $this->alias . '.parent_id')
+			)),
+			'conditions' => array($this->alias . '.id' => $id)
+		));
+		
+		//Finds order if it's a package child
+		if (empty($result[$this->alias]['order_id']) && !empty($result[$this->alias]['parent_id'])) {
+			$this->updateAll(
+				array($this->alias . '.order_id' => $result['ParentOrderProduct']['order_id']),
+				array($this->alias . '.id' => $id)
+			);
+		}
 		$order = $this->Order->find('first', array(
 			'fields' => array('Order.*', 'Invoice.*'),
 			'link' => array('Shop.OrderProduct', 'Shop.Invoice'),
 			'conditions' => array('OrderProduct.id' => $id)
 		));
-
 		//Updates information from Product
 		if (empty($order['Order']['archived'])) {
+			//Updates Order total, provided auto-pricing has not been turned off
 			if ($order['Order']['auto_price']) {
 				$this->productSync($id);
 			}
@@ -185,8 +209,11 @@ class OrderProduct extends ShopAppModel {
 			$this->alias . '.archived' => 0,
 		);
 		$result = $this->find('first', array(
-			'fields' => array('Product.*', 'CatalogItem.*'),
-			'link' => array('Shop.Product' => array('Shop.CatalogItem')),
+			'fields' => array("{$this->alias}.*", 'Product.*', 'CatalogItem.*'),
+			'link' => array('Shop.Product' => array(
+				'conditions' => array("{$this->alias}.product_id = Product.id"),
+				'Shop.CatalogItem'
+			)),
 		) + compact('conditions'));
 		
 		if (empty($result)) {
@@ -194,7 +221,10 @@ class OrderProduct extends ShopAppModel {
 		}
 		$title = $result['Product']['title'];
 		$cost = $result['CatalogItem']['cost'];
-		if (isset($result['CatalogItem']['sale']) && $result['CatalogItem']['sale'] > 0) {
+		
+		if ($result[$this->alias]['parent_id']) {
+			$price = 0;
+		} else if (isset($result['CatalogItem']['sale']) && $result['CatalogItem']['sale'] > 0) {
 			$price = $result['CatalogItem']['sale'];
 		} else {
 			$price = $result['CatalogItem']['price'];
@@ -206,26 +236,28 @@ class OrderProduct extends ShopAppModel {
 	function updateShipping($id = null) {
 		$shipping = 0;
 		
-		//This selectes the FIRST rule found, not multiple
-		$shippingRule = $this->ShippingRule->find('first', array(
-			'fields' => array(
-				'ShippingRule.amt + ShippingRule.per_item * OrderProduct.quantity + ShippingRule.pct * (OrderProduct.quantity * OrderProduct.price) AS shipping',
-			),
-			'link' => array('Shop.OrderProduct'),
-			'conditions' => array(
-				'OrderProduct.id' => $id,
-				'ShippingRule.active' => 1,
-				'(ShippingRule.min_quantity <= OrderProduct.quantity OR ShippingRule.min_quantity IS NULL)',
-				'(ShippingRule.max_quantity >= OrderProduct.quantity OR ShippingRule.max_quantity IS NULL)',
-			),
-			'order' => array(
-				'ShippingRule.max_quantity DESC', 
-				'ShippingRule.min_quantity DESC'
-			)
-		));
-		
-		if (!empty($shippingRule)) {
-			$shipping = $shippingRule[0]['shipping'];
+		$result = $this->read(null, $id);
+		if (empty($result[$this->alias]['parent_id'])) {
+			//This selectes the FIRST rule found, not multiple
+			$shippingRule = $this->ShippingRule->find('first', array(
+				'fields' => array(
+					'ShippingRule.amt + ShippingRule.per_item * OrderProduct.quantity + ShippingRule.pct * (OrderProduct.quantity * OrderProduct.price) AS shipping',
+				),
+				'link' => array('Shop.OrderProduct'),
+				'conditions' => array(
+					'OrderProduct.id' => $id,
+					'ShippingRule.active' => 1,
+					'(ShippingRule.min_quantity <= OrderProduct.quantity OR ShippingRule.min_quantity IS NULL)',
+					'(ShippingRule.max_quantity >= OrderProduct.quantity OR ShippingRule.max_quantity IS NULL)',
+				),
+				'order' => array(
+					'ShippingRule.max_quantity DESC', 
+					'ShippingRule.min_quantity DESC'
+				)
+			));
+			if (!empty($shippingRule)) {
+				$shipping = $shippingRule[0]['shipping'];
+			}
 		}
 		return $this->updateAll(compact('shipping'), array($this->alias . '.id' => $id));
 	}
@@ -278,20 +310,41 @@ class OrderProduct extends ShopAppModel {
 		}
 		if (!empty($data['order_id']) && empty($data['id'])) {
 			$result = $this->find('first', array(
-				$this->alias . '.order_id' => $data['order_id'],
-				$this->alias . '.product_id' => $data['product_id'],
+				'conditions' => array(
+					$this->alias . '.order_id' => $data['order_id'],
+					$this->alias . '.product_id' => $data['product_id'],
+					$this->alias . '.parent_id' => !empty($data['parent_id']) ? $data['parent_id'] : null,
+				)
 			));
 			if (!empty($result)) {
 				$this->id = $result[$this->alias]['id'];
 				$data['id'] = $result[$this->alias]['id'];
 				$data['quantity'] += $result[$this->alias]['quantity'];
+
+				if (isset($oData['ChildOrderProduct'])) {
+					foreach ($oData['ChildOrderProduct'] as &$childData) {
+						$childData['parent_id'] = $data['id'];
+						$childData['quantity'] = $data['quantity'];
+						if (!empty($childData['package_quantity'])) {
+							$childData['quantity'] *= $childData['package_quantity'];
+						}
+						$this->quantityExists($childData);
+					}
+				}
 			}
 		}
 		return $oData;
 	}
 
 	function updatePackageChildren($id) {
-		//TODO: Skipping this for now
+		$result = $this->read(null, $id);
+		$result = $result[$this->alias];
+		
+		return $this->updateAll(array(
+			$this->alias . '.quantity' => "{$this->alias}.package_quantity * {$result['quantity']}",
+		), array(
+			$this->alias . '.parent_id' => $id,
+		));
 		return true;
 		
 		
@@ -375,8 +428,22 @@ class OrderProduct extends ShopAppModel {
 	 * @return boolean On success
 	 */
 	public function setProductIdFromData(&$data) {
-		if ($productId = $this->Product->findProductIdFromData($data[$this->alias])) {
-			$data[$this->alias]['product_id'] = $productId;
+		if (isset($data[$this->alias])) {
+			$modelData =& $data[$this->alias];
+		} else {
+			$modelData =& $data;
+		}
+		if ($productId = $this->Product->findProductIdFromData($modelData)) {
+			$modelData['product_id'] = $productId;
+			if (!empty($data['ChildOrderProduct'])) {
+				foreach ($data['ChildOrderProduct'] as &$child) {
+					if ($childProductId = $this->Product->findProductIdFromData($child)) {
+						$child['product_id'] = $childProductId;
+					} else {
+						return false;
+					}
+				}
+			}
 			return true;
 		}
 		return false;

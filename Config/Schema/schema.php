@@ -19,8 +19,8 @@ class AppSchema extends CakeSchema {
 	public $invoices = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 8, 'key' => 'primary'),
 		'user_id' => array('type' => 'integer', 'null' => true, 'default' => null),
-		'item_name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 28, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'item_number' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'model_title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 28, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'model_id' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'description' => array('type' => 'text', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'invoice_payment_method_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),

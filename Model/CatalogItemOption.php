@@ -11,12 +11,13 @@ class CatalogItemOption extends ShopAppModel {
 	
 	var $belongsTo = array('Shop.CatalogItem');
 	
-	/**
-	 * Finds the possible option choices, using the index as keys
-	 * @param int $catalogItemId 
-	 * @param string $key The field used to index the returned array
-	 * @return array Array of possible choices with index as keys
-	 */
+/**
+ * Finds the possible option choices, using the index as keys
+ *
+ * @param int $catalogItemId 
+ * @param string $key The field used to index the returned array
+ * @return array Array of possible choices with index as keys
+ */
 	public function findCatalogItemIndexes($catalogItemId, $keyField = 'index') {
 		$indexes = array();
 		$choices = $this->ProductOptionChoice->find('all', array(
@@ -31,11 +32,12 @@ class CatalogItemOption extends ShopAppModel {
 		return $indexes;
 	}
 	
-	/**
-	 * Finds a multi-dimensional result of options and choices, using the option titles as keys
-	 * @param int $catalogItemId 
-	 * @return array Array of possible choices with title as keys
-	 */
+/**
+ * Finds a multi-dimensional result of options and choices, using the option titles as keys
+ *
+ * @param int $catalogItemId 
+ * @return array Array of possible choices with title as keys
+ */
 	public function findCatalogItemList($catalogItemId) {
 		return $this->findCatalogItemIndexes($catalogItemId, 'title');
 	}

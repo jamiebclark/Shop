@@ -1,7 +1,7 @@
 <?php
 class CatalogItemsController extends ShopAppController {
 	var $name = 'CatalogItems';
-	var $components = array('Shop.ShoppingCart');
+	var $components = array('Shop.ShoppingCart', 'Layout.Table');
 	var $helpers = array(
 		'Shop.CatalogItem', 
 		//'Layout.DisplayText'
@@ -21,32 +21,28 @@ class CatalogItemsController extends ShopAppController {
 	}
 	*/
 	
-	function index($categoryId = null) {
-		//Filters Category
-		if (empty($categoryId)) {
-			if (empty($this->findFilterVal)) {
-				$this->findFilterVal = array();
-			}
-			$categoryId = Param::keyCheck($this->findFilterVal, 'category', false, 1);	//Defaults to Category ID 1
-		} else if (!is_numeric($categoryId)) {
-			$categoryId = $this->CatalogItem->CatalogItemCategory->find('list', array(
-				'fields' => array('CatalogItemCategory.id', 'CatalogItemCategory.id'),
-				'conditions' => array('CatalogItemCategory.slug LIKE' => $categoryId),
-				'userType' => $this->_loggedUserTypes(),
-			));
-			$categoryId = array_pop($categoryId);
+	function _getCategoryId($categoryId, $rootCategoryId) {
+		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $rootCategoryId);
+		if (!$categoryId) {
+			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
 		}
+		return $categoryId;			
+	}
+	
+	function index($categoryId = null) {
+		$rootCategoryId = 1;
+		
+		//Filters Category
+		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
 		
 		//Loads Category
 		$catalogItemCategory = $this->CatalogItem->CatalogItemCategory->read(null, $categoryId);
-		$catalogItemCategoryLeft = $catalogItemCategory['CatalogItemCategory']['lft'];
-		$catalogItemCategoryRight = $catalogItemCategory['CatalogItemCategory']['rght'];
-		
+
 		//Category List
 		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findActiveCategories($categoryId);
 		
 		//Category Path
-		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId);
+		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId, $rootCategoryId);
 		
 		/*
 		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findChildren($categoryId, false, array(
@@ -54,22 +50,13 @@ class CatalogItemsController extends ShopAppController {
 		));
 		*/
 		
-		$this->paginate = array(
-			'link' => array(
-				'CatalogItemCategory',
-			),
-			'conditions' => array(
-				'CatalogItem.active' => 1,
-				'CatalogItem.hidden' => 0,
-				'CatalogItemCategory.lft BETWEEN ? AND ?' => array($catalogItemCategoryLeft, $catalogItemCategoryRight),
-			),
-			'group' => 'CatalogItem.id',
-		);
+		$this->paginate = $this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId);
 		$catalogItems = $this->paginate();
+		
 		$this->set(compact('catalogItems', 'catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
 	}
 	
-	function view($id = null) {
+	function view ($id = null) {
 		//Temporary - Remove later
 		$this->CatalogItem->createProducts($id);
 		$this->CatalogItem->updateProductTitles($id);
@@ -77,11 +64,17 @@ class CatalogItemsController extends ShopAppController {
 		
 		$catalogItem = $this->FormData->findModel($id, null, array(
 			'contain' => array(
-				'CatalogItemPackageChild',
 				'CatalogItemImage',
+				'CatalogItemOption' => array('ProductOptionChoice'),
+				'CatalogItemPackageChild' => array(
+					'CatalogItemChild' => array(
+						'CatalogItemOption' => array('ProductOptionChoice'),
+					)
+				),
 			)
 		));
-		$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemList($id);
+		//$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemList($id);
+		
 		/*
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
 			'CatalogItemImage', 
@@ -126,7 +119,9 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_edit($id = null) {
-		$this->FormData->editData($id, null, array('contain' => 'CatalogItemCategory'));
+		$this->FormData->editData($id, null, array(
+			'contain' => array('CatalogItemCategory','CatalogItemImage', 'ShippingRule')
+		));
 	}
 
 	function admin_delete($id = null) {
@@ -165,9 +160,7 @@ class CatalogItemsController extends ShopAppController {
 						)
 					)
 				),
-				'conditions' => array(
-					'CatalogItem.id' => $id
-				)
+				'conditions' => array('CatalogItem.id' => $id)
 			));
 		}
 		$this->set('catalogItems', $this->CatalogItem->selectList());

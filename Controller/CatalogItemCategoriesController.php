@@ -1,33 +1,26 @@
 <?php
 class CatalogItemCategoriesController extends ShopAppController {
 	var $name = 'CatalogItemCategories';
+	var $helpers = array('Layout.CollapseList');
 	
 	function admin_index() {
-		$this->CatalogItemCategory->recover('tree');
 		$catalogItemCategories = $this->CatalogItemCategory->find('threaded');
 		$this->set(compact('catalogItemCategories'));
-		
-		$saveOptions = array(
-			'success' => array(
-				'redirect' => array('action' => 'index'),
-			)
-		);
-		if ($this->FormData->saveData(null, $saveOptions) === null) {
-			if (!empty($this->request->params['named']['edit'])) {
-				$this->request->data = $this->FormData->findModel($this->request->params['named']['edit']);
-			}
-		}
-		$this->_setFormElements();
-		$this->set('isAjax', round($this->request->is('ajax')));
 	}
 	
 	function admin_view($id = null) {
 		$this->FormData->findModel($id);
+		//Catalog Items inside the Category
+		$catalogItems = $this->CatalogItemCategory->findCatalogItems($id);
+		
+		//Path back to root
+		$catalogItemCategoryPath = $this->CatalogItemCategory->getPath($id);
+		$children = $this->CatalogItemCategory->findChildren($id, false);
+		$this->set(compact('catalogItems', 'catalogItemCategoryPath', 'children'));		
 	}
 	
 	function admin_add() {
 		$this->FormData->addData();
-		$this->set('catalogItems', $this->CatalogItemCategory->CatalogItem->find('list'));
 	}
 	
 	function admin_edit($id = null) {		$this->FormData->editData($id);

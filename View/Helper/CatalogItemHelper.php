@@ -79,6 +79,11 @@ class CatalogItemHelper extends AppHelper {
 	}
 	
 	function inventory($qty = 0, $unlimited = false) {
+		if (is_array($qty)) {
+			$result = $qty;
+			$qty = $result['stock'];
+			$unlimited = $result['unlimited'];
+		}
 		$out = number_format($qty);
 		if ($unlimited) {
 			$out = 'Unlimited';
@@ -92,24 +97,22 @@ class CatalogItemHelper extends AppHelper {
 		return $this->Html->tag('span', $out, compact('class'));
 	}
 	
-	function price($CatalogItem) {
-		$output = '';
-		if ($CatalogItem['sale'] > 0) {
-			$output .= $this->Html->tag('font',
-				$this->cash($CatalogItem['sale']),
-				array('class' => 'salePrice')
-			);
-			$output .= ' ';
-			$output .= $this->Html->tag('font',
-				$this->cash($CatalogItem['price']),
-				array('class' => 'saleOldPrice')
-			);
+	function price($catalogItem) {
+		$out = '';
+		if ($catalogItem['sale'] > 0) {
+			$out .= $this->cash($catalogItem['sale'], array('class' => 'sale'));
+			$out .= ' ';
+			$out .= $this->cash($catalogItem['price'], array('class' => 'old'));
 		} else {
-			$output .= $this->Html->tag('font',
-				$this->cash($CatalogItem['price']),
-				array('class' => 'price')
-			);
+			$out .= $this->cash($catalogItem['price']);
 		}
-		return $this->Html->tag('span', $output, array('class' => 'catalogItemPrice'));
-	}		function cash($num) {		return '$' . number_format($num, $num == round($num) ? 0 : 2);	}
+		return $this->Html->tag('span', $out, array('class' => 'catalog-item-price'));
+	}		function cash($num, $options = array()) {
+		$options = array_merge(array('tag' => 'font'), $options);
+		extract($this->addClass($options, 'cash'));
+		$out = '$' . number_format($num, $num == round($num) ? 0 : 2);
+		if (!empty($tag)) {
+			$out = $this->Html->tag($tag, $out, compact('class', 'style'));
+		}
+		return $out;	}
 }

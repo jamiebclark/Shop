@@ -1,3 +1,2 @@
 <?php
-echo $this->element('product_categories/form');
-?>
+echo $this->element('catalog_item_categories/form');

@@ -17,4 +17,16 @@ class CatalogItemPackage extends ShopAppModel {
 			'foreignKey' => 'catalog_item_child_id',
 		)
 	);
+	
+	function afterSave($created) {
+		$result = $this->read(null, $this->id);
+		
+		$this->CatalogItemParent->save(array(
+			'id' => $result[$this->alias]['catalog_item_parent_id'],
+			'is_package' => 1,
+			'unlimited' => 1,
+		));
+		
+		return parent::afterSave($created);
+	}
 }

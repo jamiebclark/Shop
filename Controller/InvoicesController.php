@@ -3,13 +3,13 @@ class InvoicesController extends AppController {
 	var $name = 'Invoices';
 	var $components = array(
 		'Email',
-		'Shop.InvoiceEmail',
+		//'Shop.InvoiceEmail',
 	);
 	
 	var $helpers = array(
 		'Layout.Table', 
 		'Layout.Calendar', 
-		'Layout.DateBuild', 
+		//'Layout.DateBuild', 
 		'Shop.Invoice'
 	);
 	
@@ -128,7 +128,5 @@ class InvoicesController extends AppController {
 				'Invoice.id' => $id
 			)
 		));
-		
-		
 	}
 }

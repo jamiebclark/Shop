@@ -44,7 +44,7 @@ class InvoiceEmailComponent extends Component {
 	function adminNotify($invoiceId = null, $test = false) {
 		$invoice = $this->Invoice->findById($invoiceId);
 		$to = array();
-		$itemName = $invoice['Invoice']['item_name'];
+		$itemName = $invoice['Invoice']['model_title'];
 		
 		//Finds who it should be sent to
 		$userTypes = array('admin', 'hr', 'development');

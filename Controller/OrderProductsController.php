@@ -9,6 +9,7 @@ class OrderProductsController extends ShopAppController {
 		$msg = null;
 		$invalid = array();
 		if (!empty($this->request->data)) {
+			/*
 			//Finds Product ID
 			if (!$this->OrderProduct->setProductIdFromData($this->request->data)) {
 				$invalid['OrderProduct.quanitity'] = 'Please select all product options';
@@ -17,6 +18,7 @@ class OrderProductsController extends ShopAppController {
 				$this->OrderProduct->quantityExists($this->request->data);
 				$this->OrderProduct->Order->validate = array();
 			}
+			*/
 			
 			if (!empty($invalid) || !$this->OrderProduct->saveAll($this->request->data)) {
 				//$this->PersistValidation->store('OrderProduct');
@@ -63,82 +65,43 @@ class OrderProductsController extends ShopAppController {
 	}
 	
 	function admin_add($orderId = null, $productId = null) {
-		if (!empty($this->request->data['OrderProduct']['order_id'])) {
-			$orderId = $this->request->data['OrderProduct']['order_id'];
-			$productId = $this->request->data['OrderProduct']['product_id'];
-		} else {
-			$firstLoad = true;
-			$orderId = $this->_paramCheck('order_id', $orderId);
-			$productId = $this->_paramCheck('product_id', $productId);
-			if (!empty($orderId)) {
-				$this->request->data['OrderProduct']['order_id'] = $orderId;
-			}
-			if (!empty($productId)) {
-				$this->request->data['OrderProduct']['product_id'] = $productId;
-			}
-		}
-		if (empty($firstLoad)) {
-			$this->_saveData(null, array(
-				'success' => array(
-					'redirect' => array('controller' => 'orders', 'action' => 'view', $orderId)
-				)
-			));
-		}
-		//Shop Order Info
-		$order = $this->OrderProduct->Order->findById($this->request->data['OrderProduct']['order_id']);
-		if (empty($order)) {
-			$this->_redirectMsg(
-				array('controller' => 'orders', 'action' => 'index'), 
-				'Could not find shop order'
-			);
-		}
-
-		//Product Info
-		if (empty($this->request->data['OrderProduct']['product_id'])) {
-			$this->request->data['OrderProduct']['product_id'] = null;
-		}
+		$this->_paramCheck('order_id', $orderId);
+		$this->_paramCheck('product_id', $productId);
 		
-		$product = $this->OrderProduct->Product->findById($this->request->data['OrderProduct']['product_id']);
-		if (empty($product)) {
-			$this->_redirectMsg(
-				array('controller' => 'orders', 'action' => 'view', $order['Order']['id']), 
-				'Please select a product first'
-			);
-		}
-		$productOptions = $this->OrderProduct->Product->ProductOption->findProductOptions($this->request->data['OrderProduct']['product_id']);
-		
-		$this->set(compact('order', 'product', 'productOptions'));
+		$default = array('OrderProduct' => array('order_id' => $orderId, 'product_id' => $productId));
+		$this->FormData->addData(compact('default'));
 	}
 	
 	function admin_edit($id = null) {
-		if (!$this->_saveData(null, array(
-			'success' => array(
-				'redirect' => array(
-					'controller' => 'orders', 
-					'action' => 'view', 
-					$this->request->data['OrderProduct']['order_id']
-				)
-			)
-		))) {
-			$this->request->data = $this->OrderProduct->findById($id);
-			
-			if (empty($this->request->data)) {
-				$this->_redirectMsg(array('controller' => 'orders', 'action' => 'index'), 'Could not find shop order');
-			}
-		}
-		
-
-		
-		//Shop Order Info
-		$order = $this->OrderProduct->Order->findById($this->request->data['OrderProduct']['order_id']);
-		//Product Info
-		$product = $this->OrderProduct->Product->findById($this->request->data['OrderProduct']['product_id']);
-		$productOptions = $this->OrderProduct->Product->ProductOption->findProductOptions($this->request->data['OrderProduct']['product_id']);
-
-		$this->set(compact('order', 'product', 'productOptions'));
+		$this->FormData->editData($id);
 	}
 	
 	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
+	}
+	
+	function _setFormElements() {
+		if ($orderId = $this->_paramCheck('order_id')) {
+			$this->set('order', $this->OrderProduct->Order->findById($orderId));
+		}
+		if ($productId = $this->_paramCheck('product_id')) {
+			$this->set(array(
+				'catalogItem' => $this->OrderProduct->Product->findCatalogItem($productId),
+			));
+		}
+		$this->set('products', $this->OrderProduct->Product->selectList());
+	}
+	
+	function _paramCheck($varName, &$var = null) {
+		if (empty($var)) {
+			if (isset($this->request->data['OrderProduct'][$varName])) {
+				$var = $this->request->data['OrderProduct'][$varName];
+			} else if (isset($this->request->named[$varName])) {
+				$var = $this->request->named[$varName];
+			} else if (isset($this->request->query[$varName])) {
+				$var = $this->request->query[$varName];
+			}
+		}
+		return $var;
 	}
 }

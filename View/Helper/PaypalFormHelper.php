@@ -25,12 +25,14 @@ class PaypalFormHelper extends AppHelper {
 		}
 		return true;
 	}
+	
 	function addSettings($settings = array(), $overwrite = true) {
 		foreach ($settings as $name => $value) {
 			$this->addSetting($name, $value, $overwrite);
 		}
 		return true;
 	}
+	
 	function inputSetting($name, $value, $options = array()) {
 		$options = array_merge(array(
 			'name' => $name,
@@ -43,19 +45,18 @@ class PaypalFormHelper extends AppHelper {
 	}
 	
 	function inputSettings($settings) {
-		$return = '';
+		$out = '';
 		foreach ($settings as $settingName => $settingValue) {
-			$return .= $this->inputSetting($settingName, $settingValue);
+			$out .= $this->inputSetting($settingName, $settingValue);
 		}
-		return $return;
+		return $out;
 	}
 		
-			
 	function create($options = array()) {
 		$options = array_merge(array(
 			'url' => 'https://www.paypal.com/cgi-bin/webscr',
 			'type' => 'POST',
-			'class' => 'paypalForm fullFormWidth',
+			'class' => 'paypal-form',
 		), $options);
 		return $this->Form->create(false, $options) . "\n";
 	}
@@ -77,26 +78,26 @@ class PaypalFormHelper extends AppHelper {
 			- item_number	:	donation, or card::176
 		*/
 		
-		$return = '';
+		$out = '';
 		foreach($this->settings as $settingName => $settingValue) {
 			if ($settingName == 'amt') {
 				$settingValue = round($settingValue, 2);
 			}
 			if (strstr($settingName, 'phone')) {
-				$settingValue = $this->_phoneFormat($settingName, $settingValue);
+				$settingValue = $this->phoneFormat($settingName, $settingValue);
 			}
 			
 			if (is_array($settingValue)) {
-				$return .= $this->inputSettings($settingValue);
+				$out .= $this->inputSettings($settingValue);
 			} else {
-				$return .= $this->inputSetting($settingName, $settingValue);
+				$out .= $this->inputSetting($settingName, $settingValue);
 			}
 		}
-		$return .= $this->Form->end();
-		return $return;
+		$out .= $this->Form->end();
+		return $out;
 	}
 	
-	function _phoneFormat($name, $value) {
+	private function phoneFormat($name, $value) {
 		$value = preg_replace('/[^0-9]/','',$value);
 		$return = array();
 		if(!empty($value)) {

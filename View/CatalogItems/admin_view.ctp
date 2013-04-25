@@ -29,7 +29,9 @@ $url = array(
 	'action' => 'shipping_rules',
 	$catalogItem['CatalogItem']['id']
 );
-echo $this->Layout->headingActionMenu('Shipping Rules', array(array('edit', $url)));$this->Table->reset();
+echo $this->Layout->headingActionMenu('Shipping Rules', array('edit' => $url), compact('url'));
+
+$this->Table->reset();
 foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 	$range = !empty($shippingRule['min_quantity']) ? $shippingRule['min_quantity'] : '...';
 	$range .= ' - ' . (!empty($shippingRule['max_quantity']) ? $shippingRule['max_quantity'] : '...');

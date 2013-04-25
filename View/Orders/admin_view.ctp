@@ -1,60 +1,61 @@
 <?php
-
 $archived = !empty($order['Order']['archived']);
+//$this->set('back_link', array('Back to Store Orders', array('action' => 'index')));
 
-echo $this->element('orders/admin_heading', array(
-	'crumbs' => 'Order #'. $order['Order']['id']
-));
-
-$this->set('back_link', array('Back to Store Orders', array('action' => 'index')));
-
-
-echo $this->Html->tag('h1', 'Order #' . $order['Order']['id'], array('class' => 'topTitle'));
-echo $this->Layout->headerMenu(array(
-	array('Edit Order', array('action' => 'edit', $order['Order']['id'])),
-	array(
-		'Print Invoice', 
-		array('action' => 'print_invoice', $order['Order']['id']) + Prefix::reset(), 
+echo $this->Layout->defaultHeader($order['Order']['id'], array(
+	array('Print Invoice', 
+		array('action' => 'invoice', $order['Order']['id']) + Prefix::reset(), 
 		array('target' => '_blank')
-	),
-));
+	)), array(
+		'title' => $order['Order']['title'],
+	)
+);
 
-echo $this->Form->create('Order', array('class' => 'halfFormWidth'));
+echo $this->Form->create('Order', array('class' => 'form-horizontal'));
 echo $this->Form->hidden('id');
-echo $this->Html->div('span-12');
-echo $this->Layout->fieldset('Shipping Information');
+
 $info = array(
-	'Shipping Address' => $this->Contact->location($order['Order'], array('beforeField' => array('name'))),
+	'Shipping Address' => $this->AddressBook->location($order['Order'], array(
+		'beforeField' => array('name')
+	)),
+	'Billing Address' => $this->AddressBook->location($order['Invoice'], array(
+		'beforeField' => array('name')
+	)),
+	'Email' => $this->AddressBook->email($order['Order']['email']),
+	'Phone' => $this->AddressBook->phone($order['Order']['phone']),
+	'Created' => $this->Calendar->niceShort($order['Order']['created']),
+	'Last Updated' => $this->Calendar->niceShort($order['Order']['modified']),
+	'Paid' => $this->Order->paid($order),
+	'Shipped' => $this->Order->shipped($order),
+	'Track' => $this->Order->tracking($order)
 );
-$info['Email'] = $this->Contact->email($order['Order']['email']);
-$info['Phone'] = $this->Contact->phone($order['Order']['phone']);
-$info['Created'] = $this->Calendar->niceShort($order['Order']['created']);
-$info['Last Updated'] = $this->Calendar->niceShort($order['Order']['modified']);
-echo $this->Layout->infoTable($info);
-echo $this->element('orders/input_shipping');
-echo $this->FormLayout->submit('Update');
 
-echo "</fieldset>\n";
-echo "</div>\n";
-echo $this->Html->div('span-12 last');
-echo $this->Layout->fieldset('Billing Information');
-$info = array(
-	'Billing Address' => $this->Contact->location($order['Invoice'], array('beforeField' => array('name')))
-);
-echo $this->Layout->infoTable($info);
-echo $this->element('orders/input_payment');
-echo $this->FormLayout->submit('Update');
+?>
+<div class="row">
+	<div class="span6">
+		<h3>Info</h3>
+		<?php 		
+			echo $this->Layout->infoTable($info); 
+		?>
+	</div>
 
-echo "</fieldset>\n";
-echo "</div>\n";
-echo $this->Form->end();
+	<div class="span6">
+		<h3>Shipping</h3>
+			<?php echo $this->element('orders/input_shipping'); ?>
+		<h3>Payment</h3>
+			<?php echo $this->element('orders/input_payment'); ?>
+		<?php echo $this->Form->submit('Update'); ?>
+	</div>
+</div>
+<?php echo $this->Form->end(); ?>
 
-
-echo "<hr/>\n";
-
-echo $this->Html->tag('h2', 'Order Contents');
-
-
+<h2>Order Contents</h2>
+<?php
+echo $this->element('orders/cart', array(
+	'shipping' => true,
+	'delete' => true,
+));
+/*
 $this->Table->reset();
 foreach ($order['OrderProduct'] as $orderProduct) {
 	$productUrl = array(
@@ -124,8 +125,8 @@ $this->Table->cells(array(
 	array('Total', null, null, null, array('colspan' => $colspan, 'class' => 'total grandTotal')),
 	array($this->DisplayText->cash($order['Order']['total']), null, null, null, array('class' => 'total grandTotal figure')),
 ), true);
-
 echo $this->Table->table(array('class' => 'orderList'));
+*/
 
 if (empty($order['Order']['archived'])) {
 	echo $this->Form->create('OrderProduct', array('action' => 'add', 'type' => 'GET'));
@@ -141,27 +142,35 @@ if (empty($order['Order']['archived'])) {
 }
 
 $info = array();
+if ($canceled) 
 if ($archived) {
 	$info[] = 'This order has been Archived, usually because it has already been paid or shipped. If changes are made to existing 
 	handling or shipping charges in the system, no changes will be made to this order';
 } else {
-	if ($order['Order']['auto_handling']) {
-		$info[] = 'Auto-Handling is ON. It will be updated as changes are made to handling charges';
-	} else {
-		$info[] = 'Auto-Handling is OFF. Only updates made to this form will be reflected in handling charges';
+	$autoFields = array(
+		'auto_handling' => array(
+			'Auto-Handling',
+			'It will be updated as changes are made to handling charges',
+			'Only updates made to this form will be reflected in handling charges',
+		),
+		'auto_shipping' => array(
+			'Auto-Shipping',
+			'It will be updated as changes are made to shipping charges',
+			'Only updates made to this form will be reflected in shipping charges',
+		),
+		'auto_price' => array(
+			'Auto-Pricing',
+			'All prices are set by the products database',
+			'You can change the default prices of items',
+		),
+	);
+	foreach ($autoFields as $field => $fieldInfo) {
+		$on = $order['Order'][$field];
+		$out = $this->Html->tag('span', $fieldInfo[0] . ' is ' . ($on ? 'ON' : 'OFF'), array(
+			'class' => 'label label-' . ($on ? 'success' : 'error'),
+		)) . ' ';
+		$out .= $on ? $fieldInfo[1] : $fieldInfo[2];
+		$info[] = $out;
 	}
-	if ($order['Order']['auto_shipping']) {
-		$info[] = 'Auto-Shipping is ON. It will be updated as changes are made to shipping charges';
-	} else {
-		$info[] = 'Auto-Shipping is OFF. Only updates made to this form will be reflected in shipping charges';
-	}
-	if ($order['Order']['auto_price']) {
-		$info[] = 'Auto-Pricing is ON. All prices are set by the products database';
-	} else {
-		$info[] = 'Auto-Pricing is OFF. You can change the default prices of items';
-	}
-
 }
 echo $this->Layout->fieldset('Order Automatic Updating', $this->Layout->menu($info));
-
-?>

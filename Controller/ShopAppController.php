@@ -8,6 +8,7 @@ require_once '../Config/core.php';
 class ShopAppController extends AppController {
 	var $components = array(
 		'FormData.FormData' => array('plugin' => 'Shop'),
+		'Layout.FormLayout',
 		'Session',
 	);
 	
@@ -35,9 +36,21 @@ class ShopAppController extends AppController {
 		}
 	}
 	
-	function _redirectMsg($redirect = true, $msg = null) {
+	function _redirectHome() {
+		return $this->redirect(array('controller' => 'catalog_items', 'action' => 'index'));
+	}
+	
+	function _redirectMsg($redirect = true, $msg = null, $success = null) {
 		if (!empty($msg)) {
-			$this->Session->setFlash($msg);
+			$type = 'info';
+			if ($success === false) {
+				$type = 'error';
+			} else if ($success == true) {
+				$type = 'success';
+			}
+			$this->Session->setFlash(__($msg), 'default', array(
+				'class' => 'alert alert-' . $type
+			));
 		}
 		if ($redirect !== false) {
 			if ($redirect === true) {

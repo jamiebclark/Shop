@@ -2,57 +2,47 @@
 class InvoiceHelper extends AppHelper {
 	var $name = 'Invoice';
 	var $helpers = array(
-		'Layout.Asset',		'Html',		'Form', 		'Layout.Layout', 		'Shop.PaypalForm', 		'Layout.FormLayout'	);
+		'Form', 
+		'Html',		'Layout.AddressBook',
+		'Layout.Asset',
+		'Layout.Calendar',
+		'Layout.FormLayout',
+		'Layout.Layout', 		'Shop.PaypalForm', 	);
 	
 	var $companyName = COMPANY_NAME;
 	var $mailingAddress = COMPANY_ADDRESS;
 	
-	function beforeRender($viewFile) {
-		$this->Asset->css('development');
-		parent::beforeRender($viewFile);
-	}		
-	
-	function relatedLink($Result, $options = array()) {
-		$models = array(
-			'Donation' => 'Online Donation', 
-			'Order' => 'Online Store Order', 
-			'NsaMember' => 'NSA Membership',
-			'BowlathonPledge' => 'Bowlathon Pledge Payment',
-			'DonorCardOrder' => 'Donor Card Order',
-		);
-		$list = array();
-		foreach ($models as $model => $label) {
-			if (is_numeric($model)) {
-				$model = $label;
-			}
-			if (!empty($Result[$model]['id'])) {
-				$list[] = $this->Html->link(
-					$label . ' #' . $Result[$model]['id'],
-					array(
-						'controller' => Inflector::tableize($model),
-						'action' => 'view',
-						$Result[$model]['id'],
-						'admin' => true,
-					),
-					$options
-				);
-			}
-		} 
-		$title = '';
-		if (empty($list)) {
-			if (!empty($Result['Invoice']['item_name'])) {
-				$title = $Result['Invoice']['item_name'];
-				if (!empty($Result['Invoice']['item_number'])) {
-					$title .= '# ' . $Result['Invoice']['item_number'];
-				}
-			}
+	function address($invoice) {
+		return $this->AddressBook->address($invoice, array(
+			'beforeField' => array(array('first_name', 'last_name')),
+		));
+	}
+
+	public function paid($invoice) {
+		if ($invoice['paid']) {
+			return 'Paid ' . $this->Calendar->niceShort($invoice['paid'], 
+				array('time' => false));
 		} else {
-			$title = implode(', ', $list);
+			return false;
 		}
-		return $title;
 	}
 	
-	function paypalForm($Invoice, $content = null, $options = array()) {
+	function relatedTitle($invoice) {
+		return "{$invoice['model_title']} #{$invoice['model_id']}";
+	}
+	
+	function relatedLink($invoice, $options = array()) {
+		if (empty($invoice['model'])) {
+			return '';
+		}
+		return $this->Html->link($this->relatedTitle($invoice), array(
+				'controller' => Inflector::tableize($invoice['model']),
+				'action' => 'view',
+				$invoice['id'],
+			), $options);
+	}
+	
+	function paypalForm($invoice, $content = null, $options = array()) {
 		$cols = array(
 			'first_name',
 			'last_name',
@@ -75,27 +65,26 @@ class InvoiceHelper extends AppHelper {
 			'cancel_return' => $here,
 		);
 		
-		if (!empty($Invoice['title'])) {
-			$settings['item_name'] = $Invoice['title'];
-		} else if (!empty($Invoice['item_name'])) {
-			$settings['item_name'] = $Invoice['item_name'];
+		if (!empty($invoice['model_title'])) {
+			$settings['item_name'] = $this->relatedTitle($invoice);
+			$settings['item_number'] = $invoice['model_id'];
 		} else {
-			$settings['item_name'] = 'Invoice';
+			$settings['item_name'] = !empty($invoice['title']) ? $invoice['title'] : 'Invoice';
+			$settings['item_number'] = $invoice['id'];
 		}
-		$settings['item_number'] = !empty($Invoice['item_number']) ? $Invoice['item_number'] : $Invoice['id'];
 		
 		//Recurring payments
 		$recurUnit = 'M';
 		
-		if (!empty($Invoice['recur'])) {
+		if (!empty($invoice['recur'])) {
 			unset($settings['amt']);
 			$settings['cmd'] = '_xclick-subscriptions';
-			$settings['item_name'] = 'Subscription Payment';
-			$settings['a3'] = $Invoice['amt'];
+			$settings['model_title'] = 'Subscription Payment';
+			$settings['a3'] = $invoice['amt'];
 			$settings['p3'] = 1;					//Once
 			$settings['t3'] = $recurUnit;			//Every Month
 			$settings['src'] = 1;					//Do not recur when it completes the cycle
-			$settings['srt'] = $Invoice['recur'];	//Repeat this many times
+			$settings['srt'] = $invoice['recur'];	//Repeat this many times
 		}
 		
 		$optionSettings = Param::keyCheck($options, 'settings', true, array());
@@ -105,85 +94,78 @@ class InvoiceHelper extends AppHelper {
 			if (is_numeric($paypalCol)) {
 				$paypalCol = $dbCol;
 			}
-			$settings[$paypalCol] = $Invoice[$dbCol];
+			$settings[$paypalCol] = $invoice[$dbCol];
 		}
-		$output = '';
-		$output .= $this->PaypalForm->create($options);
-		$output .= $this->PaypalForm->inputSettings($settings);
+		$out = '';
+		$out .= $this->PaypalForm->create($options);
+		$out .= $this->PaypalForm->inputSettings($settings);
 		if (!empty($content)) {
-			$output .=  $content . $this->PaypalForm->end();
+			$out .=  $content . $this->PaypalForm->end();
 		} 
-		return $output;
+		return $out;
 	}
 	
 	function paypalFormClose() {
 		return $this->PaypalForm->end();
 	}
 	
-	function checkPaymentSteps($Invoice) {
-		$memo = 'Invoice #' . $Invoice['id'];
+	function checkPaymentSteps($invoice) {
+		$memo = 'Invoice #' . $invoice['id'];
 		$steps = array(
 			'Make check payable to <strong>' . $this->companyName . '</strong>',
-			'Payment should be the amount of <strong>$' . number_format($Invoice['amt'],2) . '</strong>',
+			'Payment should be the amount of <strong>$' . number_format($invoice['amt'],2) . '</strong>',
 			'Be sure to write <strong>' . $memo . '</strong> in the "Memo" section',
 			'If possible, attach a ' . $this->Html->link(
 				'printed copy of your invoice', array(
 					'controller' => 'invoices',
 					'action' => 'view',
-					$Invoice['id'],
+					$invoice['id'],
 				) + Prefix::reset(), 
-				array(
-					'target' => '_blank'
-				)
+				array('target' => '_blank')
 			),
 		);
 		
-		$output = $this->Html->div('invoiceCheckPaymentSteps');
-		$output .= '<ol><li>' . implode('</li><li>', $steps) . '</li></ol>';
-		$output .= "</div>\n";
-		return $output;
+		return $this->Html->tag('ol', '<li>' . implode('</li><li>', $steps) . '</li>', array(
+			'class' => 'invoice-check-payment-steps',
+		));
 	}
 	
 	function getMailingAddress() {
 		return $this->mailingAddress;
 	}
 	
-	function paymentForm($Invoice, $options = array()) {
+	function paymentForm($invoice, $options = array()) {
 		$options = array_merge(array(
 			'paypal' => true,
 			'check' => true,
 		), $options);
 		extract($options);
 		
-		$paypalButton = $this->paypalForm(
-			$Invoice, 
-			$this->Form->button(
-				$this->Html->image('btn/paypal.png'),
-				array(
-					'img' => false,
-					'style' => 'width: auto;',
-				)
-			)
+		$paypalForm = $this->paypalForm(
+			$invoice, 
+			$this->Form->submit ('Pay with Credit Card or PayPal', array('class' => 'btn-large btn-primary'))
 		);
 		$payments = array();
 		
 		if (!empty($paypal)) {
 			$payments[] = array(
-				'Pay with Credit Card / Paypal',
-				$paypalButton,
+				'Pay with Credit Card / PayPal',
+				$paypalForm,
 				'Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment ',
 			);
 		}
+		
 		if (!empty($check)) {
 			$payments[] = array(
 				'Pay by Check',
 				$this->Html->div(
-					'mailingAddress', 
+					'mailing-address', 
 					$this->Html->tag('h4', 'Mail to:') . $this->getMailingAddress()
 				),
-				$this->checkPaymentSteps($Invoice),
+				$this->checkPaymentSteps($invoice),
 			);
 		}
+		
 		//Begin Output
 		$out = '';
 		foreach ($payments as $k => $payment) {

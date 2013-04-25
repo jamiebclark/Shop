@@ -1,7 +1,12 @@
 <?php
 class PaypalPayment extends ShopAppModel {
 	var $name = 'PaypalPayment';
-	var $belongsTo = array('Shop.Invoice' => array('foreignKey' => 'invoice'));
+	var $belongsTo = array(
+		'Invoice' => array(
+			'className' => 'Shop.Invoice',
+			'foreignKey' => 'invoice'
+		)
+	);
 	//OnlineStore, Bowlathon
 	
 	function afterSave($created) {

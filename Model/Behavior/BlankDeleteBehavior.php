@@ -7,7 +7,9 @@
 class BlankDeleteBehavior extends ModelBehavior {
 	public $name = 'BlankDelete';
 	
-	var $settings;
+	public $settings;
+	
+	private $confirmDelete = false;
 	
 	function setup(&$Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
@@ -28,13 +30,23 @@ class BlankDeleteBehavior extends ModelBehavior {
 		}
 	}
 	
-	function beforeSave(&$Model, $options) {
-		return $this->blankDelete($Model, $options);
+	function beforeSave(Model $Model, $options) {
+		$this->confirmDelete = false;
+		$this->checkBlankDelete($Model, $options);
+		return parent::beforeSave($Model, $options);
 	}
 	
-	function blankDelete(&$Model, $options = array()) {
+	function afterSave(Model $Model, $created) {
+		if ($this->confirmDelete) {
+			$Model->delete($Model->id);
+		}
+		return parent::afterSave($Model, $created);
+	}
+	
+	function checkBlankDelete(Model $Model, $options = array()) {
 		$isBlank = false;
-		$return = true;
+		$isAssociated = empty($Model->data[$Model->alias]);
+		
 		if (!empty($Model->data[$Model->alias])) {
 			$data =& $Model->data[$Model->alias];
 		} else {
@@ -48,7 +60,7 @@ class BlankDeleteBehavior extends ModelBehavior {
 				$settings['or'] = array($settings['or']);
 			}
 			foreach ($settings['or'] as $column) {
-				if (empty($data[$column]) || $this->_isBlank($data[$column])) {
+				if (empty($data[$column]) || $this->isBlank($data[$column])) {
 					$isBlank = true;
 				}
 			}
@@ -59,7 +71,7 @@ class BlankDeleteBehavior extends ModelBehavior {
 			}
 			$andBlank = false;
 			foreach ($settings['and'] as $column) {
-				if (empty($data[$column]) || $this->_isBlank($data[$column])) {
+				if (empty($data[$column]) || $this->isBlank($data[$column])) {
 					$andBlank = true;
 				} else {
 					$andBlank = false;
@@ -71,22 +83,24 @@ class BlankDeleteBehavior extends ModelBehavior {
 			}
 		}
 		if ($isBlank) {
-			if (!empty($data['id'])) {
-				$Model->delete($data['id']);
-			}
-			$Model->validationErrors = null;
-			if (!empty($Model->data[$Model->alias])) {
-				$Model->data[$Model->alias] = array();
+			if ($isAssociated) {
+				$this->confirmDelete = true;
 			} else {
-				$Model->data = array();
+				$this->confirmDelete = false;
+				if (!empty($data['id'])) {
+					$Model->delete($data['id']);
+				}
+				$Model->validationErrors = null;
+				if (!empty($Model->data[$Model->alias])) {
+					$Model->data[$Model->alias] = array();
+				} else {
+					$Model->data = array();
+				}
 			}
-			$return = true;
 		}
-		
-		return $return;
 	}
 	
-	function _isBlank($val) {
+	private function isBlank($val) {
 		$val = trim($val);
 		$blankVals = array(
 			null,

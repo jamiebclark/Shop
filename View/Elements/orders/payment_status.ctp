@@ -10,13 +10,5 @@ if (!empty($order['Invoice']['addline1'])) {
 		$order['Order']['id'],
 	), array('escape' => false));
 }
-if (!empty($order['Invoice']['paid'])) {
-	$info['Status'] = $this->Html->tag('strong', 'Paid ' . $this->Calendar->niceShort($order['Invoice']['paid']));
-} else {
-	$info['Status'] = $this->Html->link('<em>Not paid yet</em>', array(
-		'controller' => 'orders',
-		'action' => 'checkout',
-		$order['Order']['id'],
-	), array('escape' => false));
-}
+$info['Status'] = $this->Order->paid($order);
 echo $this->element('orders/status', compact('info', 'blank', 'title', 'mode', 'tag'));

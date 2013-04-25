@@ -7,22 +7,26 @@ if (!$isArchived) {
 }
 $statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
 ?>
+<h1>Finish Checking Out</h1>
 <div class="row">
 	<div class="span8">
-		<h1>Payment Options</h1>
+		<div class="row">
+			<div class="span4">
+				<?php echo $this->element('orders/shipping_status', $statusOptions); ?>
+			</div>
+			<div class="span4">
+				<?php echo $this->element('orders/payment_status', $statusOptions); ?>
+			</div>
+		</div>
 		<?php
 		echo $this->Invoice->paymentForm($order['Invoice']);
 		?>
 	</div>
 	<div class="span4">
-		<h2><?php echo $infoTitle; ?></h2>
-		<?php echo $this->element('orders/shipping_status', $statusOptions); ?>
-		<hr/>
-		<?php echo $this->element('orders/payment_status', $statusOptions); ?>
-		<hr/>
-		<h2><?php echo $cartTitle; ?></h2>
+		<h3><?php echo $cartTitle; ?></h3>
 		<?php 
-		$this->element('orders/cart', array(
+		echo $this->element('orders/cart', array(
+			'condensed' => true,
 			'links' => false,
 			'form' => false,
 			'images' => false,

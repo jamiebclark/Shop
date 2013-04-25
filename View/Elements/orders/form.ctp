@@ -1,52 +1,59 @@
 <?php
-$this->Asset->css('products');
-$this->Asset->js('product');
-
-
 echo $this->Form->create('Order');
 echo $this->Form->hidden('id');
+$span = 6;
 
-//Shipping Info
-echo $this->Layout->fieldset('Shipping Information', null, array('class' => 'halfFormWidth'));
+echo $this->Layout->defaultHeader($order['Order']['id']);
+?>
 
-echo $this->Form->input('cancelled', array('label' => 'Order has been cancelled'));
+	<?php	
+	echo $this->Form->input('canceled', array(
+		'label' => 'Canceled', 
+		'helpBlock' => 'Order has been canceled'
+	));
+	?>
+<div class="row">
+	<div class="span5">
+		<h3>Shipping</h3>
+		<?php 
+			echo $this->element('orders/input_shipping'); 
+		?>
+	</div>
+	<div class="span7">
+		<h3>Customer Info</h3><?php
+		echo $this->FormLayout->addressInput(compact('span') + array(
+			'placeholder' => true,
+			'before' => $this->FormLayout->inputRow(array('first_name', 'last_name'), compact('span')),
+			'after' => $this->FormLayout->inputRow(array('email', 'phone'), compact('span') + array('placeholder' => true)),
+		));
+		?>
+	</div>
+</div>
 
-echo "<table><tr><td>\n";
-echo $this->element('orders/input_shipping');
-echo "</td><td>\n";
-echo $this->element('profiles/full_name_input', array('model' => 'Order'));
-echo $this->element('locations/form', array(
-	'model' => 'Order',
-	'addline' => 2,
-	'location' => true,
-	'cityStateLine' => false,
-));
-echo "</td></tr></table>\n";
-echo "</fieldset>\n";
+<div class="row">
+	<div class="span5">
+		<h3>Payment</h3>
+		<?php echo $this->element('orders/input_payment', array('amt' => false));?>
+	</div>
+	<div class="span7">
+		<h3>Billing</h3>
+		<?php 
+		echo $this->FormLayout->toggle(null, $this->FormLayout->addressInput(compact('span') + array(
+			'model' => 'Invoice',
+			'placeholder' => true,
+			'before' => $this->FormLayout->inputRow(array(
+				'Invoice.first_name', 
+				'Invoice.last_name'
+			), compact('span'))
+		)), 'Billing address is same as Shipping', array(
+			'name' => 'same_billing',
+		));
+		?>
+	</div>
+</div>
 
-//Payment Info
-echo $this->Layout->fieldset('Payment Information', null, array('class' => 'halfFormWidth'));
-echo $this->Form->input('same_billing', array('type' => 'checkbox', 'label' => 'Shipping address is same as Billing address'));
-
-
-echo "<table><tr><td>";
-echo $this->element('orders/input_payment', array('amt' => false));
-echo "</td><td>\n";
-
-echo $this->element('profiles/full_name_input', array('model' => 'Invoice'));
-echo $this->element('locations/form', array(
-	'model' => 'Invoice',
-	'addline' => 2,
-	'cityStateLine' => false,
-));
-
-echo "</td></tr></table>\n";
-
-echo "</fieldset>\n";
-
-
-//Products
-echo $this->Layout->fieldset('Order Items');
+<h2>Cart</h2>
+<?php
 echo $this->Form->inputs(array(
 	'fieldset' => false,
 	'auto_shipping' => array(
@@ -59,58 +66,111 @@ echo $this->Form->inputs(array(
 	)
 ));
 $this->Table->reset();
+$inputOptions = array('label' => false, 'class' => 'input-small');
+$cashOptions = $inputOptions + array('prepend' => '$', 'step' => 'any');
+
 foreach($this->request->data['OrderProduct'] as $k => $orderProduct) {
-	$prefix = 'OrderProduct.' . $k . '.';
+	$prefix = "OrderProduct.$k.";
 	echo $this->Form->input($prefix . 'id');
-	$productOption = !empty($productOptions[$orderProduct['product_id']]) ? $productOptions[$orderProduct['product_id']] : null;
+	
 	$this->Table->cells(array(
-		array($this->Form->input($prefix . 'product_id', array('label' => false)), 'Product'),
-		array($this->element('products/product_option_select', array(
-			'model' => 'OrderProduct', 
-			'key' => $k, 
-			'productOptions' => $productOption,
-		))),
-		array($this->Form->input($prefix . 'price', array('label' => '$', 'div' => false)), 'Price per Item', null, null, array('class' => 'number')),
-		array($this->Form->input($prefix . 'shipping', array('label' => '$', 'div' => false)), 'Shipping', null, null, array('class' => 'number')),
-		array($this->Form->input($prefix . 'quantity', array('label' => false, 'div' => false)), 'Quantity', null, null, array('class' => 'number')),
+		array(
+			$this->Form->input($prefix . 'product_id', array('class' => null) + $inputOptions),
+			'Product'
+		), array(
+			$this->Form->input($prefix . 'price', $cashOptions), 
+			'Price per Item', 
+			array('class' => 'number')
+		), array(
+			$this->Form->input($prefix . 'shipping', $cashOptions),
+			'Shipping', 
+			array('class' => 'number')
+		), array(
+			$this->Form->input($prefix . 'quantity', $inputOptions),
+			'Quantity', 
+			array('class' => 'number')
+		),
 	), true);
 }
 echo $this->Table->table();
-echo "</fieldset>\n";
+?>
 
-//Handling
-echo $this->Html->div('orderProductsForm');
-echo $this->Layout->fieldset('Handling Charges');
+<h2>Handling</h2>
+<?php
 echo $this->Form->input('auto_handling', array(
 	'type' => 'checkbox',
 	'label' => 'Let the system calculate what handling charges should be'
 ));
 echo $this->Table->reset();
-for ($k = 0; $k <= count($this->request->data['ProductHandlingsOrder']); $k++) {
-	$prefix = 'ProductHandlingsOrder.' . $k . '.';
+$total = 1;
+if (!empty($this->request->data['OrdersHandlingMethod'])) {
+	$total = count($this->request->data['OrdersHandlingMethod']);
+}
+for ($k = 0; $k <= $total; $k++) {
+	$prefix = 'OrdersHandlingMethod.' . $k . '.';
 	
-	if (!empty($this->request->data['ProductHandlingsOrder'][$k])) {
+	if (!empty($this->request->data['OrdersHandlingMethod'][$k])) {
 		$total = ($this->request->data['Order']['sub_total'] + $this->request->data['Order']['shipping']);
-		$total *= $this->request->data['ProductHandlingsOrder'][$k]['pct'];
-		$total += $this->request->data['ProductHandlingsOrder'][$k]['amt'];
+		$total *= $this->request->data['OrdersHandlingMethod'][$k]['pct'];
+		$total += $this->request->data['OrdersHandlingMethod'][$k]['amt'];
 	} else {
 		$total = 0;
 	}
 	echo $this->Form->hidden($prefix . 'id');
 	echo $this->Form->hidden($prefix . 'handling_method_id');
 	$this->Table->cells(array(
-		array($this->Form->input($prefix . 'title', array('label' => false)), 'Title'),
-		array($this->Form->input($prefix . 'amt', array('label' => '$')), 'Amount'),
-		array($this->Form->input($prefix . 'pct', array('label' => false, 'after' => '%')), 'Percent'),
-		array($this->DisplayText->cash($total), 'Charge'),
+		array(
+			$this->Form->input(
+				$prefix . 'title', 
+				array('prepend' => false, 'class' => null) + $inputOptions
+			), 'Title'
+		), array(
+			$this->Form->input($prefix . 'amt', $cashOptions), 
+			'Amount'
+		), array(
+			$this->Form->input($prefix . 'pct', $inputOptions + array('append' => '%')), 
+			'Percent'
+		), array(
+			$this->DisplayText->cash($total), 'Charge',
+			array('class' => 'price')
+		),
 	), true);
 }
-echo $this->Table->table();
-echo "</fieldset>\n";
+echo $this->Table->table(array('class' => 'handling-methods'));
 
-
-
-echo $this->FormLayout->submit('Update');
+echo $this->Form->submit('Update', array('class' => 'btn btn-primary')); 
 echo $this->Form->end();
-echo "</div>\n";
 ?>
+<script type="text/javascript">
+(function($) {
+	$.fn.toggleActive = function(find) {
+		return this.each(function() {
+			var $toggle = $(this),
+				$find = $(find);
+			function toggleClick() {
+				$find.each(function() {
+					if ($toggle.is(':checked')) {
+						$(this).data('old-readonly', $(this).prop('readonly'));
+						$(this).prop('readonly', true);
+					} else {
+						$(this).prop('readonly', false);
+					}
+				});
+			}
+			
+			$toggle.click(function(e) {
+				toggleClick();
+			});
+			toggleClick();
+			return $(this);
+		});
+	};
+})(jQuery);
+$(document).ready(function() {
+	$('input[name*=auto_shipping]').toggleActive('input[name*="[shipping]"]');
+	$('input[name*=auto_price]').toggleActive('input[name*="[price]"]');
+	$('input[name*=auto_handling]').toggleActive('.handling-methods :input');
+});
+
+
+</script>

@@ -1,59 +1,59 @@
 <?php 
 echo $this->Layout->defaultHeader(); 
-echo $this->Form->create('CatalogItem', array('class' => 'form-horizontal', 'type' => 'file'));
-echo $this->Form->inputs(array(
-	'legend' => 'Item Info',
-	'id',
-	'title',
-	'short_description',
-	'description' => array('escape' => false),
-	'price' => array('label' => 'Price', 'prepend' => '$'),
-	'sale' => array('label' => 'Sale Price', 'prepend' => '$'),
-	'min_quantity' => array('label' => 'Minimum Quantity'),
-	'quantity_per_pack',
-	'active' => array(
-		'label' => 'Active',
-		'helpBlock' => 'Whether item is available for sale',
-	),
-	'hidden' => array(
-		'label' => 'Hidden',
-		'helpBlock' => 'Hide this from catalog page while still being active',
-	),
-	'unlimited' => array(
-		'label' => 'Unlimited Inventory',
-		'helpBlock' => 'Item\'s stock never runs out'
-	),
-));
+echo $this->Form->create('CatalogItem', array('type' => 'file'));
+$cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small');
+
 ?>
-<fieldset><legend>Categories</legend>
-	<?php
-		$total = 3;
-		if (!empty($this->request->data['CatalogItemCategory'])) {
-			$total += count($this->request->data['CatalogItemCategory']);
-		}
-		for ($i = 0; $i < $total; $i++) {
-			echo $this->Form->input('CatalogItemCategory.' .$i, array(
-				'type' => 'select',
-				'label' => 'Category #' . ($i+1),
-				'options' => $catalogItemCategories,
+<div class="row">
+	<div class="span6">
+		<fieldset><legend>Item Info</legend>
+			<?php
+			echo $this->Form->inputs(array(
+				'fieldset' => false,
+				'id',
+				'title',
+				'short_description',
+				'description' => array('escape' => false),
+				'price' => array('label' => 'Price') + $cashOptions,
+				'sale' => array('label' => 'Sale Price') + $cashOptions,
+				'min_quantity' => array('label' => 'Minimum Quantity'),
+				'quantity_per_pack',
+				'active' => array(
+					'label' => 'Active',
+					'helpBlock' => 'Whether item is available for sale',
+				),
+				'hidden' => array(
+					'label' => 'Hidden',
+					'helpBlock' => 'Hide this from catalog page while still being active',
+				),
+				'unlimited' => array(
+					'label' => 'Unlimited Inventory',
+					'helpBlock' => 'Item\'s stock never runs out'
+				),
 			));
-		}
-	?>
-</fieldset>
-<fieldset><legend>Images</legend>
-	<?php
-	$total = 1;
-	if (!empty($this->request->data['CatalogItemImage'])) {
-		$total += count($this->request->data['CatalogItemImage']);
-	}
-	for ($i = 0; $i < $total; $i++) {
-		$prefix = 'CatalogItemImage.' . $i . '.';
-		echo $this->Form->inputs(array(
-			'fieldset' => false,
-			$prefix . 'id' => array('type' => 'hidden'),
-			$prefix . 'add_file' => array('type' => 'file'),
-		));
-	}
+			?>
+		</fieldset>
+	</div>
+	<div class="span6">
+		<fieldset><legend>Categories</legend>
+		<?php
+			echo $this->FormLayout->inputList('catalog_item_categories/input', array(
+				'model' => 'CatalogItemCategory'
+			));
+		?>
+		</fieldset>
+		<fieldset><legend>Images</legend>
+		<?php
+			echo $this->FormLayout->inputList('catalog_item_images/input', array(
+				'model' => 'CatalogItemImage'
+			));
+		?>
+		</fieldset>
+	</div>
+</div>
+<fieldset><legend>Shipping Rules</legend>
+	<?php 
+		echo $this->FormLayout->inputList('shipping_rules/input', array('model' => 'ShippingRule'));
 	?>
 </fieldset>
 <?php 

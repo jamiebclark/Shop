@@ -34,32 +34,37 @@ class CatalogItemImage extends ShopAppModel {
 		)
 	);
 	
-	function beforeSave2() {
-		if (
-			isset($this->data[$this->alias]) && 
-			empty($this->data[$this->alias]['id']) &&
-			empty($this->data[$this->alias]['add_file']['tmp_name'])
-		) {
-			unset($this->data[$this->alias]['add_file']);
+	private $setThumbnail = false;
+	
+	function beforeSave() {
+		$data =& $this->getData();
+		if (isset($data) && empty($data['id']) && empty($data['add_file']['tmp_name'])) {
+			unset($data['add_file']);
 		}
+		if (!empty($data['set_thumbnail'])) {
+			$this->setThumbnail = true;
+		}
+		
 		return parent::beforeSave();
 	}
 	
 	function afterSave($created) {
-		$result = $this->read('catalog_item_id', $this->id);
-		$this->setCatalogItemThumb($result[$this->alias]['catalog_item_id']);
+		if ($this->setThumbnail) {
+			$result = $this->read('catalog_item_id', $this->id);
+			$this->setCatalogItemThumb($result[$this->alias]['catalog_item_id']);
+		}
 	}
 	
 	/**
 	 * Sets the thumbnail for the CatalogItem as the first returned image in the set
 	 *
 	 **/
-	function setCatalogItemThumb($productId = null) {
+	function setCatalogItemThumb($catalogItemId = null) {
 		$options = array(
 			'group' => 'catalog_item_id'
 		);
-		if (!empty($productId)) {
-			$options['catalog_item_id'] = $productId;
+		if (!empty($catalogItemId)) {
+			$options['catalog_item_id'] = $catalogItemId;
 		}
 		
 		$results = $this->find('all', $options);
@@ -70,6 +75,7 @@ class CatalogItemImage extends ShopAppModel {
 				'filename' => $result[$this->alias]['filename'],
 			);
 		}
+		$this->CatalogItem->create();
 		$this->CatalogItem->saveAll($data);
 	}
 }

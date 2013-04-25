@@ -1,15 +1,16 @@
 <?php
-//Settings
-if (empty($form)) {
-	$form = false;
-}
-if (empty($links)) {
-	$links = false;
-}
-if (!isset($images)) {
-	$images = true;
-}
+$default = array(
+	'form' => false,
+	'links' => false,
+	'images' => true,
+	'shipping' => false,
+	'small' => false,
+	'condensed' => false,
+	'delete' => null,
+);
+extract(array_merge($default, compact(array_keys($default))));
 
+$emptyCart = empty($order['OrderProduct']);
 //Order-dependent settings
 if ($order['Order']['archived']) {
 	$archived = true;
@@ -18,19 +19,31 @@ if ($order['Order']['archived']) {
 } else {
 	$archived = false;
 }
+$tableOptions = array('blank' => 'Cart is empty');
+$wrapClass = 'order-cart';
+if ($condensed) {
+	$wrapClass .= ' condensed';
+}
+if ($form) {
+	$wrapClass .= ' order-form';
+}
+
 ?>
-<div class="order-cart <?php echo ($form ? 'order-form' : '');?>">
+<div class="<?php echo $wrapClass;?>">
 <?php
 if ($form) {
 	echo $this->Form->create('Order', array('action' => 'edit'));
 	echo $this->Form->hidden('id', array('value' => $order['Order']['id']));
 }
 $this->Table->reset();
-if (!empty($order['OrderProduct'])):
+if (!$emptyCart):
 	foreach ($order['OrderProduct'] as $k => $orderProduct) {
+		$rowOptions = array('class' => 'order-product');
 		$catalogItem = $orderProduct['Product']['CatalogItem'];
 		$prefix = 'OrderProduct.' . $k . '.';
-		$hasParent = !empty($orderProduct['ParentProduct']['id']);
+		if ($hasParent = !empty($orderProduct['parent_id'])) {
+			$rowOptions = $this->Html->addClass($rowOptions, 'child-order-product');
+		}
 		
 		$productHidden = $catalogItem['hidden'];
 		$productActive = $catalogItem['active'];
@@ -38,13 +51,16 @@ if (!empty($order['OrderProduct'])):
 		//One last post-fix from moving the old system over
 		$orderProduct['title'] = html_entity_decode($orderProduct['title']);
 		
-		
 		//Product
+		$url = null;
 		if (!$hasParent && !$productHidden && $productActive && $links) {
 			$url = $this->CatalogItem->url($catalogItem);
-		} else {
-			$url = null;
 		}
+		
+		if ($hasParent && $condensed) {
+			continue;
+		}
+		
 		$cell = $thumb = '';
 		$title = !empty($url) ? $this->Html->link($orderProduct['title'], $url) : $orderProduct['title'];
 		$mediaOptions = compact('title', 'url');
@@ -53,72 +69,80 @@ if (!empty($order['OrderProduct'])):
 				array('dir' => 'thumb', 'class' => 'media-object'));
 			if (!empty($url)) {
 				$thumb = $this->Html->link($thumb, $url, array('class' => 'pull-left', 'escape' => false));
+			} else {
+				$thumb = $this->Html->tag('span', $thumb, array('class' => 'pull-left'));
 			}
 		}
 		$cell = $this->Html->div('media', $thumb . $this->Html->div('media-body', $title));
-		debug($mediaOptions);
-		$this->Table->cell(
-			$cell,
-			'Product', 
-			array('class' => $hasParent ? 'hasParent' : null)
-		);
+
+		$this->Table->cell($cell, 'Product', array('class' => 'product'));
 		
 		//Price
-		$price = $hasParent ? '&nbsp;' : $this->DisplayText->cash($orderProduct['price']);
-		$this->Table->cell($price, 'Price', null, null, array('class' => 'price'));
+		if (!$condensed) {
+			$price = $hasParent ? '&nbsp;' : $this->CatalogItem->cash($orderProduct['price']);
+			$this->Table->cell($price, 'Price', array('class' => 'price'));
+		}
 		
 		//Quantity
 		if ($form) {
-			echo $this->Form->hidden($prefix . 'id');
-			echo $this->Form->hidden($prefix . 'product_id');
-			$fieldName = $prefix . 'quantity';
 			if ($hasParent) {
-				$cell = $this->Form->hidden($fieldName) . number_format($orderProduct['quantity']);
+				$cell = number_format($orderProduct['quantity']);
 			} else {
-				$cell = $this->Form->input($fieldName, array(
-					'label' => false,
-					'div' => false,
-					'class' => 'qty',
-					'append' => $this->Iconic->icon('x', array('url' => array(
-						'controller' => 'order_products',
-						'action' => 'delete',
-						$orderProduct['id'],
-					)))
-				));
+				echo $this->Form->hidden($prefix . 'id');
+				echo $this->Form->hidden($prefix . 'product_id');
+				echo $this->Form->hidden($prefix . 'parent_id');
+				echo $this->Form->hidden($prefix . 'package_quantity');
+				$cell = $this->Form->input(
+					$prefix . 'quantity', 
+					array('label' => false, 'div' => false, 'class' => 'qty input-small')
+				);
 			}
 			$this->Table->cell(
 				$cell,
-				$this->Form->submit('Update', array('name' => 'update', 'div' => false)), 
-				null, 
-				null, 
-				array(
-					'width' => 40,
-					'class' => $hasParent ? 'quantity' : null
-				)
+				$this->Form->submit('Update', array('name' => 'update', 'div' => false)),
+				array('class' => 'quantity')
 			);
 		} else {
 			$this->Table->cell(
 				number_format($orderProduct['quantity']), 
-				'Quantity',
-				null,
-				null,
+				!$condensed ? 'Quantity' : 'Qty',
+				array('class' => 'quantity')
+			);
+		}
+		
+		if ($shipping) {
+			$this->Table->cell(
+				$this->DisplayText->cash($orderProduct['shipping']),
+				'Shipping',
 				array('class' => 'quantity')
 			);
 		}
 
+		//DELETE Link
+		if (!empty($delete) || (!$condensed && $links)) {
+			if (!$hasParent) {
+				$deleteLink = $this->Layout->actionMenu(array('delete'), array(
+					'url' => array('controller' => 'order_products', $orderProduct['id']),
+				));
+			} else {
+				$deleteLink = '&nbsp;';
+			}
+			$this->Table->cell($deleteLink, 'Remove', array('class' => 'delete'));
+		}
+
 		$this->Table->cell(
 			$hasParent ? '&nbsp;' : $this->DisplayText->cash($orderProduct['sub_total']),
-			'Total', null, null, array(
-				'class' => 'row-total'
-			)
+			'Total', 
+			array('class' => 'row-total')
 		);
-		$this->Table->rowEnd();
+
+		$this->Table->rowEnd($rowOptions);
 	}
 	
 	//Totals Rows
 	$colspan = $this->Table->columnCount - 1;
 	$totals = array();
-		//Sub-Total
+	//Sub-Total
 	$totals[] = array(
 		'Sub-Total',
 		$this->DisplayText->cash($order['Order']['sub_total'], false)
@@ -156,31 +180,49 @@ if (!empty($order['OrderProduct'])):
 			$trOptions = $this->Html->addClass($trOptions, 'top-total'); 
 		}
 		$this->Table->cells(array(
-			array($label,
-				null, null, null, array(
-					'class' => 'total-label',
-					'colspan' => $colspan,
-				)
-			), array(
-				$value,
-				null, null, null, array(
-					'class' => 'row-total',
-				)
-			)
+			array($label, array('class' => 'total-label', 'colspan' => $colspan)), 
+			array($value, array('class' => 'row-total'))
 		), $trOptions);
 	}
-	echo $this->Table->output(array('blank' => 'Cart is empty'));
+	echo $this->Table->output($tableOptions);
 else: ?>
-	<span class="message">
-	Your cart is empty. <?php echo $this->Html->link('Add some stuff to it!', array('controller' => 'catalog_items', 'action' => 'index'));?>
-	</span>
+	<div class="jumbotron">
+		<h1>Your cart is empty!</h1>
+		<?php 
+			echo $this->Html->link(
+				'Add some stuff to it!', 
+				array('controller' => 'catalog_items', 'action' => 'index'),
+				array('class' => 'btn btn-large')
+			);
+		?>
+	</div>
 <?php
 endif;
 
-if ($form):
+if ($form && !$emptyCart):	?>
+	<div class="promo-code clearfix">
+		<?php 
+		echo $this->Form->input('PromoCode.0.code', array(
+			'div' => 'input-append',
+			'label' => false,
+			'value' => '',
+			'placeholder' => 'Add a Promo Code',
+			'after' => $this->FormLayout->submit('Add', array('div' => false))
+		));
+		if (!empty($this->request->data['Order']['PromoCode'])): ?>
+			<div class="promo-code-list">
+				Currently Using: <span><?php
+					foreach ($this->request->data['Order']['PromoCode'] as $promoCode):
+						echo $promoCode['code'] . ' ';
+					endforeach;
+				?></span>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
 	echo $this->FormLayout->buttons(array(
 		'Checkout' => array(
-			'class' => 'btn btn-primary',
+			'class' => 'btn btn-primary pull-right',
 			'name' => 'checkout',
 		),
 		'Continue Shopping' => array(
@@ -188,25 +230,8 @@ if ($form):
 			'class' => 'btn',
 		)
 	));
-	?>
-	<fieldset><legend>Promotional Codes</legend>
-	<?php 
-	echo $this->Form->input('PromoCode.0.code', array(
-		'label' => 'Promotional Code',
-		'value' => '',
-		'div' => 'input text promoInput',
-		'after' => $this->FormLayout->submit('Submit', array('div' => false))
-	));
-	if (!empty($this->request->data['Order']['PromoCode'])): ?>
-		<div class="promo-code-list">
-			Currently Using: <span><?php
-		foreach ($this->request->data['Order']['PromoCode'] as $promoCode) {
-			echo $promoCode['code'] . ' ';
-		}?></span>
-		</div>
-	<?php endif; ?>
-	</fieldset><?php
 	echo $this->Form->end();
 endif;
+//	debug($this->request->data);
 ?>
 </div>

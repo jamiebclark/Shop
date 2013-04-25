@@ -1,4 +1,3 @@
+<h1>Invoice #<?php echo $invoice['Invoice']['id'];?></h1>
 <?php
-echo $this->Html->tag('h1', 'Invoice #' . $invoice['Invoice']['id']);
-echo $this->element('invoices/info');
-?>
+//echo $this->element('invoices/info');

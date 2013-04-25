@@ -48,6 +48,14 @@ class CatalogItem extends ShopAppModel {
 		)
 	);
 	
+	/*
+	function beforeSave($options = array()) {
+		trace();
+		debug($this->data);
+		return parent::beforeSave($options);
+	}
+	*/
+	
 	function afterSave($created) {
 		$id = $this->id;
 		$this->createProducts($id);

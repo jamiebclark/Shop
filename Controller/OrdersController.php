@@ -13,7 +13,7 @@ class OrdersController extends ShopAppController {
 				'Store',
 				array('controller' => 'catalog_items','action' => 'index'),
 			))
-		),				
+		),
 	);
 	
 	var $paginate = array(
@@ -50,6 +50,7 @@ class OrdersController extends ShopAppController {
 		);
 		$saveOptions = array();
 
+		$this->Order->validate = array();
 		if (isset($this->request->data['checkout'])) {
 			$saveAttrs['success']['redirect'] = array('action' => 'checkout', 'ID');
 		} else if (isset($this->request->data['update'])) {
@@ -59,20 +60,12 @@ class OrdersController extends ShopAppController {
 		$this->redirect(array('action' => 'view', $id));
 	}
 	
-	function print_invoice($id = null) {
+	function invoice($id = null) {
 		Configure::write('debug', 0);
-		$this->header = false;
-		$this->_findOrder($id);
+		$this->FormData->findModel($id);
 	}
 	
 	function shipping($id = null) {
-		if (!empty($this->request->data['Order']['same_billing'])) {
-			$cols = array('first_name', 'last_name', 'addline1', 'addline2', 'city', 'state', 'zip', 'country');
-			foreach ($cols as $col) {
-				$this->request->data['Invoice'][$col] = !empty($this->request->data['Order'][$col]) ? $this->request->data['Order'][$col] : null;
-			}
-		}
-
 		$this->FormData->editData($id, null, array('contain' => 'Invoice'), array(
 			'success' => array(
 				'messages' => 'Successfully updated shipping information for your Order',
@@ -116,61 +109,23 @@ class OrdersController extends ShopAppController {
 	}
 	
 	function admin_view($id = null) {
-		if ($this->_saveData() === null) {
-			$this->request->data = $this->FormData->findModel($id);
-		} else {
-			$id = $this->request->data['Order']['id'];
-			$this->FormData->findModel($id);
-		}
-		$this->Order->query('UPDATE webdb.order_products SET sub_total = price * quantity');
+		$order = $this->FormData->editData($id);
+	
+		$this->set(array(
+			'archived' => $order['Order']['archived'],
+			'canceled' => $order['Order']['canceled'],
+		));
+		
+		//$this->_setFormElements();
 
-		$this->set('products', $this->Order->OrderProduct->Product->selectList());
-		$this->set('orderShippingMethods', $this->Order->ShippingMethod->selectList());
-		$this->set('invoicePaymentMethods', $this->Order->Invoice->InvoicePaymentMethod->selectList());
+		//$this->Order->query('UPDATE webdb.order_products SET sub_total = price * quantity');
+		
+		
 
 	}
 	
-	function admin_edit($id = null) {
-		$this->FormData->editData($id);
-		/*
-		null, array(), array('validate' => false)) === null) {
-			$this->request->data = $this->Order->find('first', array(
-				'fields' => '*',
-				'link' => array('Invoice'),
-				'conditions' => array(
-					'Order.id' => $id
-				),
-				'postContain' => array(
-					'OrderProduct',
-					'OrdersProductHandling',
-				)
-			));
-		}
-		*/
-		$this->set('products', $this->Order->OrderProduct->Product->selectList());
-		$this->set('states', $this->Order->State->selectList());
-		$this->set('countries', $this->Order->Country->selectList());
-		$this->set('invoicePaymentMethods', $this->Order->Invoice->InvoicePaymentMethod->selectList());
-		
-		/*$productOptionsResult = $this->Order->OrderProduct->Product->ProductOption->find('all', array(
-			'fields' => '*',
-			'link' => array('Product' => array('OrderProduct' => array('Order'))),
-			'postContain' => array('ProductOptionChoice'),
-			'conditions' => array(
-				'Order.id' => $id,
-			),
-			'group' => 'Product.id'
-		));
-		$productOptions = array();
-		foreach ($productOptionsResult as $productOption) {
-			$productOptions[$productOption['Product']['id']][] = array(
-				'ProductOption' => $productOption['ProductOption'],
-				'ProductOptionChoice' => $productOption['ProductOptionChoice']
-			);
-		}*/
-		$productOptions = $this->Order->findProductOptions($id);
-		$this->set(compact('productOptions'));
-		$this->set('orderShippingMethods', $this->Order->OrderShippingMethod->selectList());
+	function admin_edit ($id = null) {
+		$order = $this->FormData->editData($id);
 	}
 	
 	function admin_add() {
@@ -283,6 +238,18 @@ class OrdersController extends ShopAppController {
 		), $options);
 	}
 	
+	function _setFormElements() {
+		$states = $this->Order->State->selectList();
+		$countries = $this->Order->Country->selectList();
+		$this->set(compact('states', 'countries'));
+		
+		if (!empty($this->request->params['prefix']) && $this->request->params['prefix'] == 'admin') {
+			$this->set('products', $this->Order->OrderProduct->Product->selectList());
+			$this->set('shippingMethods', $this->Order->ShippingMethod->selectList());
+			$this->set('invoicePaymentMethods', $this->Order->Invoice->InvoicePaymentMethod->selectList());
+		}
+	}
+	
 	function _beforeFindModel($options = array()) {
 		if (empty($this->FormData->id)) {
 			if (!empty($this->request->data['Order']['id'])) {
@@ -297,6 +264,8 @@ class OrdersController extends ShopAppController {
 	function _afterFindModel($result = null) {
 		if (!empty($result)) {
 			$this->ShoppingCart->setCart($result['Order']['id']);
+		} else {
+			$this->_redirectHome();
 		}
 		return $result;
 	}
