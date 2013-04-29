@@ -1,31 +1,18 @@
 <?php
-class PaypalPaymentsController extends ShopAppController {
+App::uses('InvoiceEmail', 'Shop.Network/Email');
 
-	var $components = array('Shop.InvoiceEmail');
+class PaypalPaymentsController extends ShopAppController {
+	public $name = 'PaypalPayments';
+	
+	//public $components = array('Shop.InvoiceEmail');
+	
 	//Log Variables
-	var $_logFile;
-	var $_logResource;
-	var $_logFailed = false;
+	private $_logFile;
+	private $_logResource;
+	private $_logFailed = false;
 
 	function ipn() {
 		$this->_log('Received IPN');
-		/*
-		//Email addresses
-		$send_to['default'] = array(
-			'kay@souperbowl.org',
-			'jamie@souperbowl.org',
-			'tracy@souperbowl.org',
-			'stewart@souperbowl.org',
-			'rick@souperbowl.org'
-		);
-		$send_to['DONATION'] = array(
-			'kay@souperbowl.org',
-			'jamie@souperbowl.org',
-			'stewart@souperbowl.org',
-			'tracy@souperbowl.org',
-			'rick@souperbowl.org'
-		);
-		*/
 
 		// PHP 4.1
 		// read the post from PayPal system and add 'cmd'
@@ -57,27 +44,19 @@ class PaypalPaymentsController extends ShopAppController {
 				// process payment
 					if($_POST['txn_id'] != '') {
 						//Checks for existing transaction
-						$paypalPayment = $this->PaypalPayment->find('first', array(
-							'conditions' => array(
-								'PaypalPayment.txn_id' => $_POST['txn_id'],
-							)
-						));
+						$paypalPayment = $this->PaypalPayment->findByTxnId($_POST['txn_id']);
+						
 						if (!empty($paypalPayment)) {
 							$this->_log('Updating existing payment ID: ' . $paypalPayment['PaypalPayment']['id']);
 							$_POST['id'] = $paypalPayment['PaypalPayment']['id'];
 						}
-						/*
-						foreach ($_POST as $key => $val) {
-							$this->_log($key);
-						}
-						*/
 							
 						if (!$this->PaypalPayment->save($_POST)) {
 							$this->_log('Error saving info');
 						} else {
 							$this->_log('Successfully saved Paypal IPN info');
 							$invoice = $this->PaypalPayment->Invoice->find('first', array(
-								'link' => array('PaypalPayment'),
+								'link' => array('Shop.PaypalPayment'),
 								'conditions' => array(
 									'PaypalPayment.id' => $this->PaypalPayment->id,
 								)
@@ -85,7 +64,7 @@ class PaypalPaymentsController extends ShopAppController {
 							if (empty($invoice)) {
 								$this->_log('Could not load Invoice to send notification email');
 							} else {
-								if ($this->InvoiceEmail->adminNotify($invoice['Invoice']['id'])) {
+								if (InvoiceEmail::sendAdminPaid($invoice)) {
 									$this->_log('Sent notification email to admin');
 								} else {
 									$this->_log('Error sending notification email');

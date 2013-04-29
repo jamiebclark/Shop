@@ -6,7 +6,8 @@ echo $this->Layout->navBar(array(
 	array('Categories', array('controller' => 'catalog_item_categories', 'action' => 'index')),
 	array('Inventory', array('controller' => 'products', 'action' => 'index')),
 	array('Handling', array('controller' => 'handling_methods', 'action' => 'index')),
-	array('Promo Codes', array('controller' => 'promo_codes', 'action' => 'index')),
-	array('Shipping Methods', array('controller' => 'shipping_methods', 'action' => 'index')),
+	array('Promos', array('controller' => 'promo_codes', 'action' => 'index')),
+	array('Shipping', array('controller' => 'shipping_methods', 'action' => 'index')),
+	array('Invoices', array('controller' => 'invoices', 'action' => 'index')),
 ), 'Online Store', array('currentSelect' => array('controller')));
 echo $this->fetch('content');

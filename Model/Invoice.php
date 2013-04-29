@@ -3,10 +3,14 @@ App::uses('InvoiceEmail', 'Shop.Network\Email');
 class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
-	//	'Location', 
+		'Location.Mappable', 
 		'Shop.ChangedFields'
 	);
 
+	var $virtualFields = array(
+		'title' => 'CONCAT("Invoice #", $ALIAS.id)',
+	);
+	
 	var $order = '$ALIAS.created DESC';
 	
 	var $hasOne = array(
@@ -23,7 +27,7 @@ class Invoice extends ShopAppModel {
 	);	
 	var $belongsTo = array(
 		//'User' => array('foreignKey' => 'user_id'),
-		//'PaypalPayment',
+		//'Shop.PaypalPayment',
 		//'State' => array('foreignKey' => 'Invoice.state'),
 		//'Country' => array('foreignKey' => 'Invoice.country'),
 		'Shop.InvoicePaymentMethod',
@@ -62,6 +66,7 @@ class Invoice extends ShopAppModel {
 
 	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
 	private $sendPaidEmail = false;
+	public $syncedModels = array();
 	
 	function beforeFind($queryData) {
 		$queryData['fields'] = array_merge(array('*'), (array) $queryData['fields']);
@@ -71,12 +76,14 @@ class Invoice extends ShopAppModel {
 		return parent::beforeFind($queryData);
 	}
 	
-	function beforeSave() {
+	function beforeSave($options = array()) {
 		$data =& $this->getData();
 		if (!empty($data['send_paid_email'])) {
 			$this->sendPaidEmail = true;
 		}
+		return parent::beforeSave($options);
 	}
+	
 	function afterSave($created) {
 		$result = $this->read(null, $this->id);
 		$data =& $this->getData();
@@ -140,5 +147,11 @@ class Invoice extends ShopAppModel {
 			);
 		}
 		return null;
+	}
+	
+	function sendAdminPaidEmail($id) {
+		$Email = new InvoiceEmail();
+		$result = $this->read(null, $id);
+		return $Email->sendAdminPaid($result);
 	}
 }

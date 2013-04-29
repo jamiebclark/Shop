@@ -1,1 +1,3 @@
-/webroot/catalog_item_images/
+/webroot/catalog_item_images/*
+!/webroot/catalog_item_images/
+!/webroot/catalog_item_images/empty

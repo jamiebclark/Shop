@@ -1,12 +1,9 @@
 <?php
-class InvoicesController extends AppController {
+class InvoicesController extends ShopAppController {
 	var $name = 'Invoices';
-	var $components = array(
-		'Email',
-		//'Shop.InvoiceEmail',
-	);
-	
 	var $helpers = array(
+		'Layout.AddressBook',
+		'Layout.FormLayout',
 		'Layout.Table', 
 		'Layout.Calendar', 
 		//'Layout.DateBuild', 
@@ -31,7 +28,7 @@ class InvoicesController extends AppController {
 			if (!empty($invoice)) {
 				$this->redirect(array('action' => 'view', $invoice['Invoice']['id']));
 			} else {
-				$this->_redirectMsg(true, 'Invoice #' . $this->request->data['Invoice']['id'] . ' Not Found');
+				$this->_redirectMsg(true, 'Invoice #' . $this->request->data['Invoice']['id'] . ' Not Found', false);
 			}
 		}
 		
@@ -41,21 +38,15 @@ class InvoicesController extends AppController {
 	
 	function admin_view($id = null) {
 		if (!empty($this->request->params['named']['notify'])) {
-			$msg = $this->InvoiceEmail->adminNotify($id) ? 'Email sent' : 'Error sending email';
+			$msg = $this->Invoice->sendAdminPaidEmail($id) ? 'Email sent' : 'Error sending email';
 			$this->_redirectMsg(array($id), $msg);
 		}
-
-		$this->Invoice->recursive = 1;
-		$invoice = $this->Invoice->findById($id);
-		$this->set(compact('invoice'));
-		
-		$this->set('states', $this->Invoice->State->selectList());
-		$this->set('countries', $this->Invoice->Country->selectList());
-		$this->set('invoicePaymentMethods', $this->Invoice->InvoicePaymentMethod->selectList());
-		$this->set('back_link', array('Back to Invoices', array('action' => 'index')));
+		$this->FormData->findModel($id);
 	}
 	
 	function admin_edit($id = null) {
+		$this->FormData->editData($id);
+		/*
 		if ($this->_saveData(null, null, array('validate' => false)) === null) {
 			$this->request->data = $this->Invoice->findById($id);
 			
@@ -80,53 +71,42 @@ class InvoicesController extends AppController {
 					}
 				}
 			}
-
 		}
-
-		$this->set('states', $this->Invoice->State->selectList());
-		$this->set('countries', $this->Invoice->Country->selectList());
-		$this->set('invoicePaymentMethods', $this->Invoice->InvoicePaymentMethod->selectList());
+		*/
 	}
 	
 	function admin_add() {
-		$this->_saveData();
-		
-		$this->set('states', $this->Invoice->State->selectList());
-		$this->set('countries', $this->Invoice->Country->selectList());
+		$this->FormData->addData();
 	}
 	
 	function admin_delete($id = null) {
-		$this->_deleteData($id);
+		$this->FormData->deleteData($id);
 	}
 	
-	function admin_filter() {
-		$this->render('/FindFilters/filter');
-	}
-		function admin_resend_email($id = null, $test = false) {		$this->FormData->findModel($id);				if ($this->InvoiceEmail->adminNotify($id, $test)) {			$msg = 'Email successfully sent';		} else {			$msg = 'There was an error sending email';		}				$this->_redirectMsg(array('action' => 'view', $id), $msg);	}	
+	function admin_resend_email($id = null) {		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';
+		} else {			$msg = 'There was an error sending email';		}				$this->_redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
 	function admin_copy_payment($id = null) {
 		$invoice = $this->Invoice->find('first', array(
 			'fields' => array('*'),
-			'link' => array('PaypalPayment'),
+			'link' => array('Shop.PaypalPayment'),
 			'conditions' => array(
 				'Invoice.id' => $id,
 			)
 		));
-		
 		if (!empty($invoice['PaypalPayment'])) {
-			if ($this->Invoice->PaypalPayment->syncInvoice($invoice['PaypalPayment']['id'])) {
+			if ($success = $this->Invoice->PaypalPayment->syncInvoice($invoice['PaypalPayment']['id'])) {
 				$msg = 'Successfully updated Invoice information';
 			} else {
 				$msg = 'Could not update Invoice information';
 			}
 		}
-		$this->_redirectMsg(true, $msg);
+		$this->_redirectMsg(true, $msg, $success);
 	}
 	
-	function emailUpdate($id = null) {
-		$invoice = $this->Invoice->find('first', array(
-			'conditions' => array(
-				'Invoice.id' => $id
-			)
-		));
+	function _setFormElements() {
+		$this->set('states', $this->Invoice->State->selectList());
+		$this->set('countries', $this->Invoice->Country->selectList());
+		$this->set('invoicePaymentMethods', $this->Invoice->InvoicePaymentMethod->selectList());
+		//$this->set('models', array('' => ' --- No Model --- ') + $this->Invoice->syncedModels);
 	}
 }

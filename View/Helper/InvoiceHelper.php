@@ -6,6 +6,7 @@ class InvoiceHelper extends AppHelper {
 		'Html',		'Layout.AddressBook',
 		'Layout.Asset',
 		'Layout.Calendar',
+	//	'Layout.DisplayText',
 		'Layout.FormLayout',
 		'Layout.Layout', 		'Shop.PaypalForm', 	);
 	
@@ -27,6 +28,14 @@ class InvoiceHelper extends AppHelper {
 		}
 	}
 	
+	public function amount($invoice) {
+		$out = '$' . number_format($invoice['amt'], 2);
+		if (!empty($invoice['recur'])) {
+			$out .= ' every month for ' . number_format($invoice['recur']) . ' months';
+		}
+		return $out;	
+	}
+	
 	function relatedTitle($invoice) {
 		return "{$invoice['model_title']} #{$invoice['model_id']}";
 	}
@@ -38,7 +47,7 @@ class InvoiceHelper extends AppHelper {
 		return $this->Html->link($this->relatedTitle($invoice), array(
 				'controller' => Inflector::tableize($invoice['model']),
 				'action' => 'view',
-				$invoice['id'],
+				$invoice['model_id'],
 			), $options);
 	}
 	

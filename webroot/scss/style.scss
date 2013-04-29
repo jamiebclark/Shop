@@ -1,6 +1,13 @@
 .qty, .cash {
 	font-size: 20px;
 }
+th.cash, td.cash {
+	width: 120px;
+	text-align: right;
+}
+th.cash {
+	font-size: inherit;
+}
 
 form.canceled {
 	background-color: #CCC;
@@ -54,6 +61,12 @@ form.canceled {
 		line-height: 40px;
 	}
 }
+.catalog-item-admin-list {
+	img.media-object {
+		width: 80px;
+	}
+}
+
 //Shopping Cart
 .order-cart {
 	td, th {

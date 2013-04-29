@@ -1,38 +1,54 @@
 <?php
 echo $this->Form->create('Invoice');
 echo $this->Form->hidden('id');
-
-echo $this->Layout->fieldset('Customer Info');
-echo $this->element('profiles/full_name_input', array('model' => 'Invoice'));
-echo $this->element('locations/form', array(
-	'model' => 'Invoice',
-	'location' => true,
-	'addline' => 2,
-	'cityStateLine' => true,
-));
-echo $this->Form->input('email');
-echo $this->Form->input('phone');
-echo $this->FormLayout->submit('Update');
-echo "</fieldset>\n";
-
-echo $this->Layout->fieldset('Payment Info');
-echo $this->Form->input('amt', array('label' => 'Amount $'));
-echo $this->Form->input('recur', array('label' => 'Recurring'));
-echo $this->DateBuild->input('paid', array(
-	'class' => 'datetime',
-	'label' => 'Date Paid',
-	'control' => array('today', 'clear'),
-	'blank' => true
-));
-echo $this->Form->input('invoice_payment_method_id', array('label' => 'Payment Method'));
-echo $this->FormLayout->submit('Update');
-echo "</fieldset>\n";
-
-
-
-echo $this->Layout->fieldset('Admin Settings');
-echo $this->Form->input('user_id', array('type' => 'text', 'label' => 'User ID'));
-echo "</fieldset>\n";
-
-echo $this->Form->end();
+$span = 6;
 ?>
+<div class="row">
+	<div class="span7">
+		<h3>Customer Info</h3>
+		<?php
+		echo $this->FormLayout->inputRow(array('first_name', 'last_name'), compact('span'));
+		echo $this->FormLayout->addressInput(compact('span'));
+		echo $this->FormLayout->inputRow(array('email', 'phone'), compact('span'));
+		?>
+	</div>
+	<div class="span5">
+		<h3>Payment Info</h3>
+		<?php
+		echo $this->Form->input('amt', array(
+			'label' => 'Amount',
+			'prepend' => '$',
+			'placeholder' => '0.00',
+			'class' => 'input-small',
+			'step' => 'any',
+		));
+		echo $this->Form->input('recur', array(
+			'label' => 'Recurring',
+			'append' => 'per month',
+			'class' => 'input-mini',
+			'helpBlock' => 'Does payment repeat? (0 for no)',
+		));
+		echo $this->FormLayout->datetimeInput('paid', array(
+			'label' => 'Date Paid',
+			'control' => array('today', 'clear'),
+			'blank' => true
+		));
+		echo $this->Form->input('invoice_payment_method_id', array('label' => 'Payment Method'));
+		?>
+	</div>
+</div>
+<?php echo $this->Form->submit('Update', array('class' => 'btn btn-primary')); ?>
+
+<fieldset><legend>Admin Settings</legend>
+	<p>How the Invoice is connected to other models in the database</p>
+	<?php
+	echo $this->Form->inputs(array(
+		'model',
+		'model_title',
+		'model_id' => array('type' => 'text', 'label' => 'Model ID'),
+		'user_id' => array('type' => 'text', 'label' => 'User ID'),
+		'fieldset' => false,		
+	));
+	?>
+</fieldset>
+<?php echo $this->Form->end(); ?>

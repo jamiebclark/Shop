@@ -17,6 +17,12 @@ class PaypalPayment extends ShopAppModel {
 		return parent::afterSave($created);
 	}
 	
+	function findByTxnId($txnId) {
+		return $this->find('first', array(
+			'conditions' => array($this->alias . '.txn_id' => $txnId)
+		));
+	}
+	
 	function syncInvoice($id, $soft = true) {
 		$result = $this->find('first', array(
 			'fields' => array('*'),

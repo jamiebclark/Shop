@@ -8,6 +8,21 @@ class CatalogItemHelper extends AppHelper {
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	function media($catalogItem, $options = array()) {
+		$options = array_merge(array(
+			'url' => $this->url($catalogItem),
+			'dir' => 'thumb',
+		), $options);
+		$thumbOptions = $this->addClass($options, 'media-object');
+		$thumb = $this->Html->div('pull-left', $this->thumb($catalogItem, $thumbOptions));
+		$title = $catalogItem['title'];
+		if (!empty($options['url'])) {
+			$title = $this->Html->link($title, $options['url']);
+		}
+		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
+		return $this->Html->div('catalog-item media', $thumb . $this->Html->div('media-body', $body));
+	}
+	
 	function thumb($catalogItem, $options = array()) {
 		$src = $this->thumbDir;
 		if (!empty($options['dir'])) {

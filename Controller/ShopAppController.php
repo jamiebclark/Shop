@@ -25,13 +25,30 @@ class ShopAppController extends AppController {
 		'Layout.Table',
 	);
 	
+	function beforeFilter() {
+		//Makes sure everything is loaded
+		$vars = array();
+		if (!defined('SHOP_VARS_LOADED')) {
+			$vars['noBootstrap'] = true;
+		}
+		if (!empty($vars)) {
+			$this->set($vars);
+			$this->helpers = array('Layout.Layout');
+			$this->layout = 'setup';
+			$this->render('Shop./CatalogItems/setup');
+		}
+		parent::beforeFilter();		
+	}
+	
 	function beforeRender() {
 		parent::beforeRender();
+		
+		//Set Variables
 		$loggedUserId = 1;
 		$isShopAdmin = true;
 		$this->set(compact('loggedUserId', 'isShopAdmin'));
 		
-		if (!empty($this->request->params['prefix'])) {
+		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
 			$this->layout = 'admin';
 		}
 	}
