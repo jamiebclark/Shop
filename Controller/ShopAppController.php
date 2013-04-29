@@ -31,7 +31,7 @@ class ShopAppController extends AppController {
 		if (!defined('SHOP_VARS_LOADED')) {
 			$vars['noBootstrap'] = true;
 		}
-		if (!ClassRegistry::('Shop.Order', true)) {
+		if (!ClassRegistry::init('Shop.Order', true)) {
 			$vars['noSchema'] = true;
 		}
 		if (!empty($vars)) {
