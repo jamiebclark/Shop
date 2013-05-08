@@ -87,7 +87,9 @@ class CatalogItemCategory extends ShopAppModel {
 	}
 	
 	function findLeftRight($id) {
-		$result = $this->read(array('lft', 'rght'), $id);
+		if (!($result = $this->read(array('lft', 'rght'), $id))) {
+			return null;
+		}
 		return array($result[$this->alias]['lft'], $result[$this->alias]['rght']);
 	}
 	
