@@ -32,7 +32,7 @@ if (empty($check) || $check !== false) {
 
 echo $this->Html->div('invoicePayments');
 foreach ($payments as $payment) {
-	echo $this->Layout->clearFix();
+	
 	echo $this->Html->div('invoicePayment');
 	echo $this->Html->tag('h3', $payment['title']);
 	echo $this->Html->div('invoicePaymentWrapper');
