@@ -16,7 +16,9 @@ class CatalogItemCategory extends ShopAppModel {
 	function findChildren($id, $deep = true, $admin = false) {
 		$options = array();
 		if ($deep) {
-			$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $this->findLeftRight($id);
+			if ($leftRight = $this->findLeftRight($id)) {
+				$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $leftRight;
+			}
 		} else {
 			$options['conditions'][$this->alias . '.parent_id'] = $id;
 		}
@@ -65,7 +67,9 @@ class CatalogItemCategory extends ShopAppModel {
 			$options['conditions'] += array('CatalogItem.hidden' => 0, 'CatalogItem.active' => 1);
 		}
 		if ($deep) {
-			$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $this->findLeftRight($id);
+			if ($leftRight = $this->findLeftRight($id)) {
+				$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $leftRight;
+			}
 		} else {
 			$options['conditions'][$this->alias . '.id'] = $id;
 		}
@@ -88,7 +92,7 @@ class CatalogItemCategory extends ShopAppModel {
 	
 	function findLeftRight($id) {
 		if (!($result = $this->read(array('lft', 'rght'), $id))) {
-			return null;
+			return array(null, null);
 		}
 		return array($result[$this->alias]['lft'], $result[$this->alias]['rght']);
 	}
