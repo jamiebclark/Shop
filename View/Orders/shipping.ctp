@@ -32,7 +32,7 @@
 		<fieldset>
 			<legend>Billing Information</legend>
 		<?php
-		echo $this->FormLayout->toggle('', $this->FormLayout->inputRows(array(
+		echo $this->Layout->toggle('', $this->FormLayout->inputRows(array(
 				array('Invoice.addline1' => array('label' => 'Street Address')),
 				array('Invoice.addline2' => array('label' => 'Apt. #')),
 				array('Invoice.city', 'Invoice.state', 'Invoice.zip'),

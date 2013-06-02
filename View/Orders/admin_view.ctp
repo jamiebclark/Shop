@@ -125,7 +125,7 @@ $this->Table->cells(array(
 	array('Total', null, null, null, array('colspan' => $colspan, 'class' => 'total grandTotal')),
 	array($this->DisplayText->cash($order['Order']['total']), null, null, null, array('class' => 'total grandTotal figure')),
 ), true);
-echo $this->Table->table(array('class' => 'orderList'));
+echo $this->Table->output(array('class' => 'orderList'));
 */
 
 if (empty($order['Order']['archived'])) {

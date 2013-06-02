@@ -30,6 +30,6 @@ foreach ($invoices as $invoice) {
 		array($this->Layout->actionMenu(array('view', 'edit', 'delete'), compact('url'), 'Actions')),
 	), compact('class'));
 }
-echo $this->Table->table(array(
+echo $this->Table->output(array(
 	'paginate' => true
 ));

@@ -44,7 +44,7 @@ foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 		array(round($shippingRule['pct'] * 100) . '%', 'Percent of Sub-Total')
 	), true);
 }
-echo $this->Table->table();
+echo $this->Table->output();
 ?>
 </div><div class="span4">
 	<div class="content-box">
@@ -72,7 +72,7 @@ echo $this->Table->table();
 						), 'Quantity')
 				), true);
 			}
-			echo $this->Table->table();
+			echo $this->Table->output();
 		}
 		?>
 	</div>
@@ -98,7 +98,7 @@ echo $this->Table->table();
 				), compact('url'))),
 			), true);
 		}
-		echo $this->Table->table(array('class' => 'orderCatalogItemsForm'));
+		echo $this->Table->output(array('class' => 'orderCatalogItemsForm'));
 	?>
 	</div>
 </div>
