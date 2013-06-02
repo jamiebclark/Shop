@@ -38,7 +38,7 @@ echo $this->Layout->defaultHeader($order['Order']['id']);
 	<div class="span7">
 		<h3>Billing</h3>
 		<?php 
-		echo $this->FormLayout->toggle(null, $this->FormLayout->addressInput(compact('span') + array(
+		echo $this->Layout->toggle(null, $this->FormLayout->addressInput(compact('span') + array(
 			'model' => 'Invoice',
 			'placeholder' => true,
 			'before' => $this->FormLayout->inputRow(array(

@@ -8,6 +8,7 @@ class OrdersController extends ShopAppController {
 		'Shop.CatalogItem', 
 		'Shop.PaypalForm',
 		'Layout.AddressBook',
+		'Layout.AddressBookForm',
 		'Layout.Crumbs' => array(
 			'controllerCrumbs' => array(array(
 				'Store',

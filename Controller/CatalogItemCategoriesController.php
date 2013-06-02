@@ -36,5 +36,6 @@ class CatalogItemCategoriesController extends ShopAppController {
 	
 	function _setFormElements() {
 		$this->set('catalogItems', $this->CatalogItemCategory->CatalogItem->find('list'));
+		$this->set('parents', $this->CatalogItemCategory->selectList());
 	}
 }
