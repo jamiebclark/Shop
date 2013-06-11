@@ -16,7 +16,9 @@ class CatalogItemCategory extends ShopAppModel {
 	function findChildren($id, $deep = true, $admin = false) {
 		$options = array();
 		if ($deep) {
-			$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $this->findLeftRight($id);
+			if ($leftRight = $this->findLeftRight($id)) {
+				$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $leftRight;
+			}
 		} else {
 			$options['conditions'][$this->alias . '.parent_id'] = $id;
 		}
@@ -25,6 +27,9 @@ class CatalogItemCategory extends ShopAppModel {
 	
 	function getPath($id, $rootId = null, $fields = null, $recursive = null) {
 		$path = parent::getPath($id, $fields, $recursive);
+		if (empty($path)) {
+			return null;
+		}
 		if (!empty($rootId)) {
 			foreach ($path as $k => $row) {
 				if ($row[$this->alias][$this->primaryKey] != $rootId) {
@@ -62,7 +67,9 @@ class CatalogItemCategory extends ShopAppModel {
 			$options['conditions'] += array('CatalogItem.hidden' => 0, 'CatalogItem.active' => 1);
 		}
 		if ($deep) {
-			$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $this->findLeftRight($id);
+			if ($leftRight = $this->findLeftRight($id)) {
+				$options['conditions'][$this->alias . '.lft BETWEEN ? AND ?'] = $leftRight;
+			}
 		} else {
 			$options['conditions'][$this->alias . '.id'] = $id;
 		}
@@ -75,13 +82,18 @@ class CatalogItemCategory extends ShopAppModel {
 				'fields' => array($this->alias . '.id', $this->alias . '.id'),
 				'conditions' => array($this->alias . '.slug LIKE' => $id),
 			));
+			if (empty($result)) {
+				return null;
+			}
 			$id = array_pop($result);
 		}
 		return $id;
 	}
 	
 	function findLeftRight($id) {
-		$result = $this->read(array('lft', 'rght'), $id);
+		if (!($result = $this->read(array('lft', 'rght'), $id))) {
+			return array(null, null);
+		}
 		return array($result[$this->alias]['lft'], $result[$this->alias]['rght']);
 	}
 	
@@ -91,9 +103,10 @@ class CatalogItemCategory extends ShopAppModel {
 			'CatalogItem.active' => 1,
 			'CatalogItem.hidden' => 0,
 		);
-		if (!empty($parentId)) {
-			$result = $this->read(array('lft', 'rght'), $parentId);
-			$conditions[$this->alias . '.lft BETWEEN ? AND ?'] = array($result[$this->alias]['lft'], $result[$this->alias]['rght']);
+		if (!empty($parentId) && ($result = $this->read(array('lft', 'rght'), $parentId))) {
+			$conditions[$this->alias . '.lft BETWEEN ? AND ?'] = array(
+				$result[$this->alias]['lft'], $result[$this->alias]['rght']
+			);
 		}
 		$this->create();
 		//Finds all active categories
