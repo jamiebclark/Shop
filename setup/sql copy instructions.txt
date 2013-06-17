@@ -10,8 +10,8 @@ DROP TABLE handling_methods;
 RENAME TABLE product_handlings TO handling_methods;
 DROP TABLE handling_methods_orders;
 RENAME TABLE product_handlings_shop_orders TO handling_methods_orders;
-ALTER TABLE handling_methods_orders CHANGE product_handling_id handling_method_id;
-ALTER TABLE handling_methods_orders CHANGE shop_order_id order_id;
+ALTER TABLE handling_methods_orders CHANGE product_handling_id handling_method_id INT(11) NOT NULL;
+ALTER TABLE handling_methods_orders CHANGE shop_order_id order_id INT(11) NOT NULL;
 DROP TABLE promo_codes;
 RENAME TABLE product_promos TO promo_codes;
 DROP TABLE orders_promo_codes;
@@ -19,16 +19,47 @@ RENAME TABLE product_promos_shop_orders TO orders_promo_codes;
 ALTER TABLE `orders_promo_codes` CHANGE `product_promo_id` `promo_code_id` INT( 11 ) NOT NULL;
 ALTER TABLE `orders_promo_codes` CHANGE `shop_order_id` `order_id` INT(11) NOT NULL;
 
+DROP TABLE order_products;
+RENAME TABLE shop_order_products TO order_products;
+ALTER TABLE `order_products` CHANGE `shop_order_id` `order_id` INT(11) NOT NULL;
+ALTER TABLE `order_products` CHANGE `product_id` `catalog_item_id` INT(11);
+ALTER TABLE `order_products` ADD  `product_id` INT( 11 ) NOT NULL AFTER  `parent_id`, ADD INDEX (`product_id`);
+
 
 REPLACE INTO products
-(catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4) SELECT catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4 FROM order_products
-GROUP BY catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4;
+(catalog_item_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4) SELECT product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4 FROM shop_order_products
+GROUP BY product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4;
 
 UPDATE order_products AS OrderProduct
 JOIN products AS Product ON
-OrderProduct.catalog_product_id = Product.catalog_product_id AND
+OrderProduct.catalog_item_id = Product.catalog_item_id AND
 ((OrderProduct.product_option_choice_id_1 IS NULL AND Product.product_option_choice_id_1 IS NULL) OR OrderProduct.product_option_choice_id_1 = Product.product_option_choice_id_1) AND
 ((OrderProduct.product_option_choice_id_2 IS NULL AND Product.product_option_choice_id_2 IS NULL) OR OrderProduct.product_option_choice_id_2 = Product.product_option_choice_id_2) AND
 ((OrderProduct.product_option_choice_id_3 IS NULL AND Product.product_option_choice_id_3 IS NULL) OR OrderProduct.product_option_choice_id_3 = Product.product_option_choice_id_3) AND
 ((OrderProduct.product_option_choice_id_4 IS NULL AND Product.product_option_choice_id_4 IS NULL) OR OrderProduct.product_option_choice_id_4 = Product.product_option_choice_id_4) 
 SET OrderProduct.product_id = Product.id;
+ALTER TABLE order_products DROP catalog_item_id;
+ALTER TABLE order_products DROP product_option_choice_id_1;
+ALTER TABLE order_products DROP product_option_choice_id_2;
+ALTER TABLE order_products DROP product_option_choice_id_3;
+ALTER TABLE order_products DROP product_option_choice_id_4;
+
+ALTER TABLE `product_inventories` CHANGE `product_id` `catalog_item_id` INT(11);
+ALTER TABLE `product_inventories` ADD  `product_id` INT( 11 ) NOT NULL AFTER  `parent_id`, ADD INDEX (`product_id`);
+UPDATE product_inventories AS Inventory
+JOIN products AS Product ON
+Inventory.catalog_item_id = Product.catalog_item_id AND
+((Inventory.product_option_choice_id_1 IS NULL AND Product.product_option_choice_id_1 IS NULL) OR Inventory.product_option_choice_id_1 = Product.product_option_choice_id_1) AND
+((Inventory.product_option_choice_id_2 IS NULL AND Product.product_option_choice_id_2 IS NULL) OR Inventory.product_option_choice_id_2 = Product.product_option_choice_id_2) AND
+((Inventory.product_option_choice_id_3 IS NULL AND Product.product_option_choice_id_3 IS NULL) OR Inventory.product_option_choice_id_3 = Product.product_option_choice_id_3) AND
+((Inventory.product_option_choice_id_4 IS NULL AND Product.product_option_choice_id_4 IS NULL) OR Inventory.product_option_choice_id_4 = Product.product_option_choice_id_4) 
+SET Inventory.product_id = Product.id;
+ALTER TABLE product_inventories DROP catalog_item_id;
+ALTER TABLE product_inventories DROP product_option_choice_id_1;
+ALTER TABLE product_inventories DROP product_option_choice_id_2;
+ALTER TABLE product_inventories DROP product_option_choice_id_3;
+ALTER TABLE product_inventories DROP product_option_choice_id_4;
+
+ALTER TABLE product_inventory_adjustments CHANGE product_inventory_id product_id INT(11);
+UPDATE products AS Product JOIN (SELECT product_id, SUM(quantity) AS stock FROM product_inventory_adjustments GROUP BY product_id) AS Adjust ON Product.id = Adjust.product_id
+SET Product.stock = Adjust.stock
