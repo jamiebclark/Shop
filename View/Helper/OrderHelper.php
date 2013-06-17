@@ -1,6 +1,8 @@
 <?php
 App::uses('Prefix', 'Shop.Lib');
-class OrderHelper extends AppHelper {
+App::uses('ModelViewHelper', 'Layout.View/Helper');
+
+class OrderHelper extends ModelViewHelper {
 	var $name = 'Order';
 	var $helpers = array(
 		'Html',

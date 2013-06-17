@@ -1,8 +1,8 @@
 <?php
 define('SHOP_ROOT', APP . 'Plugin' . DS . 'Shop' . DS);
 define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
-
-class CatalogItemHelper extends AppHelper {
+App::uses('ModelViewHelper', 'Layout.View/Helper');
+class CatalogItemHelper extends ModelViewHelper {
 	var $name = 'CatalogItem';
 	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
 	

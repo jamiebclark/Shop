@@ -1,5 +1,6 @@
 <?php
-class InvoiceHelper extends AppHelper {
+App::uses('ModelViewHelper', 'Layout.View/Helper');
+class InvoiceHelper extends ModelViewHelper {
 	var $name = 'Invoice';
 	var $helpers = array(
 		'Form', 
