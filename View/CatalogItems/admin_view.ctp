@@ -93,9 +93,8 @@ echo $this->Table->output();
 				array($this->CatalogItem->thumb(
 					$catalogItemImage, 
 					array('dir' => 'thumb', 'url' => $url)
-				)), array($this->Layout->actionMenu(array(
-					'view', 'edit', 'delete', 'move_up', 'move_down'
-				), compact('url'))),
+				)), 
+				array($this->CatalogItem->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url'))),
 			), true);
 		}
 		echo $this->Table->output(array('class' => 'orderCatalogItemsForm'));

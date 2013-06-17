@@ -1,3 +1,25 @@
+RENAME TABLE products TO catalog_items;
+RENAME TABLE shop_orders TO orders;
+ALTER TABLE  `orders` CHANGE  `cancelled`  `canceled` TINYINT( 1 ) NOT NULL;
+ALTER TABLE  `orders` CHANGE  `shop_order_shipping_method_id`  `shipping_method_id` TINYINT( 1 ) NOT NULL
+DROP TABLE shipping_methods;
+RENAME TABLE shop_order_shipping_methods TO shipping_methods;
+DROP TABLE shipping_classes;
+RENAME TABLE shop_order_shipping_classes TO shipping_classes;
+DROP TABLE handling_methods;
+RENAME TABLE product_handlings TO handling_methods;
+DROP TABLE handling_methods_orders;
+RENAME TABLE product_handlings_shop_orders TO handling_methods_orders;
+ALTER TABLE handling_methods_orders CHANGE product_handling_id handling_method_id;
+ALTER TABLE handling_methods_orders CHANGE shop_order_id order_id;
+DROP TABLE promo_codes;
+RENAME TABLE product_promos TO promo_codes;
+DROP TABLE orders_promo_codes;
+RENAME TABLE product_promos_shop_orders TO orders_promo_codes;
+ALTER TABLE `orders_promo_codes` CHANGE `product_promo_id` `promo_code_id` INT( 11 ) NOT NULL;
+ALTER TABLE `orders_promo_codes` CHANGE `shop_order_id` `order_id` INT(11) NOT NULL;
+
+
 REPLACE INTO products
 (catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4) SELECT catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4 FROM order_products
 GROUP BY catalog_product_id, product_option_choice_id_1, product_option_choice_id_2, product_option_choice_id_3, product_option_choice_id_4;

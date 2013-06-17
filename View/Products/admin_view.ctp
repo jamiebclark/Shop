@@ -44,4 +44,4 @@ foreach ($productInventoryAdjustments as $productInventoryAdjustment) {
 		array($this->Layout->actionMenu(array('edit', 'delete'), compact('url')), 'Actions'),
 	), true);
 }
-echo $this->Table->output(array('paginate'));
+echo $this->Table->output(array('paginate' => true));
