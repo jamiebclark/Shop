@@ -27,7 +27,7 @@ foreach ($invoices as $invoice) {
 		)), 'Related To:'),
 		array($this->Calendar->niceShort($invoice['created']), 'Created', 'created'),
 		
-		array($this->Layout->actionMenu(array('view', 'edit', 'delete'), compact('url'), 'Actions')),
+		array($this->Invoice->actionMenu(array('view', 'edit', 'delete'), compact('url'), 'Actions')),
 	), compact('class'));
 }
 echo $this->Table->output(array(
