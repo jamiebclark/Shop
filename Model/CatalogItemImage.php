@@ -4,7 +4,7 @@ class CatalogItemImage extends ShopAppModel {
 	var $actsAs = array(
 		'Uploadable.ImageUploadable' => array(
 			'plugin' => 'Shop',
-			'bypass_is_uploaded' => true,
+			//'bypass_is_uploaded' => true,
 			'upload_dir' => 'img/catalog_item_images/',
 			'update' => array('filename'),
 			'dirs' => array(
@@ -19,6 +19,8 @@ class CatalogItemImage extends ShopAppModel {
 				)
 			)
 		),
+		//'Shop.BlankDelete' => array('title'),
+		'Layout.Removable',
 		'Shop.FieldOrder' => array(
 			'orderField' => 'order',
 			'subKeyFields' => array('catalog_item_id'),
@@ -76,6 +78,6 @@ class CatalogItemImage extends ShopAppModel {
 			);
 		}
 		$this->CatalogItem->create();
-		$this->CatalogItem->saveAll($data);
+		$this->CatalogItem->saveAll($data, array('validate' => false, 'callbacks' => false));
 	}
 }

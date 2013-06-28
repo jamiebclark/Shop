@@ -7,7 +7,7 @@ class InvoiceHelper extends ModelViewHelper {
 		'Html',		'Layout.AddressBook',
 		'Layout.Asset',
 		'Layout.Calendar',
-	//	'Layout.DisplayText',
+		'Layout.DisplayText',
 		'Layout.FormLayout',
 		'Layout.Layout', 		'Shop.PaypalForm', 	);
 	
@@ -37,6 +37,13 @@ class InvoiceHelper extends ModelViewHelper {
 		return $out;	
 	}
 	
+	public function title($invoice, $options = array()) {
+		if (empty($options['text'])) {
+			$options['text'] = 'Invoice #' . $invoice['id'];
+		}
+		return parent::title($invoice, $options);
+	}
+	
 	function relatedTitle($invoice) {
 		return "{$invoice['model_title']} #{$invoice['model_id']}";
 	}
@@ -45,11 +52,14 @@ class InvoiceHelper extends ModelViewHelper {
 		if (empty($invoice['model'])) {
 			return '';
 		}
-		return $this->Html->link($this->relatedTitle($invoice), array(
-				'controller' => Inflector::tableize($invoice['model']),
+		list($plugin, $model) = pluginSplit($invoice['model']);
+		$url = array(
+				'controller' => Inflector::tableize($model),
 				'action' => 'view',
 				$invoice['model_id'],
-			), $options);
+				'plugin' => strtolower($plugin),
+			);
+		return $this->Html->link($this->relatedTitle($invoice), $url, $options);
 	}
 	
 	function paypalForm($invoice, $content = null, $options = array()) {
@@ -129,6 +139,7 @@ class InvoiceHelper extends ModelViewHelper {
 				'printed copy of your invoice', array(
 					'controller' => 'invoices',
 					'action' => 'view',
+					'plugin' => 'shop',
 					$invoice['id'],
 				) + Prefix::reset(), 
 				array('target' => '_blank')
@@ -178,14 +189,15 @@ class InvoiceHelper extends ModelViewHelper {
 		
 		//Begin Output
 		$out = '';
+		$span = 12 / count($payments);
 		foreach ($payments as $k => $payment) {
 			list($title, $action, $info) = $payment + array(null, null, null);
-			$out .= $this->Html->div('invoice-payment',
+			$out .= $this->Html->div("invoice-payment span$span",
 				$this->Html->tag('h3', $title) . $this->Html->div('invoice-payment-wrap',
 					$this->Html->div('action', $action) . $this->Html->div('info', $info)
 				)
 			);
 		}
-		return $this->Html->div('invoice-payments', $out);;
+		return $this->Html->div('invoice-payments row-fluid', $out);;
 	}
 }

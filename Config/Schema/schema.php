@@ -8,13 +8,52 @@ class ShopSchema extends CakeSchema {
 	public function after($event = array()) {
 	}
 
+	public $acos = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'),
+		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'foreign_key' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'alias' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'lft' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'rght' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1)
+		),
+		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
+	);
+	public $aros = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'),
+		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'foreign_key' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'alias' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'lft' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'rght' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 10),
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1)
+		),
+		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
+	);
+	public $aros_acos = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'primary'),
+		'aro_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10, 'key' => 'index'),
+		'aco_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 10),
+		'_create' => array('type' => 'string', 'null' => false, 'default' => '0', 'length' => 2, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'_read' => array('type' => 'string', 'null' => false, 'default' => '0', 'length' => 2, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'_update' => array('type' => 'string', 'null' => false, 'default' => '0', 'length' => 2, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'_delete' => array('type' => 'string', 'null' => false, 'default' => '0', 'length' => 2, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1),
+			'ARO_ACO_KEY' => array('column' => array('aro_id', 'aco_id'), 'unique' => 1)
+		),
+		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
+	);
 	public $catalog_item_categories = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
 		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'lft' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'rght' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'slug' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'parent_id' => array('column' => 'parent_id', 'unique' => 0)
@@ -45,11 +84,11 @@ class ShopSchema extends CakeSchema {
 	public $catalog_item_options = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
 		'catalog_item_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-		'index' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'index' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'product_id' => array('column' => array('catalog_item_id', 'index'), 'unique' => 1)
+			'product_id' => array('column' => array('catalog_item_id', 'index'), 'unique' => 0)
 		),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
 	);
@@ -79,7 +118,6 @@ class ShopSchema extends CakeSchema {
 		'active' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
 		'hidden' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'unlimited' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
-		'is_package' => array('type' => 'boolean', 'null' => false, 'default' => null),
 		'order' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 3),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
@@ -110,9 +148,11 @@ class ShopSchema extends CakeSchema {
 	public $invoices = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 8, 'key' => 'primary'),
 		'user_id' => array('type' => 'integer', 'null' => true, 'default' => null),
-		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 16, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'model_title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 28, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'model_id' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'item_name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 28, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'item_number' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64, 'key' => 'index', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'model_id' => array('type' => 'integer', 'null' => true, 'default' => null),
+		'model_title' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'description' => array('type' => 'text', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'invoice_payment_method_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
@@ -131,12 +171,12 @@ class ShopSchema extends CakeSchema {
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'paid' => array('type' => 'datetime', 'null' => true, 'default' => null),
-		'paid_email' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'paypal_payment_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'unique'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'paypal_payment_id' => array('column' => 'paypal_payment_id', 'unique' => 1),
-			'invoice_payment_method_id' => array('column' => 'invoice_payment_method_id', 'unique' => 0)
+			'invoice_payment_method_id' => array('column' => 'invoice_payment_method_id', 'unique' => 0),
+			'model' => array('column' => array('model', 'model_id'), 'unique' => 0)
 		),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
 	);
@@ -145,11 +185,11 @@ class ShopSchema extends CakeSchema {
 		'order_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
 		'parent_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'product_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-		'parent_catalog_item_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
+		'catalog_item_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
+		'parent_product_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'product_inventory_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'quantity' => array('type' => 'integer', 'null' => false, 'default' => null),
-		'package_quantity' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'price' => array('type' => 'float', 'null' => true, 'default' => null, 'length' => '10,2'),
 		'shipping' => array('type' => 'float', 'null' => true, 'default' => null, 'length' => '10,2'),
 		'sub_total' => array('type' => 'float', 'null' => true, 'default' => null, 'length' => '10,2'),
@@ -158,8 +198,9 @@ class ShopSchema extends CakeSchema {
 		'archived' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'parent_product_id' => array('column' => 'parent_catalog_item_id', 'unique' => 0),
+			'parent_product_id' => array('column' => 'parent_product_id', 'unique' => 0),
 			'shop_order_id' => array('column' => 'order_id', 'unique' => 0),
+			'product_id' => array('column' => 'catalog_item_id', 'unique' => 0),
 			'parent_shop_order_product_id' => array('column' => 'parent_id', 'unique' => 0),
 			'product_inventory_id' => array('column' => 'product_inventory_id', 'unique' => 0),
 			'product_id_2' => array('column' => 'product_id', 'unique' => 0)
@@ -192,10 +233,10 @@ class ShopSchema extends CakeSchema {
 		'auto_handling' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
 		'promo_discount' => array('type' => 'float', 'null' => false, 'default' => null, 'length' => '10,2'),
 		'total' => array('type' => 'float', 'null' => false, 'default' => null, 'length' => '10,2'),
-		'order_product_count' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'shop_order_product_count' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'shipped' => array('type' => 'datetime', 'null' => true, 'default' => null),
-		'order_shipping_id' => array('type' => 'integer', 'null' => true, 'default' => null),
-		'shipping_method_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
+		'shop_order_shipping_id' => array('type' => 'integer', 'null' => true, 'default' => null),
+		'shipping_method_id' => array('type' => 'boolean', 'null' => false, 'default' => null, 'key' => 'index'),
 		'shipping_cost' => array('type' => 'float', 'null' => false, 'default' => null, 'length' => '10,2'),
 		'tracking' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'first_name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
@@ -210,7 +251,6 @@ class ShopSchema extends CakeSchema {
 		'email' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'phone' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'same_billing' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
-		'shipped_email' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'canceled' => array('type' => 'boolean', 'null' => false, 'default' => null),
@@ -312,8 +352,8 @@ class ShopSchema extends CakeSchema {
 	);
 	public $product_inventories = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 64, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'product_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
+		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 64, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'quantity' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 6),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
@@ -325,16 +365,14 @@ class ShopSchema extends CakeSchema {
 	);
 	public $product_inventory_adjustments = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-		'product_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
-		'product_inventory_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
+		'product_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'index'),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'quantity' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 6),
 		'available' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'product_id' => array('column' => 'product_inventory_id', 'unique' => 0),
-			'product_id_2' => array('column' => 'product_id', 'unique' => 0)
+			'product_id' => array('column' => 'product_id', 'unique' => 0)
 		),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
 	);

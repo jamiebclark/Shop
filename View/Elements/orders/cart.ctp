@@ -121,7 +121,7 @@ if (!$emptyCart):
 		//DELETE Link
 		if (!empty($delete) || (!$condensed && $links)) {
 			if (!$hasParent) {
-				$deleteLink = $this->ModelVide->actionMenu(array('delete'), array(
+				$deleteLink = $this->ModelView->actionMenu(array('delete'), array(
 					'url' => array('controller' => 'order_products', $orderProduct['id']),
 				));
 			} else {

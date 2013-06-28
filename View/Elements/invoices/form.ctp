@@ -7,9 +7,9 @@ $span = 6;
 	<div class="span7">
 		<h3>Customer Info</h3>
 		<?php
-		echo $this->FormLayout->inputRow(array('first_name', 'last_name'), compact('span'));
-		echo $this->FormLayout->addressInput(compact('span'));
-		echo $this->FormLayout->inputRow(array('email', 'phone'), compact('span'));
+		echo $this->FormLayout->inputRow(array('first_name', 'last_name'));
+		echo $this->AddressBookForm->inputAddress('Invoice');
+		echo $this->FormLayout->inputRow(array('email', 'phone'));
 		?>
 	</div>
 	<div class="span5">
@@ -37,18 +37,17 @@ $span = 6;
 		?>
 	</div>
 </div>
-<?php echo $this->Form->submit('Update', array('class' => 'btn btn-primary')); ?>
+<?php echo $this->FormLayout->submitPrimary('Update'); ?>
 
 <fieldset><legend>Admin Settings</legend>
 	<p>How the Invoice is connected to other models in the database</p>
 	<?php
-	echo $this->Form->inputs(array(
+	echo $this->FormLayout->inputRow(array(
+		'model_id' => array('type' => 'id', 'label' => 'Model ID'),
 		'model',
 		'model_title',
-		'model_id' => array('type' => 'text', 'label' => 'Model ID'),
-		'user_id' => array('type' => 'text', 'label' => 'User ID'),
-		'fieldset' => false,		
 	));
+	echo $this->FormLayout->input('user_id', array('type' => 'id', 'label' => 'User ID'));
 	?>
 </fieldset>
 <?php echo $this->Form->end(); ?>

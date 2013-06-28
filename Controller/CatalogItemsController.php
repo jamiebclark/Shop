@@ -120,8 +120,13 @@ class CatalogItemsController extends ShopAppController {
 	
 	function admin_edit($id = null) {
 		$this->FormData->editData($id, null, array(
-			'contain' => array('CatalogItemCategory','CatalogItemImage', 'ShippingRule')
-		));
+			'contain' => array(
+				'CatalogItemCategory',
+				'CatalogItemImage', 
+				'ShippingRule',
+				'CatalogItemOption' => array('ProductOptionChoice'),
+			)
+		), null, array('deep' => true));
 	}
 
 	function admin_delete($id = null) {
@@ -141,6 +146,7 @@ class CatalogItemsController extends ShopAppController {
 					)
 				)
 			),
+			'CatalogItemOption' => array('ProductOptionChoice'),
 			'CatalogItemImage', 
 			'ShippingRule',
 			'CatalogItemCategory',

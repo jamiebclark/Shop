@@ -8,6 +8,7 @@ class CatalogItemHelper extends ModelViewHelper {
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	/*
 	function media($catalogItem, $options = array()) {
 		$options = array_merge(array(
 			'url' => $this->url($catalogItem),
@@ -22,6 +23,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
 		return $this->Html->div('catalog-item media', $thumb . $this->Html->div('media-body', $body));
 	}
+	*/
 	
 	function thumb($catalogItem, $options = array()) {
 		$src = $this->thumbDir;

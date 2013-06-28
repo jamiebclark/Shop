@@ -2,14 +2,40 @@
 class CatalogItemOption extends ShopAppModel {
 	var $name = 'CatalogItemOption';
 
+	var $actsAs = array(
+		'Shop.BlankDelete' => array('title'),
+		'Shop.FieldOrder' => array(
+			'orderField' => 'index',
+			'subKeyFields' => array('catalog_item_id')
+		),
+		'Layout.Removable',
+	);
+	
 	var $hasMany = array(
 		'ProductOptionChoice' => array(
 			'className' => 'Shop.ProductOptionChoice',
 			'dependent' => true,
 		)
 	);
-	
 	var $belongsTo = array('Shop.CatalogItem');
+	
+	/*
+	function beforeSave($options = array()) {
+		$data =& $this->getData();
+		//If no index is set, add it to the bottom
+		if (empty($data['index'])) {
+			$index = $this->find('count', array(
+				'recursive' => -1,
+				'conditions' => array('catalog_item_id' => $data['catalog_item_id'])
+			));
+			if (empty($data['id'])) {
+				$index++;
+			}
+			$data['index'] = $index;
+		}
+		return parent::beforeSave($options);
+	}
+	*/
 	
 /**
  * Finds the possible option choices, using the index as keys

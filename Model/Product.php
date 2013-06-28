@@ -59,7 +59,7 @@ class Product extends ShopAppModel {
 	
 	function adjustStock($id, $amt) {
 		return $this->updateAll(
-			array($this->alias . '.stock', $this->alias . '.stock + ' . $amt),
+			array($this->alias . '.stock' => $this->alias . '.stock + ' . $amt),
 			array($this->alias . '.id' => $id)
 		);
 	}

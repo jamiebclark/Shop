@@ -46,7 +46,8 @@ foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 }
 echo $this->Table->output();
 ?>
-</div><div class="span4">
+</div>
+<div class="span4">
 	<div class="content-box">
 	<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>
 		<h2><?php echo $this->Html->link('Packages', $url);?></h2>
@@ -79,7 +80,7 @@ echo $this->Table->output();
 	<div class="content-box">
 		<?php echo $this->Layout->headingActionMenu(
 			'Photos', 
-			array('index', 'add'), 
+			array('index'), 
 			array('url' => array(
 				'controller' => 'catalog_item_images',
 				'action' => 'index',

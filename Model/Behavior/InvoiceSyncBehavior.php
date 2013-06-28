@@ -14,7 +14,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * Available settings:
  *
  * - fields: (array) The fields to sync between the model and Invoice, using the format:
- *   modelField => invoiceField
+ *   	modelField => invoiceField
  * - title: (string) The human-formatted title of the model, used for the Invoice view
  *
  * @param Model $Model Model using the behavior
@@ -38,7 +38,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		);
 		
 		$Invoice = ClassRegistry::init('Shop.Invoice');
-		$Invoice->bindModel(array('hasOne' => array($this->getModelName($Model))));
+		$Invoice->bindModel(array('hasOne' => array($this->getModelName($Model))), false);
 		if (empty($Invoice->syncedModels)) {
 			$Invoice->syncedModels = array();
 		}
@@ -62,8 +62,9 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		if (empty($fields)) {
 			$fields = $settings['fields'];
 		}
+
 		$result = $Model->find('first', array(
-			'contain' => array('Invoice'),
+			'link' => array('Shop.Invoice'),
 			'conditions' => array($Model->alias . '.id' => $id)
 		));
 		$data = array($Model->alias => compact('id'), 'Invoice' => array(

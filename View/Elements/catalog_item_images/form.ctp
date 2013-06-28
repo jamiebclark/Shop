@@ -1,24 +1,9 @@
 <?php
 $add = !$this->Html->value('ProductImage.id');
-
-if ($add) {
-	$crumbs = array(
-		'Add Image',
-	);
-} else {
-	$crumbs = array(
-		array('Image', array('action' => 'view', $this->Html->value('ProductImage.id'))),
-		array('Edit'),
-	);
-}
-echo $this->element('product_images/admin_heading', compact('crumbs'));
-
-echo $this->Form->create('ProductImage', array('type' => 'file'));
+echo $this->Form->create(null, array('type' => 'file', 'class' => 'form-horizontal'));
 echo $this->Form->inputs(array(
 	'id',
-	'product_id',
-	'add_file' => array('type' => 'file')
+	'add_file' => array('type' => 'file', 'helpBlock' => 'Select an image from your computer')
+	'catalog_item_id' => array('helpBlock' => 'Select the which product this image represents'),
 ));
-echo $this->FormLayout->submit($add ? 'Add Image' : 'Update Image');
-echo $this->Form->end();
-?>
+echo $this->FormLayout->end($add ? 'Add Image' : 'Update Image');

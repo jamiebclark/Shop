@@ -26,10 +26,9 @@ class InvoiceEmailComponent extends Component {
 	function initialize(&$controller) {
 		$this->controller =& $controller;
 		
-		App::import('Model', 'Invoice');
-		$this->Invoice = new Invoice();
+		$this->Invoice = ClassRegistry::init('Shop.Invoice');
 		
-		$helpers = array('Contact', 'DisplayText', 'Invoice', 'Email');
+		$helpers = array('Contact', 'Layout.DisplayText', 'Shop.Invoice', 'Email');
 		foreach ($helpers as $helper => $config) {
 			if (is_numeric($helper)) {
 				$helper = $config;

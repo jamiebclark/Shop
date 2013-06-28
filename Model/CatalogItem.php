@@ -1,11 +1,13 @@
 <?php
 class CatalogItem extends ShopAppModel {
 	var $name = 'CatalogItem';
-	var $actsAs = array('Shop.SelectList');
+	var $actsAs = array(
+		'Shop.SelectList',
+		'Shop.BlankDelete' => array('title'),
+	);
 	var $recursive = 0;
 	
 	var $order = array('$ALIAS.active DESC', '$ALIAS.hidden', '$ALIAS.title');
-	
 	var $hasMany = array(
 		'Product' => array(
 			'className' => 'Shop.Product',

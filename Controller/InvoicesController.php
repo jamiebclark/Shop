@@ -3,6 +3,7 @@ class InvoicesController extends ShopAppController {
 	var $name = 'Invoices';
 	var $helpers = array(
 		'Layout.AddressBook',
+		'Layout.AddressBookForm',
 		'Layout.FormLayout',
 		'Layout.Table', 
 		'Layout.Calendar', 

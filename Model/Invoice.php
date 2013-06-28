@@ -116,7 +116,7 @@ class Invoice extends ShopAppModel {
 		$contain = $fields = array();
 		$models = array_merge($this->hasOne, $this->hasMany);
 		foreach ($models as $model => $config) {
-			$fields[] = "$model.*";
+			$fields[] = "`$model`.*";
 			if (is_numeric($model)) {
 				$model = $config;
 				$config = null;

@@ -1,7 +1,9 @@
 <?php
 class ProductOptionChoice extends ShopAppModel {
 	var $name = 'ProductOptionChoice';
-	var $actsAs = array('Shop.BlankDelete' => array('and' => array('title')));
+	var $actsAs = array(
+		'Shop.BlankDelete' => array('title')
+	);
 	var $order = '$ALIAS.id';
 	
 	var $belongsTo = array('Shop.CatalogItemOption');

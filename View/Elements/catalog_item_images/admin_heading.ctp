@@ -17,5 +17,3 @@ if (is_array($product)) {
 
 	echo $this->element('layouts/add_crumbs', compact('defaultCrumbs', 'crumbs'));
 }
-
-?>
