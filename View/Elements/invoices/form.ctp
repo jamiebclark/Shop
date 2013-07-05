@@ -28,7 +28,7 @@ $span = 6;
 			'class' => 'input-mini',
 			'helpBlock' => 'Does payment repeat? (0 for no)',
 		));
-		echo $this->FormLayout->datetimeInput('paid', array(
+		echo $this->FormLayout->inputDatetime('paid', array(
 			'label' => 'Date Paid',
 			'control' => array('today', 'clear'),
 			'blank' => true

@@ -1,6 +1,6 @@
 <div class="form-horizontal">
 	<?php
-	echo $this->FormLayout->datetimeInput('shipped', array(
+	echo $this->FormLayout->inputDatetime('shipped', array(
 		'control' => array('today', 'clear'), 
 		'label' => 'Date Shipped',
 		'blank' => true,

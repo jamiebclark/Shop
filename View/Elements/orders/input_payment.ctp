@@ -18,7 +18,7 @@
 
 	echo $this->Form->hidden('Invoice.paid_email');
 	
-	echo $this->FormLayout->datetimeInput('Invoice.paid', array(
+	echo $this->FormLayout->inputDatetime('Invoice.paid', array(
 		'control' => array('today', 'clear'), 
 		'class' => 'datetime', 
 		'label' => 'Date Paid',
