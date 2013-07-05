@@ -1,3 +1,3 @@
 <?php
-echo $this->element('product_images/form');
+echo $this->element('catalog_item_images/form');
 ?>

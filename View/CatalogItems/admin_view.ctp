@@ -44,9 +44,10 @@ foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 		array(round($shippingRule['pct'] * 100) . '%', 'Percent of Sub-Total')
 	), true);
 }
-echo $this->Table->table();
+echo $this->Table->output();
 ?>
-</div><div class="span4">
+</div>
+<div class="span4">
 	<div class="content-box">
 	<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>
 		<h2><?php echo $this->Html->link('Packages', $url);?></h2>
@@ -72,14 +73,14 @@ echo $this->Table->table();
 						), 'Quantity')
 				), true);
 			}
-			echo $this->Table->table();
+			echo $this->Table->output();
 		}
 		?>
 	</div>
 	<div class="content-box">
 		<?php echo $this->Layout->headingActionMenu(
 			'Photos', 
-			array('index', 'add'), 
+			array('index'), 
 			array('url' => array(
 				'controller' => 'catalog_item_images',
 				'action' => 'index',
@@ -93,12 +94,11 @@ echo $this->Table->table();
 				array($this->CatalogItem->thumb(
 					$catalogItemImage, 
 					array('dir' => 'thumb', 'url' => $url)
-				)), array($this->Layout->actionMenu(array(
-					'view', 'edit', 'delete', 'move_up', 'move_down'
-				), compact('url'))),
+				)), 
+				array($this->CatalogItem->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url'))),
 			), true);
 		}
-		echo $this->Table->table(array('class' => 'orderCatalogItemsForm'));
+		echo $this->Table->output(array('class' => 'orderCatalogItemsForm'));
 	?>
 	</div>
 </div>

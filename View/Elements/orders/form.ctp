@@ -92,7 +92,7 @@ foreach($this->request->data['OrderProduct'] as $k => $orderProduct) {
 		),
 	), true);
 }
-echo $this->Table->table();
+echo $this->Table->output();
 ?>
 
 <h2>Handling</h2>
@@ -136,7 +136,7 @@ for ($k = 0; $k <= $total; $k++) {
 		),
 	), true);
 }
-echo $this->Table->table(array('class' => 'handling-methods'));
+echo $this->Table->output(array('class' => 'handling-methods'));
 
 echo $this->Form->submit('Update', array('class' => 'btn btn-primary')); 
 echo $this->Form->end();

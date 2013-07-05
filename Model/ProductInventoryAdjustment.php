@@ -6,7 +6,7 @@
 class ProductInventoryAdjustment extends ShopAppModel {
 	var $name = 'ProductInventoryAdjustment';
 	var $actsAs = array('Shop.ChangedFields');
-	var $order = 'Shop.ProductInventoryAdjustment.available DESC';
+	var $order = 'ProductInventoryAdjustment.available DESC';
 	
 	var $belongsTo = array('Shop.Product');
 	

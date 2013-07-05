@@ -18,5 +18,5 @@ foreach ($totals as $year => $total) {
 	*/
 }
 $this->Table->rowEnd();
-echo $this->Table->table();
+echo $this->Table->output();
 ?>

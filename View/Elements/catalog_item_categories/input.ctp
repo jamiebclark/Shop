@@ -8,4 +8,7 @@ if (isset($count)) {
 if (!isset($options) && isset($catalogItemCategories)) {
 	$options = $catalogItemCategories;
 }
-echo $this->Form->input($prefix . 'id', array('type' => 'select') + compact('label', 'options'));
+echo $this->Form->input($prefix . 'id', array(
+	'type' => 'select',
+	'class' => 'select-collapse',
+) + compact('label', 'options'));

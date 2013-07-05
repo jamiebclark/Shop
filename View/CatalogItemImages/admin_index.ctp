@@ -17,10 +17,9 @@ foreach ($catalogItemImages as $catalogItemImage) {
 				), array('class' => 'secondary')),
 			'Catalog Item',
 		), array(
-			$this->Layout->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url')),
+			$this->ModelView->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url')),
 			'Actions',
 		)
 	), true);
 }
 echo $this->Table->output(array('paginate' => true));
-echo $this->Paginator->pagination();

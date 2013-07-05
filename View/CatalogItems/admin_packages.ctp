@@ -43,7 +43,7 @@ for ($k = 0; $k <= $max; $k++) {
 		), 'Quantity')
 	), true);
 }
-echo $this->Table->table();
+echo $this->Table->output();
 echo $this->FormLayout->submit('Update');
 echo $this->Form->end();
 echo "</div>\n";

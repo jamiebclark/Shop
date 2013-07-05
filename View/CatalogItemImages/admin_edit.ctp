@@ -1,5 +1,5 @@
 <?php
-echo $this->element('product_images/form', array(
+echo $this->element('catalog_item_images/form', array(
 	'product' => $this->Html->value('Product')
 ));
 ?>

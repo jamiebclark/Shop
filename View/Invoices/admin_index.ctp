@@ -9,10 +9,12 @@ echo $this->Table->tableSortMenu(array(
 $this->Table->reset();
 foreach ($invoices as $invoice) {
 	$invoice = $invoice['Invoice'];
-	$url = array('action' => 'view', $invoice['id']);
+	debug($invoice);
+
 	$class = !empty($invoice['paid']) ? 'success' : null;
+	$this->Table->checkbox($invoice['id']);
 	$this->Table->cells(array(
-		array($this->Html->link('Invoice #' . $invoice['id'], $url), 'Invoice #', 'id'),
+		array($this->Invoice->link($invoice), 'Invoice #', 'id'),
 		array(
 			$this->Invoice->amount($invoice), 
 			'Amount', 
@@ -27,9 +29,10 @@ foreach ($invoices as $invoice) {
 		)), 'Related To:'),
 		array($this->Calendar->niceShort($invoice['created']), 'Created', 'created'),
 		
-		array($this->Layout->actionMenu(array('view', 'edit', 'delete'), compact('url'), 'Actions')),
+		array($this->Invoice->actionMenu(array('view', 'edit', 'delete'), $invoice), 'Actions'),
 	), compact('class'));
 }
-echo $this->Table->table(array(
-	'paginate' => true
+echo $this->Table->output(array(
+	'paginate' => true,
+	'withChecked' => array('delete'),
 ));

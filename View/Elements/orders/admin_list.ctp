@@ -4,7 +4,7 @@ echo $this->element('orders/key');
 $this->Table->reset();
 $dateOptions = array('format' => 'tiny', 'time' => false, 'year');
 foreach ($orders as $order) {
-	$url = array('controller' => 'orders', 'action' => 'view', $order['Order']['id']);
+	$url = $this->Order->url($order['Order']);
 	$class = $this->Order->getStatusClass($order);
 
 	$this->Table->cells(array(
@@ -28,10 +28,9 @@ foreach ($orders as $order) {
 			$this->Calendar->niceShort($order['Order']['shipped'], $dateOptions), 
 			'Shipped', 'shipped'
 		), array(
-			$this->Layout->actionMenu(array('view', 'edit', 'delete'), compact('url')), 
+			$this->Order->actionMenu(array('view', 'edit', 'delete'), compact('url')), 
 			'Actions'
 		)
 	), compact('class'));
 }
 echo $this->Table->output(array('paginate' => true, 'div' => 'orders'));
-echo "DONE OUTPUTTING";

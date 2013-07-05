@@ -29,10 +29,14 @@ class BlankDeleteBehavior extends ModelBehavior {
 			$this->settings[$Model->alias] = $settings;
 		}
 	}
+	function beforeValidate($Model) {
+		$Model->data = $this->checkBlankDelete($Model);
+		return parent::beforeValidate($Model);
+	}
 	
 	function beforeSave(Model $Model, $options) {
 		$this->confirmDelete = false;
-		$this->checkBlankDelete($Model, $options);
+		$Model->data = $this->checkBlankDelete($Model);
 		return parent::beforeSave($Model, $options);
 	}
 	
@@ -42,15 +46,51 @@ class BlankDeleteBehavior extends ModelBehavior {
 		}
 		return parent::afterSave($Model, $created);
 	}
-	
-	function checkBlankDelete(Model $Model, $options = array()) {
-		$isBlank = false;
-		$isAssociated = empty($Model->data[$Model->alias]);
+
+	function checkBlankDelete(Model $Model, $passedData = null) {
+		$isAssociated = true;
+		if (empty($passedData)) {
+			$passedData =& $Model->data;
+			$isAssociated = false;
+		}
 		
-		if (!empty($Model->data[$Model->alias])) {
-			$data =& $Model->data[$Model->alias];
+		$isBlank = false;
+		
+		//Looks for sub-models
+		foreach ($passedData as $key => $val) {
+			if (is_array($val) && !is_numeric($key) && ctype_upper($key{0}) && $key != $Model->alias) {
+				if (is_object($Model->{$key})) {
+					$SubModel =& $Model->{$key};
+				} else {
+					foreach (CakePlugin::loaded() as $plugin) {
+						if ($SubModel = ClassRegistry::init("$plugin.$key", true)) {
+							break;
+						}
+					}
+				}
+				if (isset($this->settings[$key])) {
+					//Has Many
+					if (isset($val[0])) {
+						foreach ($val as $subKey => $subVal) {
+							if (!($passedData[$key][$subKey] = $SubModel->checkBlankDelete($subVal))) {
+								unset($passedData[$key][$subKey]);
+							}
+						}
+						$passedData[$key] = array_values($passedData[$key]); //Re-numbers
+					} else {
+						$passedData[$key] = $SubModel->checkBlankDelete($val);
+					}
+					if (empty($passedData[$key])) {
+						unset($passedData[$key]);
+					}
+				}
+			}
+		}
+
+		if (!empty($passedData[$Model->alias])) {
+			$data =& $passedData[$Model->alias];
 		} else {
-			$data =& $Model->data;
+			$data =& $passedData;
 		}
 		
 		$settings =& $this->settings[$Model->alias];
@@ -82,22 +122,20 @@ class BlankDeleteBehavior extends ModelBehavior {
 				$isBlank = true;
 			}
 		}
+		
 		if ($isBlank) {
-			if ($isAssociated) {
-				$this->confirmDelete = true;
+			$this->confirmDelete = false;
+			if (!empty($data['id'])) {
+				$Model->delete($data['id']);
+			}
+			$Model->validationErrors = null;
+			if (!empty($passedData)) {
+				$passedData = array();
 			} else {
-				$this->confirmDelete = false;
-				if (!empty($data['id'])) {
-					$Model->delete($data['id']);
-				}
-				$Model->validationErrors = null;
-				if (!empty($Model->data[$Model->alias])) {
-					$Model->data[$Model->alias] = array();
-				} else {
-					$Model->data = array();
-				}
+				$passedData = array();
 			}
 		}
+		return $passedData;
 	}
 	
 	private function isBlank($val) {

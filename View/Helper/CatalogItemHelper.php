@@ -1,13 +1,14 @@
 <?php
 define('SHOP_ROOT', APP . 'Plugin' . DS . 'Shop' . DS);
 define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
-
-class CatalogItemHelper extends AppHelper {
+App::uses('ModelViewHelper', 'Layout.View/Helper');
+class CatalogItemHelper extends ModelViewHelper {
 	var $name = 'CatalogItem';
 	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	/*
 	function media($catalogItem, $options = array()) {
 		$options = array_merge(array(
 			'url' => $this->url($catalogItem),
@@ -22,6 +23,7 @@ class CatalogItemHelper extends AppHelper {
 		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
 		return $this->Html->div('catalog-item media', $thumb . $this->Html->div('media-body', $body));
 	}
+	*/
 	
 	function thumb($catalogItem, $options = array()) {
 		$src = $this->thumbDir;
