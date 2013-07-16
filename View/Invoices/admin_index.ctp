@@ -1,11 +1,5 @@
 <?php
 echo $this->Layout->defaultHeader();
- 
-echo $this->Table->tableSortMenu(array(
-	array('Last Added', 'Invoice.created', 'desc'),
-	array('Last Updated', 'Invoice.modified', 'desc'),
-));
-
 $this->Table->reset();
 foreach ($invoices as $invoice) {
 	$invoice = $invoice['Invoice'];
@@ -35,4 +29,8 @@ foreach ($invoices as $invoice) {
 echo $this->Table->output(array(
 	'paginate' => true,
 	'withChecked' => array('delete'),
+	'sort' => array(
+		array('Last Added', 'Invoice.created', 'desc'),
+		array('Last Updated', 'Invoice.modified', 'desc'),
+	)
 ));
