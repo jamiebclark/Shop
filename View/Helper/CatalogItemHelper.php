@@ -132,4 +132,20 @@ class CatalogItemHelper extends ModelViewHelper {
 			$out = $this->Html->tag($tag, $out, compact('class', 'style'));
 		}
 		return $out;	}
+	
+	function categories($catalogItemCategories) {
+		$out = '';
+		foreach ($catalogItemCategories as $catalogItemCategory) {
+			$list = '';
+			foreach ($catalogItemCategory as $id => $title) {
+				$url = array('controller' => 'catalog_items', 'action' => 'index', 'category' => $id);
+				if (!empty($list)) {
+					$list .= ' / ';
+				}
+				$list .= $this->Html->link($title, $url);
+			}
+			$out .= $this->Html->div('catalog-item-category', $list);
+		}
+		return $this->Html->div('catalog-item-categories', $out);
+	}
 }

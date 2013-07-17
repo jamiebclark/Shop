@@ -49,8 +49,10 @@ echo $this->Table->output();
 </div>
 <div class="span4">
 	<div class="content-box">
-	<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>
-		<h2><?php echo $this->Html->link('Packages', $url);?></h2>
+		<h3>Categories</h3>
+		<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
+		<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>
+		<h3><?php echo $this->Html->link('Packages', $url);?></h3>
 		<?php
 		$this->Table->reset();
 		if (!empty($catalogItem['CatalogItemPackageChild'])) {

@@ -3,7 +3,7 @@ class CatalogItem extends ShopAppModel {
 	var $name = 'CatalogItem';
 	var $actsAs = array(
 		'Shop.SelectList',
-		'Shop.BlankDelete' => array('title'),
+	//	'Shop.BlankDelete' => array('title'),
 	);
 	var $recursive = 0;
 	
@@ -50,28 +50,28 @@ class CatalogItem extends ShopAppModel {
 		)
 	);
 	
-	/*
 	function beforeSave($options = array()) {
-		trace();
 		debug($this->data);
+		debug($options);
 		return parent::beforeSave($options);
 	}
-	*/
 	
 	function afterSave($created) {
 		$id = $this->id;
+		debug($this->find('first', array('contain' => array('CatalogItemCategory'), 'conditions' => array($this->alias . '.id' => $id))));
+		
 		$this->createProducts($id);
 		$this->updateProductTitles($id);
 		$this->read(null, $id);
 		return parent::afterSave($created);	
 	}
 	
-	/**
-	 * Updates the titles of the catalog item's associated products
-	 *
-	 * @param int $id Catalog Item Id
-	 * @return bool Success
-	 **/
+/**
+ * Updates the titles of the catalog item's associated products
+ *
+ * @param int $id Catalog Item Id
+ * @return bool Success
+ **/
 	public function updateProductTitles($id) {
 		$products = $this->Product->find('list', array(
 			'link' => array('Shop.' . $this->alias),
@@ -83,13 +83,13 @@ class CatalogItem extends ShopAppModel {
 		return true;
 	}
 	
-	/**
-	 * Finds all possible combinations of options of the catalog item
-	 * Saves each one in the product table
-	 *
-	 * @param int $id Catalog Item Id
-	 * @return bool Success
-	 **/
+/**
+ * Finds all possible combinations of options of the catalog item
+ * Saves each one in the product table
+ *
+ * @param int $id Catalog Item Id
+ * @return bool Success
+ **/
 	public function createProducts($id) {
 		$result = $this->find('first', array(
 			'contain' => array('Product'),
@@ -137,6 +137,44 @@ class CatalogItem extends ShopAppModel {
 			}
 		}
 		return $this->Product->saveAll($data, array('callbacks' => false));
+	}
+	
+	function findCategories($id) {
+		$categories = $this->CatalogItemCategory->find('all', array(
+			'link' => array('Shop.CatalogItem'),
+			'conditions' => array('CatalogItem.id' => $id)
+		));
+		$options = array('order' => 'CatalogItemCategory.lft DESC', 'conditions' => array());
+		$conditions = array();
+		$ids = array();
+		foreach ($categories as $category) {
+			$options['conditions']['OR'][]['AND'] = array(
+				'CatalogItemCategory.lft <=' => $category['CatalogItemCategory']['lft'],
+				'CatalogItemCategory.rght >=' => $category['CatalogItemCategory']['rght'],
+			);
+			$ids[$category['CatalogItemCategory']['id']] = $category['CatalogItemCategory']['id'];
+		}
+		$categories = $this->CatalogItemCategory->find('all', $options);
+		$return = $returnSorted = array();
+		foreach ($categories as $category) {
+			$id = $category['CatalogItemCategory']['id'];
+			$parentId = $category['CatalogItemCategory']['parent_id'];
+			if (isset($ids[$id])) {
+				$return[][$parentId] = $category;
+			}
+			foreach ($return as $key => $list) {
+				if (isset($list[$id])) {
+					$return[$key][$parentId] = $category;
+				}
+			}
+		}
+		foreach ($return as $key => $categories) {
+			$categories = array_reverse($categories);
+			foreach ($categories as $category) {
+				$returnSorted[$key][$category['CatalogItemCategory']['id']] = $category['CatalogItemCategory']['title'];
+			}
+		}
+		return $returnSorted;
 	}
 	
 	/*

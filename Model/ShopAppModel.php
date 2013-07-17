@@ -2,6 +2,7 @@
 class ShopAppModel extends AppModel {
 	var $actsAs = array(
 		'Containable',
+		'Shop.BlankDelete',
 		'Shop.Linkable',
 		'Shop.PostContain',
 		'Shop.DateValidate',

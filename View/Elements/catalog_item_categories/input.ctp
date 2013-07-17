@@ -1,14 +1,21 @@
 <?php
-$prefix = 'CatalogItemCategory.';
-$label = 'Category';
+$default = null;
 if (isset($count)) {
-	$prefix .= $count . '.';
-	$label .= ' #' . ($count + 1);
+	$field = "CatalogItemCategory.$count.id";
+	$label = false;
+	if (isset($catalogItem['CatalogItemCategory']['id'])) {
+		$default = $catalogItem['CatalogItemCategory']['id'];
+	}
+} else {
+	$label = 'Category';
+	$field = 'CatalogItemCategory.id';
 }
+	
 if (!isset($options) && isset($catalogItemCategories)) {
 	$options = $catalogItemCategories;
 }
-echo $this->Form->input($prefix . 'id', array(
+
+echo $this->Form->input($field, array(
 	'type' => 'select',
 	'class' => 'select-collapse',
-) + compact('label', 'options'));
+) + compact('label', 'options', 'default'));

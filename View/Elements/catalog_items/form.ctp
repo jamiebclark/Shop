@@ -7,16 +7,24 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 <div class="row">
 	<div class="span6">
 		<?php
-		echo $this->Form->inputs(array(
-			'legend' => 'Item Info',
+		echo $this->FormLayout->inputs(array(
 			'id',
 			'title' => array('class' => 'input-block-level'),
 			'short_description' => array('class' => 'input-block-level'),
 			'description' => array('escape' => false, 'class' => 'input-block-level'),
-			'price' => array('label' => 'Price') + $cashOptions,
-			'sale' => array('label' => 'Sale Price') + $cashOptions,
-			'min_quantity' => array('label' => 'Minimum Quantity'),
-			'quantity_per_pack',
+		));
+		?>
+		<div class="form-horizontal"><?php
+			echo $this->FormLayout->inputs(array(
+				'price' => array('label' => 'Price', 'type' => 'cash'),
+				'sale' => array('label' => 'Sale Price', 'type' => 'cash'),
+				'min_quantity' => array('label' => 'Minimum Quantity', 'type' => 'int'),
+				'quantity_per_pack' => array('type' => 'int'),
+			));
+			?>
+		</div>
+		<?php
+		echo $this->FormLayout->inputs(array(
 			'active' => array(
 				'label' => 'Active',
 				'helpBlock' => 'Whether item is available for sale',
@@ -54,5 +62,4 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 	?>
 </fieldset>
 <?php 
-echo $this->Form->submit('Update');
-echo $this->Form->end(); 
+echo $this->FormLayout->end('Update');

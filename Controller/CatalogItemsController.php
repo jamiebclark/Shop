@@ -52,12 +52,11 @@ class CatalogItemsController extends ShopAppController {
 		
 		$this->paginate = $this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId);
 		$catalogItems = $this->paginate();
-		
 		$this->set(compact('catalogItems', 'catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
 	}
 	
 	function view ($id = null) {
-		//Temporary - Remove later
+		//TODO: Temporary - Remove later
 		$this->CatalogItem->createProducts($id);
 		$this->CatalogItem->updateProductTitles($id);
 		//
@@ -98,8 +97,9 @@ class CatalogItemsController extends ShopAppController {
 			}
 		}
 		*/
+		$catalogItemCategories = $this->CatalogItem->findCategories($id);
 		$this->request->data['Order']['id'] = $this->ShoppingCart->getCart();
-		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions'));
+		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions', 'catalogItemCategories'));
 	}
 	
 	function admin_index() {
@@ -119,14 +119,14 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_edit($id = null) {
-		$this->FormData->editData($id, null, array(
+		$result = $this->FormData->editData($id, null, array(
 			'contain' => array(
 				'CatalogItemCategory',
 				'CatalogItemImage', 
 				'ShippingRule',
 				'CatalogItemOption' => array('ProductOptionChoice'),
 			)
-		), null, array('deep' => true));
+		), null, array('deep' => true, 'callbacks' => false));
 	}
 
 	function admin_delete($id = null) {
@@ -151,7 +151,10 @@ class CatalogItemsController extends ShopAppController {
 			'ShippingRule',
 			'CatalogItemCategory',
 		));
-		$this->set(compact('catalogItem'));
+		
+		$catalogItemCategories = $this->CatalogItem->findCategories($id);
+		
+		$this->set(compact('catalogItem', 'catalogItemCategories'));
 	}
 	
 	function admin_packages($id = null) {

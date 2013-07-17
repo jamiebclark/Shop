@@ -43,7 +43,7 @@
 
 		<?php if (!empty($catalogItem['CatalogItemPackageChild'])): ?>
 		<div class="package">
-			<h2>Packaged Item</h2>
+			<h4>Packaged Item</h4>
 			This product contains the following items:
 			<?php
 			echo $this->element('catalog_item_packages/child_table', array(
@@ -51,6 +51,10 @@
 			));
 			?>
 		</div>
+		<?php endif; ?>
+		<?php if (!empty($catalogItemCategories)): ?>
+			<h4>Categories</h4>
+			<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
 		<?php endif; ?>
 	</div>
 	<div class="span3 add-cart">
