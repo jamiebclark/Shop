@@ -1,4 +1,5 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItem extends ShopAppModel {
 	var $name = 'CatalogItem';
 	var $actsAs = array(
@@ -50,15 +51,8 @@ class CatalogItem extends ShopAppModel {
 		)
 	);
 	
-	function beforeSave($options = array()) {
-		debug($this->data);
-		debug($options);
-		return parent::beforeSave($options);
-	}
-	
 	function afterSave($created) {
 		$id = $this->id;
-		debug($this->find('first', array('contain' => array('CatalogItemCategory'), 'conditions' => array($this->alias . '.id' => $id))));
 		
 		$this->createProducts($id);
 		$this->updateProductTitles($id);

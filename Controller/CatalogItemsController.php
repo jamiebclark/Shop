@@ -126,7 +126,7 @@ class CatalogItemsController extends ShopAppController {
 				'ShippingRule',
 				'CatalogItemOption' => array('ProductOptionChoice'),
 			)
-		), null, array('deep' => true, 'callbacks' => false));
+		), null, array('deep' => true));
 	}
 
 	function admin_delete($id = null) {

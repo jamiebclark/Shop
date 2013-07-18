@@ -13,7 +13,7 @@ foreach ($catalogItems as $catalogItem) {
 			'Catalog Item',
 			
 		), array($this->CatalogItem->inventory($catalogItem['CatalogItem']), 'Stock'),
-		array($this->Layout->actionMenu(array('view', 'edit', 'active', 'delete'), compact('url', 'active')), 'Actions')
+		array($this->CatalogItem->actionMenu(array('view', 'edit', 'active', 'delete'), compact('url', 'active')), 'Actions')
 	), array('class' => $active ? null : 'inactive'));
 }
 echo $this->Table->output(array(

@@ -2,6 +2,7 @@
 class CatalogItemImage extends ShopAppModel {
 	var $name = 'CatalogItemImage';
 	var $actsAs = array(
+		'Shop.BlankDelete' => array('id', 'add_file'),
 		'Uploadable.ImageUploadable' => array(
 			'plugin' => 'Shop',
 			//'bypass_is_uploaded' => true,
@@ -38,7 +39,7 @@ class CatalogItemImage extends ShopAppModel {
 	
 	private $setThumbnail = false;
 	
-	function beforeSave() {
+	function beforeSave($options) {
 		$data =& $this->getData();
 		if (isset($data) && empty($data['id']) && empty($data['add_file']['tmp_name'])) {
 			unset($data['add_file']);
@@ -47,7 +48,7 @@ class CatalogItemImage extends ShopAppModel {
 			$this->setThumbnail = true;
 		}
 		
-		return parent::beforeSave();
+		return parent::beforeSave($options);
 	}
 	
 	function afterSave($created) {
