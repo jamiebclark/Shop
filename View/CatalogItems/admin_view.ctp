@@ -49,6 +49,16 @@ echo $this->Table->output();
 </div>
 <div class="span4">
 	<div class="content-box">
+	<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
+		<h4><?php echo $catalogItemOption['title']; ?></h4>
+		<ul>
+		<?php foreach ($catalogItemOption['ProductOptionChoice'] as $productOptionChoice): ?>
+			<li><?php echo $productOptionChoice['title']; ?></li>
+		<?php endforeach; ?>
+		</ul>
+	<?php endforeach; ?>
+	</div>
+	<div class="content-box">
 		<h3>Categories</h3>
 		<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
 		<?php $url = array('action' => 'packages', $catalogItem['CatalogItem']['id']); ?>

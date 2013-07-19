@@ -2,6 +2,8 @@
 App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItem extends ShopAppModel {
 	var $name = 'CatalogItem';
+	var $useDbConfig = 'shop';
+	
 	var $actsAs = array(
 		'Shop.SelectList',
 	//	'Shop.BlankDelete' => array('title'),
@@ -90,6 +92,7 @@ class CatalogItem extends ShopAppModel {
 			'conditions' => array($this->alias . '.id' => $id)
 		));
 		$count = $this->Product->optionChoiceCount;
+		$this->CatalogItemOption = ClassRegistry::init('Shop.CatalogItemOption');
 		$indexes = $this->CatalogItemOption->findCatalogItemIndexes($id);
 		$data = $indexData = array();
 		foreach ($indexes as $index => $indexVals) {
@@ -130,6 +133,8 @@ class CatalogItem extends ShopAppModel {
 				continue 2;
 			}
 		}
+		$this->Product->create();
+		
 		return $this->Product->saveAll($data, array('callbacks' => false));
 	}
 	
@@ -169,6 +174,30 @@ class CatalogItem extends ShopAppModel {
 			}
 		}
 		return $returnSorted;
+	}
+	
+/**
+ * Totals all the associated Product stock values
+ *
+ **/
+	function updateStock($id) {
+		$result = $this->Product->find('first', array(
+			'fields' => array('SUM(IF(Product.stock < 0, 0, Product.stock)) AS stock'),
+			'conditions' => array('Product.catalog_item_id' => $id),
+			'group' => array('Product.catalog_item_id')
+		));
+		return $this->updateAll(array(
+			$this->escapeField('stock') => !empty($result) ? $result[0]['stock'] : 0,
+		), array(
+			$this->escapeField($this->primaryKey) => $id
+		));
+	}
+
+	function updateAllStock() {
+		$result = $this->find('list');
+		foreach ($result as $id => $title) {
+			$this->updateStock($id);
+		}
 	}
 	
 	/*

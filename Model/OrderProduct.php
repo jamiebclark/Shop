@@ -6,7 +6,7 @@ class OrderProduct extends ShopAppModel {
 		'Shop.Product', 
 		/*'ParentProduct' => array(
 			'className' => 'Shop.Product',
-			'foreignKey' => 'parent_catalog_item_id',
+			'foreignKey' => 'parent_product_id',
 		),
 		*/
 		'ParentOrderProduct' => array(
@@ -17,7 +17,7 @@ class OrderProduct extends ShopAppModel {
 			'className' => 'Shop.Order',
 			'counterCache' => true,
 		),
-		'Shop.ProductInventory'
+	//	'Shop.ProductInventory'
 	);
 	
 	var $hasMany = array(
@@ -70,7 +70,7 @@ class OrderProduct extends ShopAppModel {
 		
 		//If only catalog_item_id is passed, finds the appropriate product ID
 		if (empty($data['product_id'])) {
-			if (!empty($data['catalog_item_id'])) {
+			if (!empty($this->data['Product']['catalog_item_id'])) {
 				if (!$this->setProductIdFromData($this->data)) {
 					$this->invalidate('product_id', 'Please select all options');
 					return false;
@@ -78,6 +78,17 @@ class OrderProduct extends ShopAppModel {
 			} else {
 				$this->invalidate('product_id', 'Select a product first');
 				return false;
+			}
+		}
+		
+		for ($i = 1; $i <= $this->Product->optionChoiceCount; $i++) {
+			$field = 'product_option_choice_id_' . $i;
+			if (isset($data[$field])) {
+				if (empty($data[$field])) {
+					$this->invalidate($field, 'Please select all options');
+				}
+			} else {
+				break;
 			}
 		}
 		
@@ -91,8 +102,6 @@ class OrderProduct extends ShopAppModel {
 				$data['quantity'] *= $data['package_quantity'];
 			}
 		}
-
-//		debug(array($this->data, $data));
 		
 		//Checks if product already exists in the cart
 		$this->quantityExists($this->data);
@@ -191,7 +200,7 @@ class OrderProduct extends ShopAppModel {
 		if (!empty($this->current[$this->alias]['order_id'])) {
 			$this->Order->updateTotal($this->current[$this->alias]['order_id']);
 		}
-		$this->ProductInventory->rebuildQuantity($this->current[$this->alias]['product_inventory_id']);
+		//$this->Product->updateStock($this->current[$this->alias]['product_id']);
 		$this->updateProductStock($this->id);
 		
 		//If deleted item as a package, deletes all package elements
@@ -263,9 +272,9 @@ class OrderProduct extends ShopAppModel {
 	}
 	
 	function updateTotal($id = null) {
-		$fields = $this->read(array('parent_catalog_item_id', 'quantity', 'price', 'shipping'), $id);
+		$fields = $this->read(array('parent_product_id', 'quantity', 'price', 'shipping'), $id);
 		//Non-Shipping Total
-		if (!empty($fields[$this->alias]['parent_catalog_item_id'])) {
+		if (!empty($fields[$this->alias]['parent_product_id'])) {
 			$sub_total = 0;
 			$total = 0;
 		} else {
@@ -279,7 +288,7 @@ class OrderProduct extends ShopAppModel {
 	
 	function findProductTotal($productId) {
 		$result = $this->find('first', array(
-			'fields' => array('SUM('. $this->alias .'.quantity) AS total'),
+			'fields' => array("SUM({$this->alias}.quantity) AS total"),
 			'link' => array('Shop.Order'),
 			'conditions' => array(
 				$this->alias . '.product_id' => $productId,
@@ -433,8 +442,9 @@ class OrderProduct extends ShopAppModel {
 		} else {
 			$modelData =& $data;
 		}
-		if ($productId = $this->Product->findProductIdFromData($modelData)) {
+		if (!empty($data['Product']) && $productId = $this->Product->findProductIdFromData($data['Product'])) {
 			$modelData['product_id'] = $productId;
+			$data['Product']['id'] = $productId;
 			if (!empty($data['ChildOrderProduct'])) {
 				foreach ($data['ChildOrderProduct'] as &$child) {
 					if ($childProductId = $this->Product->findProductIdFromData($child)) {

@@ -56,11 +56,6 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function view ($id = null) {
-		//TODO: Temporary - Remove later
-		$this->CatalogItem->createProducts($id);
-		$this->CatalogItem->updateProductTitles($id);
-		//
-		
 		$catalogItem = $this->FormData->findModel($id, null, array(
 			'contain' => array(
 				'CatalogItemImage',
@@ -72,6 +67,11 @@ class CatalogItemsController extends ShopAppController {
 				),
 			)
 		));
+		//TODO: Temporary - Remove later
+		$this->CatalogItem->createProducts($id);
+		$this->CatalogItem->updateProductTitles($id);
+		//
+
 		//$catalogItemOptions = $this->CatalogItem->CatalogItemOption->findCatalogItemList($id);
 		
 		/*
@@ -103,6 +103,8 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_index() {
+		$this->CatalogItem->updateAllStock();
+		
 		$this->paginate = array('conditions' => array('CatalogItem.active' => 1));
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
@@ -121,6 +123,7 @@ class CatalogItemsController extends ShopAppController {
 	function admin_edit($id = null) {
 		$result = $this->FormData->editData($id, null, array(
 			'contain' => array(
+				'CatalogItemPackageChild',
 				'CatalogItemCategory',
 				'CatalogItemImage', 
 				'ShippingRule',
@@ -134,12 +137,23 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_view($id = null) {
+		$catalogItem = $this->FormData->findModel($id, null, array(
+			'contain' => array(
+				'CatalogItemPackageChild' => array(
+					'CatalogItemChild'
+				),
+				'CatalogItemOption' => array('ProductOptionChoice'),
+				'CatalogItemImage', 
+				'ShippingRule',
+				'CatalogItemCategory',
+			)
+		));
+		/*
 		$catalogItem = $this->CatalogItem->findById($id);
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
 			'CatalogItemPackageChild' => array(
 				'link' => array(
-					'CatalogItemChild' => array(
-						'class' => 'Shop.CatalogItem',
+					'Shop.CatalogItemChild' => array(
 						'conditions' => array(
 							'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
 						)
@@ -151,7 +165,7 @@ class CatalogItemsController extends ShopAppController {
 			'ShippingRule',
 			'CatalogItemCategory',
 		));
-		
+		*/
 		$catalogItemCategories = $this->CatalogItem->findCategories($id);
 		
 		$this->set(compact('catalogItem', 'catalogItemCategories'));
@@ -163,7 +177,7 @@ class CatalogItemsController extends ShopAppController {
 				'postContain' => array(
 					'CatalogItemPackageChild' => array(
 						'link' => array(
-							'CatalogItemChild' => array(
+							'Shop.CatalogItemChild' => array(
 								'conditions' => 'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
 							)
 						)
@@ -284,5 +298,16 @@ class CatalogItemsController extends ShopAppController {
 	*/
 	function _setFormElements() {
 		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
+		$packageChildren = array('' => ' -- Package Content -- ') + $this->CatalogItem->find('list', array(
+			'link' => array('Shop.CatalogItemPackageParent' => array(
+				'table' => 'catalog_item_packages',
+				'conditions' => array(
+					'CatalogItemPackageParent.catalog_item_parent_id = CatalogItem.id',
+				)
+			)),
+			'conditions' => array('CatalogItemPackageParent.id' => null),
+			'order' => array('CatalogItem.active DESC', 'CatalogItem.title'),
+		));
+		$this->set(compact('packageChildren'));
 	}
 }

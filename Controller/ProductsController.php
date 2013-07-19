@@ -7,11 +7,14 @@ class ProductsController extends ShopAppController {
 		$this->paginate = array(
 			'fields' => '*',
 			'recursive' => 0,
-			'order' => array(
-				'Product.active DESC', 'Product.title', 'Product.id', 'ProductOptionChoice1.id'
-			),
 			'conditions' => array(),
 			'limit' => 50,
+			'order' => array(
+				'CatalogItem.active' => 'desc',
+				'Product.title' => 'asc',
+				'Product.id' => 'asc',
+				'ProductOptionChoice1.id' => 'asc',
+			),
 		);
 		if (!empty($catalogItemId)) {
 			$paginate = $this->paginate;
@@ -21,6 +24,9 @@ class ProductsController extends ShopAppController {
 		}
 		$products = $this->paginate();
 		$this->set(compact('products'));
+		
+		$this->Product->updateMissingCatalogItemOptions();
+		$this->Product->combine();
 	}
 	
 	function admin_update_title() {

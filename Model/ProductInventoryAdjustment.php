@@ -3,6 +3,7 @@
  * A combination of ProductInventory and OrderProduct
  *
  **/
+App::uses('ShopAppModel', 'Shop.Model');
 class ProductInventoryAdjustment extends ShopAppModel {
 	var $name = 'ProductInventoryAdjustment';
 	var $actsAs = array('Shop.ChangedFields');

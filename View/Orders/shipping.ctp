@@ -30,29 +30,10 @@
 		<fieldset>
 			<legend>Billing Information</legend>
 		<?php
-<<<<<<< HEAD
-=======
 		echo $this->Layout->toggle('', $this->AddressBookForm->inputAddress('Invoice', array(
 				'placeholder' => true,
 				'before' => $this->FormLayout->inputRow(array('Invoice.first_name', 'Invoice.last_name'))
 			)),
-			'Billing information is same as Shipping', 
-			array('name' => 'same_billing')
-		);
-		
->>>>>>> ef478f205f59f09d8287e867b839528a1b628e12
-		echo $this->Layout->toggle('', $this->FormLayout->inputRows(array(
-				array('Invoice.addline1' => array('label' => 'Street Address')),
-				array('Invoice.addline2' => array('label' => 'Apt. #')),
-				array('Invoice.city', 'Invoice.state', 'Invoice.zip'),
-				array('Invoice.country' => array('default' => 'US'))
-			), array(
-				'placeholder' => true,
-				'before' => $this->FormLayout->inputRow(array(
-					'Invoice.first_name', 
-					'Invoice.last_name'
-				))
-			)), 
 			'Billing information is same as Shipping', 
 			array('name' => 'same_billing')
 		);

@@ -18,8 +18,8 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 			echo $this->FormLayout->inputs(array(
 				'price' => array('label' => 'Price', 'type' => 'cash'),
 				'sale' => array('label' => 'Sale Price', 'type' => 'cash'),
-				'min_quantity' => array('label' => 'Minimum Quantity', 'type' => 'int'),
-				'quantity_per_pack' => array('type' => 'int'),
+				'min_quantity' => array('label' => 'Minimum Quantity', 'type' => 'number'),
+				'quantity_per_pack' => array('type' => 'number'),
 			));
 			?>
 		</div>
@@ -38,7 +38,9 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 				'helpBlock' => 'Item\'s stock never runs out'
 			),
 		));
+		echo $this->FormLayout->inputList('shipping_rules/input', array('model' => 'ShippingRule', 'legend' => 'Shipping Rules'));
 		?>
+		</fieldset>
 	</div>
 	<div class="span6">
 		<fieldset>
@@ -54,12 +56,12 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 			<p class="note">If there are options that must be selected before the item can be purchased (ie sizes, colors, langauges, etc), then set them here</p>
 			<?php echo $this->FormLayout->inputList('catalog_item_options/admin_input', array('model' => 'CatalogItemOption')); ?>
 		</fieldset>
+		<fieldset>
+			<legend>Packages</legend>
+			<p class="note">If this is a combination of other products, you can group them all here</p>
+			<?php echo $this->FormLayout->inputList('catalog_item_packages/input', array('model' => 'CatalogItemPackage')); ?>
+		</fieldset>
 	</div>
 </div>
-<fieldset><legend>Shipping Rules</legend>
-	<?php 
-		echo $this->FormLayout->inputList('shipping_rules/input', array('model' => 'ShippingRule'));
-	?>
-</fieldset>
 <?php 
 echo $this->FormLayout->end('Update');

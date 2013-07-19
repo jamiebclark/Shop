@@ -12,6 +12,10 @@ foreach ($result as $k => $catalogItemPackage):
 		'dir' => 'thumb', 
 		'url' => $url,
 	)); 
+	$class = $this->CatalogItem->getInventoryClass($catalogItemPackage['CatalogItemChild']);
+	if ($class == 'success') {
+		$class = null;
+	}
 	$this->Table->cells(array(
 		array($thumb, null, array('class' => 'thumb')),
 		array($title, 'Product'),
@@ -20,7 +24,7 @@ foreach ($result as $k => $catalogItemPackage):
 			'prefix' => $prefix,
 		)), 'Options'),
 		array(number_format($catalogItemPackage['quantity']), 'Qty.', array('class' => 'qty')),
-	), true);
+	), compact('class'));
 	
 	echo $this->Form->hidden($prefix . 'catalog_item_id', array(
 		'value' => $catalogItemPackage['CatalogItemChild']['id'],

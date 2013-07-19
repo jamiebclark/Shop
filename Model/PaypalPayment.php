@@ -26,7 +26,7 @@ class PaypalPayment extends ShopAppModel {
 	function syncInvoice($id, $soft = true) {
 		$result = $this->find('first', array(
 			'fields' => array('*'),
-			'link' => array('Invoice'),
+			'link' => array('Shop.Invoice'),
 			'conditions' => array(
 				$this->alias . '.id' => $id
 			)

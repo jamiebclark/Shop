@@ -8,6 +8,7 @@ class ShopAppModel extends AppModel {
 		'Shop.DateValidate',
 	);
 
+	var $useDbConfig = 'shop';
 	var $recursive = 0;
 	
 	function __construct($id = false, $table = null, $ds = null) {

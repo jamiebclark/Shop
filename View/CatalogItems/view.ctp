@@ -59,7 +59,7 @@
 	</div>
 	<div class="span3 add-cart">
 		<?php 
-		if ($catalogItem['CatalogItem']['stock'] <= 0): ?>
+		if (!$this->CatalogItem->hasStock($catalogItem['CatalogItem'])): ?>
 			<h3>Out of stock</h3>
 			<p>Sorry, this item is temporarily out of stock. Please check back soon for inventory updates</p><?php 
 		else: ?>
@@ -70,7 +70,7 @@
 			echo $this->Form->inputs(array(
 				'fieldset' => false,
 				'Order.id' => array('type' => 'hidden'),
-				'OrderProduct.catalog_item_id' => array(
+				'Product.catalog_item_id' => array(
 					'type' => 'hidden', 
 					'value' => $catalogItem['CatalogItem']['id']
 				),
@@ -81,7 +81,7 @@
 			));
 
 			echo $this->element('catalog_item_options/input', array(
-				'prefix' => 'OrderProduct.',
+				'prefix' => 'Product.',
 				'catalogItemOptions' => $catalogItem['CatalogItemOption']
 			));
 
@@ -100,7 +100,6 @@
 	<?php echo $this->Form->end(); ?>
 </div>
 <?php
-
 if (!empty($isShopAdmin)) {
 	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
 		'action' => 'view',

@@ -8,7 +8,10 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 	
 	function admin_add($productId = null) {
 		$default = array(
-			'ProductInventoryAdjustment' => array('product_id' => $productId)
+			'ProductInventoryAdjustment' => array(
+				'product_id' => $productId,
+				'available' => date('Y-m-d H:i:s'),
+			)
 		);
 		$this->FormData->addData(compact('default'));
 	}

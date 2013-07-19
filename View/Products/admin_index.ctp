@@ -7,7 +7,7 @@ foreach ($products as $product) {
 	$qtyDisplay = $this->CatalogItem->inventory($qty);
 	
 	$url = array('controller' => 'products', 'action' => 'view', $id);
-	$active = $product['Product']['active'];
+	$active = $product['CatalogItem']['active'];
 	$title = html_entity_decode($product['Product']['title']);
 	$unlimited = $product['CatalogItem']['unlimited'];
 	
@@ -24,7 +24,8 @@ foreach ($products as $product) {
 					$product['CatalogItem']['id']
 				)
 			),
-			'Catalog Item'
+			'Catalog Item',
+			'CatalogItem.title',
 		), array(
 			$this->Html->link($product['Product']['sub_title'], $url, array('class' => 'secondary')),
 			'Product',

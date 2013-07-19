@@ -1,4 +1,5 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
 class ProductInventory extends ShopAppModel {
 	var $name = 'ProductInventory';
 	
@@ -55,11 +56,10 @@ class ProductInventory extends ShopAppModel {
 	}
 	
 	function adjustQuantity($id, $adjustQuantity) {
-		$this->updateAll(array(
-			'ProductInventory.quantity' => 'ProductInventory.quantity + ' . $adjustQuantity,
-		), array(
-			'ProductInventory.id' => $id,
-		));
+		$this->updateAll(
+			array('Product.stock' => 'Product.stock + ' . $adjustQuantity), 
+			array('ProductInventory.id' => $id)
+		);
 		$this->read(null, $id);
 		return $this->afterSave(false);
 	}
@@ -67,45 +67,16 @@ class ProductInventory extends ShopAppModel {
 	function rebuildQuantity($id) {
 		$result = $this->ProductInventoryAdjustment->find('first', array(
 			'fields' => 'SUM(ProductInventoryAdjustment.quantity) AS total_inventory',
-			'link' => array('ProductInventory'),
-			'conditions' => array(
-				'ProductInventory.id' => $id,
-			)
+			'link' => array('Shop.Product'),
+			'conditions' => array('Product.id' => $id)
 		));
 		$totalInventory = !empty($result) ? $result[0]['total_inventory'] : 0;
 		
 		$result = $this->Product->OrderProduct->find('first', array(
 			'fields' => 'SUM(OrderProduct.quantity) AS total_sold',
-			'link' => array('Order', 'ProductInventory'),
-			/*
-			'joins' => array(
-				array(
-					'table' => 'product_inventories',
-					'alias' => 'ProductInventory',
-					'conditions' => array(
-						'ProductInventory.product_id = OrderProduct.product_id',
-						'((
-							ProductInventory.product_option_choice_id_1 IS NULL AND 
-							OrderProduct.product_option_choice_id_1 IS NULL
-						) || ProductInventory.product_option_choice_id_1 = OrderProduct.product_option_choice_id_1)',
-						'((
-							ProductInventory.product_option_choice_id_2 IS NULL AND 
-							OrderProduct.product_option_choice_id_2 IS NULL
-						) || ProductInventory.product_option_choice_id_2 = OrderProduct.product_option_choice_id_2)',
-						'((
-							ProductInventory.product_option_choice_id_3 IS NULL AND 
-							OrderProduct.product_option_choice_id_3 IS NULL
-						) || ProductInventory.product_option_choice_id_3 = OrderProduct.product_option_choice_id_3)',
-						'((
-							ProductInventory.product_option_choice_id_4 IS NULL AND 
-							OrderProduct.product_option_choice_id_4 IS NULL
-						) || ProductInventory.product_option_choice_id_4 = OrderProduct.product_option_choice_id_4)',
-					)
-				)
-			),
-			*/
+			'link' => array('Shop.Order', 'Shop.Product'),
 			'conditions' => array(
-				'ProductInventory.id' => $id,
+				'Product.id' => $id,
 				'Order.archived' => 1,
 				'Order.canceled' => 0,
 			)
@@ -140,14 +111,9 @@ class ProductInventory extends ShopAppModel {
 		$conditions = array_merge(array('Product.id' => $productId), $conditions);
 		$result = $this->find('first', array(
 			'fields' => '*', //$this->alias . '.quantity',
-			'link' => array('Product' => array(
-				'type' => 'RIGHT'
-			)),
+			'link' => array('Shop.Product' => array('type' => 'RIGHT')),
 			'conditions' => array(
-				'OR' => array(
-					$conditions,
-					'Product.unlimited = 1 AND Product.id = ' . $productId,
-				)
+				'OR' => array($conditions, 'Product.unlimited = 1 AND Product.id = ' . $productId)
 			)
 		));
 		if (empty($result[$this->alias]['quantity'])) {

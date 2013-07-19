@@ -4,10 +4,36 @@ class OrderProductsController extends ShopAppController {
 	var $components = array('Shop.ShoppingCart',);
 	var $helpers = array('Shop.Order');
 	
+	function _invalidDisplay($errors = null) {
+		$out = '';
+		if (empty($errors)) {
+			$errors = $this->OrderProduct->validationErrors;
+		}
+		foreach ($errors as $field => $msg) {
+			$out .= '<li>';
+			if (!is_numeric($field)) {
+				$out .= '<strong>' . $field . ':</strong> ';
+			}
+			if (is_array($msg)) {
+				if (count($msg) == 1 && isset($msg[0]) && !is_array($msg[0])) {
+					$out .= $msg[0];
+				} else {
+					$out .= $this->_invalidDisplay($msg);
+				}
+			} else {
+				$out .= $msg;
+			}
+			$out .= '</li>';
+		}
+		return "<ul>$out</ul>\n";
+	}
+	
 	function add() {
 		$redirect = true;
 		$msg = null;
 		$invalid = array();
+		
+
 		if (!empty($this->request->data)) {
 			/*
 			//Finds Product ID
@@ -19,20 +45,22 @@ class OrderProductsController extends ShopAppController {
 				$this->OrderProduct->Order->validate = array();
 			}
 			*/
-			
+			$success = null;
 			if (!empty($invalid) || !$this->OrderProduct->saveAll($this->request->data)) {
 				//$this->PersistValidation->store('OrderProduct');
+				//debug($this->OrderProduct->validationErrors);
+				$success = false;
 				$msg = 'Sorry, there was an error adding the product to your order';
 				foreach ($invalid as $key => $errorMsg) {
 					$this->OrderProduct->invalidate($key, $errorMsg);
 				}
-				//debug($this->OrderProduct->invalidFields());
+				$msg .= $this->_invalidDisplay();
 			} else {
+				$success = false;
 				$order = $this->OrderProduct->Order->find('first', array(
 					'link' => array('Shop.OrderProduct'),
 					'conditions' => array('OrderProduct.id' => $this->OrderProduct->id)
 				));
-				
 				$this->ShoppingCart->setCart($order['Order']['id']);
 				//return true;
 				$redirect = array(
@@ -45,7 +73,7 @@ class OrderProductsController extends ShopAppController {
 			$this->_redirectMsg(array('controller' => 'products', 'action' => 'index'));
 		}
 		//debug(compact('redirect', 'msg'));
-		$this->_redirectMsg($redirect, $msg);
+		$this->_redirectMsg($redirect, $msg, $success);
 	}
 	
 	//Removes an item from a cart

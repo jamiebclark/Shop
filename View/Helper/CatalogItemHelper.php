@@ -73,7 +73,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		if ($catalogItem['quantity_per_pack'] > 1) {
 			$notes[] = 'This is a pack of ' . number_format($catalogItem['quantity_per_pack']);
 		}
-		if ($catalogItem['stock'] < 10) {
+		if (empty($catalogItem['unlimited']) && $catalogItem['stock'] < 10) {
 			$notes[] = 'Limited stock';
 		}
 		if (empty($notes)) {
@@ -85,7 +85,18 @@ class CatalogItemHelper extends ModelViewHelper {
 		}
 	}
 	
+/**
+ * Gets the class associated with how much stock an item has
+ * 
+ * @param int|Array $qty Either the quantity of stock available, or the result array containing stock and unlimited fields
+ * @param bool $unlimited Whether there is an unlimited amount of stock available
+ * 
+ * @return string CSS class name
+ **/
 	function getInventoryClass($qty, $unlimited = false) {
+		if (is_array($qty)) {
+			return $this->getInventoryClass($qty['stock'], $qty['unlimited']);
+		}
 		$warning = 10;
 		if ($qty <= 0 && !$unlimited) {
 			$class = 'error';
@@ -132,6 +143,10 @@ class CatalogItemHelper extends ModelViewHelper {
 			$out = $this->Html->tag($tag, $out, compact('class', 'style'));
 		}
 		return $out;	}
+	
+	function hasStock($catalogItem) {
+		return !empty($catalogItem['stock']) || !empty($catalogItem['unlimited']);
+	}
 	
 	function categories($catalogItemCategories) {
 		$out = '';

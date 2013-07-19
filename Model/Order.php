@@ -1,6 +1,6 @@
 <?php
 App::uses('OrderEmail', 'Shop.Network/Email');
-
+App::uses('ShopAppModel', 'Shop.Model');
 class Order extends ShopAppModel {
 	var $name = 'Order';
 	var $displayField = 'title';
@@ -80,8 +80,8 @@ class Order extends ShopAppModel {
 		
 		$order = $this->find('first', array(
 			'fields' => '*',
-			'link' => array('Invoice'),
-			'conditions' => array('Order.id' => $this->id)
+			'link' => array('Shop.Invoice'),
+			'conditions' => array($this->alias . '.id' => $this->id)
 		));
 		
 		//Updates invoice with billing address if set
@@ -130,7 +130,7 @@ class Order extends ShopAppModel {
 				'SUM(OrderProduct.sub_total) AS sub_total',
 				'SUM(OrderProduct.shipping) AS shipping',
 			),
-			'link' => array('OrderProduct'),
+			'link' => array('Shop.OrderProduct'),
 			'group' => $this->alias . '.id',
 		);
 		$options['conditions']['Order.id'] = $id;
@@ -142,7 +142,7 @@ class Order extends ShopAppModel {
 				'SUM(OrdersHandlingMethod.amt + OrdersHandlingMethod.pct * ' . $subTotal . ') AS handling',
 				'-1 * SUM(OrdersPromoCode.amt + OrdersPromoCode.pct * ' . $subTotal . ') AS promo_discount',
 			),
-			'link' => array('OrdersHandlingMethod', 'OrdersPromoCode'),
+			'link' => array('Shop.OrdersHandlingMethod', 'Shop.OrdersPromoCode'),
 			'group' => $this->alias . '.id',
 		);
 		$options['conditions']['Order.id'] = $id;

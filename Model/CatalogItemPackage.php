@@ -3,7 +3,7 @@ class CatalogItemPackage extends ShopAppModel {
 	var $name = 'CatalogItemPackage';
 	var $actsAs = array(
 		'Shop.BlankDelete' => array('or' => array(
-			'catalog_item_parent_id', 'catalog_item_child_id', 'quantity'
+			'catalog_item_child_id', 'quantity'
 		))
 	);
 	

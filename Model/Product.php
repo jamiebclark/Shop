@@ -32,14 +32,14 @@ class Product extends ShopAppModel {
 		return $this->CatalogItem->find('first', $options);
 	}
 
-	/**
-	 * Finds the product ID based on a catalog item ID and option choices
-	 * passed through data
-	 *
-	 * @param array $data the request data containing catalog_item_id and additional option choices
-	 * @param boolean $overwrite If false and product_id already exists, it will return that
-	 * @return int/boolean ID if found, false if not
-	 **/
+/**
+ * Finds the product ID based on a catalog item ID and option choices
+ * passed through data
+ *
+ * @param array $data the request data containing catalog_item_id and additional option choices
+ * @param boolean $overwrite If false and product_id already exists, it will return that
+ * @return int/boolean ID if found, false if not
+ **/
 	public function findProductIdFromData($data, $overwrite = false) {
 		if (!empty($data['product_id']) && !$overwrite) {
 			return $data['product_id'];
@@ -66,10 +66,8 @@ class Product extends ShopAppModel {
 	
 	function checkStock($id, $quantity = 1) {
 		$this->updateStock($id);	//Temporary
-		
 		$result = $this->read(null, $id);
 		$catalogItemId = $result[$this->alias]['catalog_item_id'];
-		
 		/*
 		//If the product is a package, check all the child elements in the package
 		$catalogItemChildren = $this->CatalogItem->findPackageChildren($catalogItemId);
@@ -93,7 +91,6 @@ class Product extends ShopAppModel {
 			return true;
 		}
 		*/
-		
 		$result = $this->CatalogItem->find('first', array(
 			'fields' => '*', //$this->alias . '.quantity',
 			'link' => array('Shop.Product'),
@@ -109,8 +106,6 @@ class Product extends ShopAppModel {
 			$result[$this->alias]['stock'] = 0;
 		}
 		$checkQuantity = $result[$this->alias]['stock'] - $quantity;
-		
-		//debug(compact('result', 'checkQuantity'));
 		if (!empty($result['CatalogItem']['unlimited'])) {
 			return true;
 		} else if (!empty($checkQuantity)) {
@@ -125,8 +120,11 @@ class Product extends ShopAppModel {
 		$bought = $this->OrderProduct->findProductTotal($id);
 		$stock = $added - $bought;
 		$this->create();
-		return $this->save(compact('id', 'stock'));
-		
+		$success = $this->save(compact('id', 'stock'));
+		// Updates parent CatalogItem stock total
+		$result = $this->read('catalog_item_id', $id);
+		$this->CatalogItem->updateStock($result[$this->alias]['catalog_item_id']);
+		return $success;
 		/*
 		$this->find('first', array(
 			'link' => array(
@@ -182,6 +180,100 @@ class Product extends ShopAppModel {
 		*/
 	}
 
+/**
+ * Finds instances of existing product option choices with missing catalog item options
+ *
+ **/
+	function updateMissingCatalogItemOptions() {
+		//Finds missing Product Option Choice
+		$options = array('fields' => '*', 'recursive' => -1);
+		for ($i = 1; $i <= $this->optionChoiceCount; $i++) {
+			$class = 'ProductOptionChoice' . $i;
+			$key = "{$this->alias}.product_option_choice_id_$i";
+			$options['joins'][] = array(
+				'type' => 'LEFT',
+				'alias' => $class,
+				'table' => 'product_option_choices',
+				'conditions' => array("$class.id = $key"),
+			);
+			$options['conditions']['OR'][] = array($class . '.id' => null, "$key <>" => null);
+		}
+		if ($result = $this->find('all', $options)) {
+			$data = array();
+			foreach ($result as $row) {
+				for ($i = $this->optionChoiceCount; $i >=1; $i--) {
+					$key = $row['Product']['catalog_item_id'] . '-' . $i;
+					$index = "product_option_choice_id_$i";
+					$id = $row[$this->alias][$index];
+					
+					if (!empty($id)) {
+						if (empty($data[$key])) {
+							$data[$key] = array(
+								'CatalogItemOption' => array(
+									'catalog_item_id' => $row['Product']['catalog_item_id'],
+									'index' => $i,
+								)
+							);
+						}
+						if (isset($row[$this->alias][$index])) {
+							$data[$key]['ProductOptionChoice'][$id] = compact('id');
+							break;
+						}
+					}
+				}
+			}
+			$data = array_values($data);
+			foreach ($data as &$val) {
+				$val['ProductOptionChoice'] = array_values($val['ProductOptionChoice']);
+			}
+			if (!empty($data)) {
+				debug($data);
+				$this->CatalogItem->CatalogItemOption->saveAll($data, array('callbacks' => false, 'validate' => false, 'deep' => true));
+			}
+		}	
+		
+		// Finds missing CatalogItemOptions
+		$data = array();
+		$options = array('fields' => '*', 'recursive' => -1);
+		for ($i = 1; $i <= $this->optionChoiceCount; $i++) {
+			$class = 'ProductOptionChoice' . $i;
+			$optionClass = 'CatalogItemOption' . $i;
+			$options['joins'][] = array(
+				'type' => 'LEFT',
+				'alias' => $class,
+				'table' => 'product_option_choices',
+				'conditions' => array($class . '.id = ' . $this->alias . '.product_option_choice_id_' . $i),
+			);
+			$options['joins'][] = array(
+				'type' => 'LEFT',
+				'alias' => $optionClass,
+				'table' => 'catalog_item_options',
+				'conditions' => array("$optionClass.id = $class.catalog_item_option_id"),
+			);
+			$options['conditions']['OR'][] = array($class . '.id <>' => null, $optionClass . '.id' => null);
+		}
+		
+		if ($result = $this->find('all', $options)) {
+			foreach ($result as $row) {
+				for ($i = $this->optionChoiceCount; $i >=1; $i--) {
+					if (isset($row['ProductOptionChoice' . $i]['id'])) {
+						$id = $row['ProductOptionChoice' . $i]['catalog_item_option_id'];
+						$data[$id] = array(
+							'catalog_item_id' => $row['Product']['catalog_item_id'],
+							'id' => $id
+						);
+						break;
+					}
+				}
+			}
+			if (!empty($data)) {
+				debug($data);
+				return $this->CatalogItem->CatalogItemOption->saveAll(array_values($data));
+			}
+		}
+		return null;
+	}
+	
 	function updateTitle($id) {
 		$fields = array('CatalogItem.title');
 		$link = array('Shop.CatalogItem');
@@ -221,5 +313,39 @@ class Product extends ShopAppModel {
 			);
 		}
 		return $success;
+	}
+
+/**
+ * Looks for duplicate products with the exact same production option choice and combines them
+ *
+ **/
+	function combine($catalogItemId = null) {
+		$options = array('order' => $this->alias . '.catalog_item_id');
+		if (!empty($catalogItemId)) {
+			$options['conditions'] = array($this->alias . '.catalog_item_id' => $catalogItemId);
+		}
+		$result = $this->find('all', $options);
+		$combine = array();
+		foreach ($result as $row) {
+			$key = $row[$this->alias]['catalog_item_id'];
+			for ($i = 1; $i <= $this->optionChoiceCount; $i++) {
+				$key .= '-' . $row[$this->alias]['product_option_choice_id_' . $i];
+			}
+			$combine[$key][] = $row[$this->alias]['id'];
+		}
+		foreach ($combine as $key => $ids) {
+			if (count($ids) > 1) {
+				$keepId = array_pop($ids);
+				foreach ($this->hasMany as $model => $attrs) {
+					if ($this->{$model}->updateAll(
+						array("$model.product_id" => $keepId),
+						array("$model.product_id" => $ids)
+					)) {
+						$this->{$model}->deleteAll(array("$model.product_id" => $ids));
+					}
+				}
+				$this->deleteAll(array($this->alias . '.id' => $ids));
+			}
+		}
 	}
 }

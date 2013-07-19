@@ -30,10 +30,8 @@ class ProductInventoriesController extends ShopAppController {
 		$this->paginate = array(
 			'ProductInventoryAdjustment' => array(
 				'fields' => '*',
-				'link' => array('ProductInventory'),
-				'conditions' => array(
-					'ProductInventory.id' => $id,
-				)
+				'link' => array('Shop.ProductInventory'),
+				'conditions' => array('ProductInventory.id' => $id)
 			)
 		);
 		$productInventory = $this->ProductInventory->find('first', array(

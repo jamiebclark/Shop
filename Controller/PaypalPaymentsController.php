@@ -89,7 +89,7 @@ class PaypalPaymentsController extends ShopAppController {
 	function admin_fix() {
 		$paypalPayments = $this->PaypalPayment->find('all', array(
 			'fields' => '*',
-			'link' => array('Invoice')
+			'link' => array('Shop.Invoice')
 		));
 		$count = 0;
 		foreach ($paypalPayments as $paypalPayment) {

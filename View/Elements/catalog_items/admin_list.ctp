@@ -9,10 +9,12 @@ foreach ($catalogItems as $catalogItem) {
 	
 	$this->Table->cells(array(
 		array(
-			$this->CatalogItem->media($catalogItem['CatalogItem']), 
+			$this->CatalogItem->media($catalogItem['CatalogItem'], array('dir' => 'tiny')), 
 			'Catalog Item',
 			
-		), array($this->CatalogItem->inventory($catalogItem['CatalogItem']), 'Stock'),
+		), 
+		array($this->CatalogItem->inventory($catalogItem['CatalogItem']), 'Stock'),
+		array($this->Layout->boolOutput($active), 'Active', 'active'),		
 		array($this->CatalogItem->actionMenu(array('view', 'edit', 'active', 'delete'), compact('url', 'active')), 'Actions')
 	), array('class' => $active ? null : 'inactive'));
 }

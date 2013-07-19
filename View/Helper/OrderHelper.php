@@ -84,7 +84,7 @@ class OrderHelper extends ModelViewHelper {
 	public function paid($result) {
 		if (!($title = $this->Invoice->paid($result['Invoice']))) {
 			$title = $this->Html->link('Not paid yet', array(
-				'controller' => 'order', 'action' => 'checkout', $result['Order']['id']
+				'controller' => 'orders', 'action' => 'checkout', $result['Order']['id']
 			));
 		}
 		return $this->status($result, $title);
