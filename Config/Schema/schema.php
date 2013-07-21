@@ -32,10 +32,24 @@ class ShopSchema extends CakeSchema {
 		),
 		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'MyISAM')
 	);
+	public $catalog_item_category_links = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
+		'model' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 25, 'key' => 'index', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'model_id' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'catalog_item_category_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1),
+			'model' => array('column' => array('model', 'model_id', 'catalog_item_category_id'), 'unique' => 1),
+			'model_2' => array('column' => array('model', 'model_id'), 'unique' => 0),
+			'catalog_item_category_id' => array('column' => 'catalog_item_category_id', 'unique' => 0)
+		),
+		'tableParameters' => array('charset' => 'latin1', 'collate' => 'latin1_swedish_ci', 'engine' => 'InnoDB')
+	);
 	public $catalog_item_images = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
 		'catalog_item_id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'index'),
 		'filename' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'thumb' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'order' => array('type' => 'integer', 'null' => false, 'default' => null, 'length' => 4),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),

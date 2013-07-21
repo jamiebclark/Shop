@@ -1,6 +1,6 @@
 <?php
 class CatalogItemCategoryLink extends ShopAppModel {
-	var $name = 'CatalogItemCategory';
+	var $name = 'CatalogItemCategoryLink';
 	var $belongsTo = array('Shop.CatalogItemCategory');
 	
 	function beforeDelete() {
