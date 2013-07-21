@@ -2,7 +2,6 @@
 App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItem extends ShopAppModel {
 	var $name = 'CatalogItem';
-	var $useDbConfig = 'shop';
 	
 	var $actsAs = array(
 		'Shop.SelectList',
@@ -53,15 +52,61 @@ class CatalogItem extends ShopAppModel {
 		)
 	);
 	
+	function beforeValidate($options = array()) {
+		$id = !empty($this->data[$this->alias]['id']) ? $this->data[$this->alias]['id'] : null;
+		$thumb = !empty($id) ? $this->findThumbNail($id) : null;
+		$thumbId = !empty($thumb) ? $thumb['CatalogItemImage']['id'] : null;
+		// If no thumbnail has been set, makes sure at least one of the saved images is prepped to be a thumbnail
+		if (!empty($this->data['CatalogItemImage']) && (empty($id) || empty($thumbId))) {
+			foreach ($this->data['CatalogItemImage'] as $key => $catalogItemImage) {
+				if (!empty($catalogItemImage['thumb'])) {
+					$thumbId = $catalogItemImage['id'];
+				}
+			}
+			if (empty($thumbId)) {
+				$this->data['CatalogItemImage'][0]['thumb'] = 1;
+			}
+		}
+		return parent::beforeValidate($options);
+	}
+	
 	function afterSave($created) {
 		$id = $this->id;
-		
 		$this->createProducts($id);
 		$this->updateProductTitles($id);
-		$this->read(null, $id);
+		$result = $this->read(null, $id);
+		if (empty($result[$this->alias]['filename'])) {
+			$this->setThumbnail($id);
+		}
 		return parent::afterSave($created);	
 	}
 	
+/**
+ * Finds all images associated with CatalogItem and returns the first as the thumbnail
+ *
+ **/
+	function setThumbnail($id) {
+		$catalogItemImage = $this->CatalogItemImage->find('first', array(
+			'conditions' => array('CatalogItemImage.catalog_item_id' => $id),
+			'order' => array(
+				'CatalogItemImage.thumb DESC',
+				'CatalogItemImage.order ASC',
+			),
+		));
+		if (!empty($catalogItemImage)) {
+			return $this->CatalogItemImage->setThumbnail($catalogItemImage['CatalogItemImage']['id']);
+		}
+		return null;		
+	}
+	
+	function findThumbnail($id) {
+		return $this->CatalogItemImage->find('first', array(
+			'conditions' => array(
+				$this->CatalogItemImage->escapeField('catalog_item_id') => $id,
+				$this->CatalogItemImage->escapeField('thumb') => 1,
+			)
+		));
+	}
 /**
  * Updates the titles of the catalog item's associated products
  *

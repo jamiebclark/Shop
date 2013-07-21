@@ -9,7 +9,7 @@ foreach ($catalogItems as $catalogItem) {
 	
 	$this->Table->cells(array(
 		array(
-			$this->CatalogItem->media($catalogItem['CatalogItem'], array('dir' => 'tiny')), 
+			$this->CatalogItem->media($catalogItem['CatalogItem'], array('dir' => 'thumb')), 
 			'Catalog Item',
 			
 		), 

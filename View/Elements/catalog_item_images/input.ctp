@@ -21,7 +21,7 @@ if (isset($count)) {
 			'fieldset' => false,
 			$prefix . 'id' => array('type' => 'hidden'),
 			$prefix . 'add_file' => array('type' => 'file'),
-			$prefix . 'set_thumbnail' => array('type' => 'checkbox', 'label' => 'Make Thumbnail'),
+			$prefix . 'thumb' => array('type' => 'checkbox', 'label' => 'Make Thumbnail'),
 		));
 	?>
 	</div>

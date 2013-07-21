@@ -4,6 +4,7 @@ App::uses('ModelViewHelper', 'Layout.View/Helper');
 
 class OrderHelper extends ModelViewHelper {
 	var $name = 'Order';
+	var $plugin = 'Shop';
 	var $helpers = array(
 		'Html',
 		'Layout.Calendar',
@@ -12,10 +13,12 @@ class OrderHelper extends ModelViewHelper {
 		'Shop.Invoice',
 	);
 	
-	public function link($order) {
-		return $this->Html->link('Order #' . $order['id'], $this->url($order));
+	public function title($result, $options = array()) {
+		$options['text'] = 'Order #' . $result['id'];
+		return parent::title($result, $options);
 	}
 	
+	/*
 	public function url($order) {
 		return array(
 			'controller' => 'orders',
@@ -24,6 +27,7 @@ class OrderHelper extends ModelViewHelper {
 			'plugin' => 'shop',
 		) + Prefix::reset();
 	}
+	*/
 	
 	public function tracking($result) {
 		$order = !empty($result['Order']) ? $result['Order'] : $result;

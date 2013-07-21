@@ -37,48 +37,30 @@ class CatalogItemImage extends ShopAppModel {
 		)
 	);
 	
-	private $setThumbnail = false;
-	
-	function beforeSave($options) {
-		$data =& $this->getData();
-		if (isset($data) && empty($data['id']) && empty($data['add_file']['tmp_name'])) {
-			unset($data['add_file']);
-		}
-		if (!empty($data['set_thumbnail'])) {
-			$this->setThumbnail = true;
-		}
-		
-		return parent::beforeSave($options);
-	}
-	
 	function afterSave($created) {
-		if ($this->setThumbnail) {
-			$result = $this->read('catalog_item_id', $this->id);
-			$this->setCatalogItemThumb($result[$this->alias]['catalog_item_id']);
+		$result = $this->read(null, $this->id);
+		if (!empty($result[$this->alias]['thumb'])) {
+			$this->setThumbnail($this->id);
 		}
+		return parent::afterSave($created);
 	}
-	
-	/**
-	 * Sets the thumbnail for the CatalogItem as the first returned image in the set
-	 *
-	 **/
-	function setCatalogItemThumb($catalogItemId = null) {
-		$options = array(
-			'group' => 'catalog_item_id'
-		);
-		if (!empty($catalogItemId)) {
-			$options['catalog_item_id'] = $catalogItemId;
-		}
-		
-		$results = $this->find('all', $options);
-		$data = array();
-		foreach ($results as $result) {
-			$data[] = array(
-				'id' => $result[$this->alias]['catalog_item_id'],
-				'filename' => $result[$this->alias]['filename'],
-			);
-		}
-		$this->CatalogItem->create();
-		$this->CatalogItem->saveAll($data, array('validate' => false, 'callbacks' => false));
+
+/**
+ *	Sets the current image as the CatalogItem's default thumnail image
+ *
+ **/
+	function setThumbnail($id) {
+		$result = $this->read(null, $id);
+		$result = $result[$this->alias];
+		$this->CatalogItem->save(array(
+			'id' => $result['catalog_item_id'],
+			'filename' => $result['filename'],
+		), array('callbacks' => false, 'validate' => false));
+		return $this->updateAll(array(
+			$this->escapeField('thumb') => 0,
+		), array(
+			$this->escapeField('catalog_item_id') => $result['catalog_item_id'],
+			$this->escapeField($this->primaryKey) . ' <>' => $id
+		));
 	}
 }

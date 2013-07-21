@@ -4,7 +4,7 @@ echo $this->element('orders/key');
 $this->Table->reset();
 $dateOptions = array('format' => 'tiny', 'time' => false, 'year');
 foreach ($orders as $order) {
-	$url = $this->Order->url($order['Order']);
+	$url = $this->Order->url($order['Order'], array('admin' => true));
 	$class = $this->Order->getStatusClass($order);
 
 	$this->Table->cells(array(

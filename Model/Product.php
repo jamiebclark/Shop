@@ -11,7 +11,11 @@ class Product extends ShopAppModel {
 	);
 	var $belongsTo = array('Shop.CatalogItem');
 	
-	var $optionChoiceCount = 4;
+	// The amount of different types of catalog item options there can be for a single catalog item
+	public $optionChoiceCount = 4;
+	
+	// Tracks the Catalog Item ID of a deleted Product from beforeDelete to afterDelete
+	private $deletedProductCatalogItemId;
 	
 	function __construct($id = false, $table = null, $ds = null) {
 		if (!empty($this->optionChoiceCount)) {
@@ -25,7 +29,21 @@ class Product extends ShopAppModel {
 		parent::__construct($id, $table, $ds);
 	}
 	
+	function beforeDelete() {
+		// Finds the Catalog Item ID to be updated after the deletion
+		$result = $this->read('catalog_item_id', $this->id);
+		$this->deletedProductCatalogItemId = $result[$this->alias]['catalog_item_id'];
+		return parent::beforeDelete();
+	}
 	
+	function afterDelete() {
+		// Updates the stock of the Catalog Item now Product has been deleted
+		if (!empty($this->deletedProductCatalogItemId)) {
+			$this->CatalogItem->updateStock($this->deletedProductCatalogItemId);
+		}
+		return parent::afterDelete();
+	}
+
 	function findCatalogItem($id, $options = array()) {
 		$options['link'] = array('Shop.Product');
 		$options['conditions']['Product.id'] = $id;

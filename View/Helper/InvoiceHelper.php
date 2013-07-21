@@ -2,6 +2,8 @@
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class InvoiceHelper extends ModelViewHelper {
 	var $name = 'Invoice';
+	var $plugin = 'Shop';
+	
 	var $helpers = array(
 		'Form', 
 		'Html',		'Layout.AddressBook',

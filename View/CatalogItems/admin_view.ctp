@@ -48,6 +48,7 @@ echo $this->Table->output();
 ?>
 </div>
 <div class="span4">
+	<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], array('dir' => 'mid'));?>
 	<div class="content-box">
 	<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
 		<h4><?php echo $catalogItemOption['title']; ?></h4>

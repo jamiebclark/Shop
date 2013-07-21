@@ -4,6 +4,8 @@ define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class CatalogItemHelper extends ModelViewHelper {
 	var $name = 'CatalogItem';
+	var $plugin = 'Shop';
+	
 	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
 	
 	var $thumbDir = 'catalog_item_images/';
@@ -25,6 +27,7 @@ class CatalogItemHelper extends ModelViewHelper {
 	}
 	*/
 	
+	/*
 	function thumb($catalogItem, $options = array()) {
 		$src = $this->thumbDir;
 		if (!empty($options['dir'])) {
@@ -43,6 +46,17 @@ class CatalogItemHelper extends ModelViewHelper {
 		} else {
 			return null;
 		}
+	}
+	*/
+	
+	function thumbOptions($result, $options = array()) {
+		$options = array_merge(array(
+			'externalServer' => false,
+			'root' => SHOP_WWW_ROOT . 'img' . DS,
+			'plugin' => 'Shop',
+			'defaultFile' => false,
+		), $options);
+		return parent::thumbOptions($result, $options);
 	}
 	
 	function link ($CatalogItem, $options = array(), $onClick = null) {
