@@ -8,14 +8,15 @@ foreach ($handlingMethods as $handlingMethod) {
 		$handlingMethod['HandlingMethod']['id'],
 	);
 	$active = $handlingMethod['HandlingMethod']['active'];
-	$class = $active ? 'active' : 'inactive';
+	$class = $active ? null : 'inactive';
 	
+	$this->Table->checkbox($handlingMethod['HandlingMethod']['id']);
 	$this->Table->cells(array(
 		array($this->Html->link($handlingMethod['HandlingMethod']['title'],$url), 'Title'),
 		array(($handlingMethod['HandlingMethod']['pct'] * 100) . '%', 'Percent'),
 		array($this->DisplayText->cash($handlingMethod['HandlingMethod']['amt']), 'Amount'),
 		array(
-			$this->Layout->actionMenu(array('view', 'edit', 'delete', 'active'), compact('url', 'active')), 
+			$this->ModelView->actionMenu(array('view', 'edit', 'delete', 'active'), compact('url', 'active')), 
 			'Actions',
 			null,
 			null,
@@ -23,5 +24,7 @@ foreach ($handlingMethods as $handlingMethod) {
 		),
 	), compact('class'));
 }
-echo $this->Table->output(array('paginate' => true));
-?>
+echo $this->Table->output(array(
+	'paginate' => true,
+	'withChecked' => array('active', 'inactive', 'delete')
+));

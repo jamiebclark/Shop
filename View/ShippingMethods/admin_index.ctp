@@ -11,6 +11,7 @@ foreach ($shippingMethods as $shippingMethod) {
 		$trackUrl = substr($trackUrl, 0, floor($urlLen/2)) . '...' . substr($trackUrl, -1 * ceil($urlLen/2));
 	}
 	
+	$this->Table->checkbox($shippingMethod['ShippingMethod']['id']);
 	$this->Table->cells(array(
 		array(
 			$this->Html->link($shippingMethod['ShippingMethod']['title'], $url),
@@ -19,9 +20,12 @@ foreach ($shippingMethods as $shippingMethod) {
 			$trackUrl,
 			'Track URL',
 		), array(
-			$this->Layout->actionMenu(array('view', 'edit', 'delete'), compact('url')),
+			$this->ModelView->actionMenu(array('view', 'edit', 'delete'), compact('url')),
 			'Actions',
 		)
 	), true);
 }
-echo $this->Table->output(array('paginate' => true));
+echo $this->Table->output(array(
+	'paginate' => true,
+	'withChecked' => array('active', 'inactive', 'delete')
+));

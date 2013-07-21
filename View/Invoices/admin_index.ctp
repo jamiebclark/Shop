@@ -3,7 +3,6 @@ echo $this->Layout->defaultHeader();
 $this->Table->reset();
 foreach ($invoices as $invoice) {
 	$invoice = $invoice['Invoice'];
-	debug($invoice);
 
 	$class = !empty($invoice['paid']) ? 'success' : null;
 	$this->Table->checkbox($invoice['id']);
