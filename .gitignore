@@ -1,4 +1,7 @@
 /Config/bootstrap.php
+
+/webroot/.sass-cache/*
+
 /webroot/img/catalog_item_images/*
 !/webroot/img/catalog_item_images/
 !/webroot/img/catalog_item_images/empty
