@@ -210,7 +210,7 @@ class ShopSchema extends CakeSchema {
 		'auto_handling' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
 		'promo_discount' => array('type' => 'float', 'null' => false, 'default' => null, 'length' => '10,2'),
 		'total' => array('type' => 'float', 'null' => false, 'default' => null, 'length' => '10,2'),
-		'shop_order_product_count' => array('type' => 'integer', 'null' => false, 'default' => null),
+		//'shop_order_product_count' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'shipped' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'shop_order_shipping_id' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'shipping_method_id' => array('type' => 'boolean', 'null' => false, 'default' => null, 'key' => 'index'),
