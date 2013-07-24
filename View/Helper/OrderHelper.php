@@ -4,7 +4,7 @@ App::uses('ModelViewHelper', 'Layout.View/Helper');
 
 class OrderHelper extends ModelViewHelper {
 	var $name = 'Order';
-	var $plugin = 'Shop';
+	var $modelPlugin = 'Shop';
 	var $helpers = array(
 		'Html',
 		'Layout.Calendar',
