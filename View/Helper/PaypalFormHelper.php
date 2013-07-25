@@ -67,7 +67,7 @@ class PaypalFormHelper extends AppHelper {
 		$this->addSetting('business', PAYPAL_USER_NAME, false);
 		$this->addSetting('no_shipping','0',false);
 		$this->addSetting('return',$this->returnUrl,false);
-		$this->addSetting('cbt', "Return to {COMPANY_NAME}",false);
+		$this->addSetting('cbt', "Return to " . COMPANY_NAME,false);
 		$this->addSetting('cancel_return',$this->cancelReturnUrl,false);
 		$this->addSetting('image_url',$this->imageUrl,false);
 		$this->addSetting('currency_code','USD',false);
