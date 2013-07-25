@@ -2,7 +2,7 @@
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class ProductHelper extends ModelViewHelper {
 	var $name = 'Product';
-	var $plugin = 'Shop';
+	var $modelPlugin = 'Shop';
 	
 	function __construct(View $View, $settings = array()) {
 		parent::__construct($View, $settings);

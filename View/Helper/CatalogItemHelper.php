@@ -4,7 +4,7 @@ define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class CatalogItemHelper extends ModelViewHelper {
 	var $name = 'CatalogItem';
-	var $plugin = 'Shop';
+	var $modelPlugin = 'Shop';
 	
 	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
 	
