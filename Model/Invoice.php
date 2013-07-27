@@ -113,10 +113,12 @@ class Invoice extends ShopAppModel {
  **/
 	private function copyToModels($id) {
 		$fn = 'copyInvoiceToModel';
-		$contain = $fields = array();
+		$contain = $fields = $link = array();
 		$models = array_merge($this->hasOne, $this->hasMany);
+		
 		foreach ($models as $model => $config) {
 			$fields[] = "`$model`.*";
+			$link[] = $config['className'];
 			if (is_numeric($model)) {
 				$model = $config;
 				$config = null;
@@ -124,7 +126,7 @@ class Invoice extends ShopAppModel {
 			$contain[] = $model;
 		}
 		$conditions = array($this->alias . '.id' => $id);
-		$result = $this->find('first', compact('fields', 'contain', 'conditions'));
+		$result = $this->find('first', compact('fields', 'link', 'conditions'));
 		if (!empty($result)) {
 			foreach ($result as $model => $vals) {
 				if ($model == $this->alias) {	//Avoids Invoice results
