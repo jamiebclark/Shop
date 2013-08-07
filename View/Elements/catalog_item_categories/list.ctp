@@ -12,7 +12,7 @@ if (!empty($catalogItemCategory)) {
 	} else {
 		$title = 'Categories';
 	}
-	echo $this->Html->tag('h2', $title);
+	echo $this->Html->tag('h4', $title);
 }
 if (!empty($catalogItemCategories)) {
 	$list = array();
@@ -24,7 +24,7 @@ if (!empty($catalogItemCategories)) {
 	}
 	echo $this->Layout->menu($list, array(
 		'tag' => false,
-		'class' => 'nav nav-pills nav-stacked'
+		'class' => 'nav-catalogitemcategories nav nav-pills nav-stacked'
 	));
 } else {
 	echo $this->Html->tag('em', 'No Categories');

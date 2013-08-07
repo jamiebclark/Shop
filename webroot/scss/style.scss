@@ -1,3 +1,13 @@
+@import "../../../../webroot/scss/variables";
+@import "../../../Layout/webroot/scss/bootstrap/variables";
+@import "../../../Layout/webroot/scss/variables";
+
+.nav-catalogitemcategories {
+	li a {
+		font-size: $fontSizeLarge;
+	}
+}
+
 .qty, .cash {
 	font-size: 20px;
 }
@@ -7,6 +17,16 @@ th.cash, td.cash {
 }
 th.cash {
 	font-size: inherit;
+}
+.media-catalogitem {
+	.pull-right {
+		line-height: normal;
+	}
+	.catalog-item-price {
+		font {
+			font-size: 36px;
+		}
+	}
 }
 
 form.canceled {

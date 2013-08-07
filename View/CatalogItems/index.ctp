@@ -1,10 +1,23 @@
+<?php
+$layout = 'thumb';
+$paginateNav = $this->Layout->paginateNav();
+?>
 <div class="row">
 	<div class="span2">
 		<?php echo $this->element('catalog_item_categories/list');?>
 	</div>
-	<div class="span10">
-		<div class="catalog-item-list"><?php
+	<div class="span10"><?php 
+		echo $paginateNav;
 		echo $this->element('catalog_items/category_path');
+		if ($layout == 'thumb'): ?>
+			<div class="row-fluid">
+				<?php echo $this->CatalogItem->thumbnails($catalogItems, array('span' => 3, 'caption' => true)); ?>
+			</div>
+		<?php else: ?>
+			<div class="catalog-item-list">
+				<?php echo $this->CatalogItem->mediaList($catalogItems); ?>
+			</div>
+		<?php endif; 
 		/*
 		if (!isset($sort)) {
 			$sort = true;
@@ -16,28 +29,7 @@
 			));
 		}
 		*/
-		$dir = 'thumb';
-		echo $this->Layout->paginateNav();
-		foreach ($catalogItems as $catalogItem):
-			$catalogItem = $catalogItem['CatalogItem'];
-			$url = $this->CatalogItem->url($catalogItem);
-			?>
-			<div class="catalog-item-list-item media">
-				<div class="img"><?php
-					echo $this->CatalogItem->thumb($catalogItem, compact('url', 'dir'));
-				?></div>
-				<div class="rght"><?php 
-					echo $this->CatalogItem->price($catalogItem);
-				?></div>
-				<div class="bd"><?php
-					echo $this->Html->tag('h3', $this->CatalogItem->link($catalogItem));
-					if (!empty($catalogItem['short_description'])) {
-						echo $this->DisplayText->text($catalogItem['short_description']);
-					}
-				?></div>	
-			</div>
-		<?php endforeach;
-		echo $this->Layout->paginateNav();
+		echo $paginateNav;
 		?>
 		</div>
 	</div>

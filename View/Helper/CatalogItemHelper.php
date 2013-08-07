@@ -10,6 +10,18 @@ class CatalogItemHelper extends ModelViewHelper {
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	function media($result, $options = array()) {
+		$result = $this->_getResult($result);
+		$options = array_merge(array(
+			'titleTag' => 'h3',
+			'right' => $this->price($result),
+			'dir' => 'thumb',
+		), $options);
+		if (!empty($result['short_description'])) {
+			$options['after'] = $this->DisplayText->text($result['short_description']);
+		}
+		return parent::media($result, $options);
+	}
 	/*
 	function media($catalogItem, $options = array()) {
 		$options = array_merge(array(
