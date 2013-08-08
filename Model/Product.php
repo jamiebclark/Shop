@@ -29,6 +29,15 @@ class Product extends ShopAppModel {
 		parent::__construct($id, $table, $ds);
 	}
 	
+	function afterSave($created) {
+		if ($created) {
+			$id = $this->id;
+			$this->updateTitle($id);
+			$this->read(null, $id);
+		}
+		return parent::afterSave($created);
+	}
+	
 	function beforeDelete() {
 		// Finds the Catalog Item ID to be updated after the deletion
 		$result = $this->read('catalog_item_id', $this->id);
