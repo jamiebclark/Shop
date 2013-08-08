@@ -344,8 +344,9 @@ class CatalogItemsController extends ShopAppController {
 			}
 			$srcFields = $dstFields = array();
 			while($row = $M->fetch()) {
-				$srcFields[] = $row['field'];
-				$dstFields[] = !empty($fields[$row['field']]) ? $fields[$row['field']] : $row['field'];
+				$field = $row['Field'];
+				$srcFields[] = $field;
+				$dstFields[] = !empty($fields[$field]) ? $fields[$field] : $field;
 			}
 			$dstFields = implode(',', $dstFields);
 			$srcFields = implode(',', $srcFields);
