@@ -323,6 +323,7 @@ class Product extends ShopAppModel {
 		}
 		$this->create();
 		$data = compact('id', 'title') + array('sub_title' => $subTitle);
+		debug($data);
 		if ($success = $this->save($data)) {
 			$this->OrderProduct->updateAll(
 				array('OrderProduct.title' => $this->getDataSource()->value($title)),

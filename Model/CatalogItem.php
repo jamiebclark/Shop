@@ -178,6 +178,7 @@ class CatalogItem extends ShopAppModel {
 				continue 2;
 			}
 		}
+		debug($data);
 		$this->Product->create();
 		return $this->Product->saveAll($data, array('callbacks' => false));
 	}
