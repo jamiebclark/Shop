@@ -293,7 +293,6 @@ class Product extends ShopAppModel {
 				}
 			}
 			if (!empty($data)) {
-				debug($data);
 				return $this->CatalogItem->CatalogItemOption->saveAll(array_values($data));
 			}
 		}
@@ -332,7 +331,6 @@ class Product extends ShopAppModel {
 		}
 		$this->create();
 		$data = compact('id', 'title') + array('sub_title' => $subTitle);
-		debug($data);
 		if ($success = $this->save($data)) {
 			$this->OrderProduct->updateAll(
 				array('OrderProduct.title' => $this->getDataSource()->value($title)),
