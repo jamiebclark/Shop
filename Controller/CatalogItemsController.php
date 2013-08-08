@@ -287,6 +287,9 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_copy() {
+		$PDO = new PDO('mysql:host=65.60.39.82;db=webdb;charset=utf8;', 'souper_remote', '1Fv5y4cc');
+		$PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
 		$srcDb = 'souper_bowl'; //'webdb';
 		$dstDb = 'souper_bowl_shop'; //'shop';
 		$srcDb = 'webdb';
@@ -294,7 +297,6 @@ class CatalogItemsController extends ShopAppController {
 
 		
 		$tables = array(
-			'products' => 'catalog_items',
 			'product_categories' => 'catalog_item_categories',
 			'product_categories_products' => array(
 				'table' => 'catalog_item_categories_catalog_items',
@@ -316,11 +318,30 @@ class CatalogItemsController extends ShopAppController {
 				'table' => 'catalog_item_packages',
 				'fields' => array('product_parent_id' => 'catalog_item_parent_id', 'product_child_id' => 'catalog_item_child_id'),
 			),
+			'product_option_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
+			'products' => 'catalog_items',
+		);
+		$tables2 = array(
 			'product_handlings' => 'handling_methods',
 			'invoices',
 			'invoice_payment_methods',
-			'shop_orders' => 'orders',
-			'handling_methods' => 'orders_handling_methods',
+			'shop_orders' => array(
+				'table' => 'orders',
+				'fields' => array(
+					'shop_order_product_count' => false,
+					//'shop_order_shipping_id'//
+					'shop_order_shipping_method_id' => 'shipping_method_id',
+					'cancelled' => 'canceled',
+					
+				)
+			),
+			'product_handlings_shop_orders' => array(
+				'table' => 'orders_handling_methods',
+				'fields' => array(
+					'product_handling_id' => 'handling_method_id',
+					'shop_order_id' => 'order_id',
+				),
+			),
 			'product_promos_shop_orders' => array(
 				'table' => 'orders_promo_codes',
 				'fields' => array(
@@ -332,6 +353,10 @@ class CatalogItemsController extends ShopAppController {
 				'table' => 'order_products',
 				'fields' => array(
 					'shop_order_id' => 'order_id',	//TODO: Update this?
+					'product_option_choice_id_1' => false,
+					'product_option_choice_id_2' => false,
+					'product_option_choice_id_3' => false,
+					'product_option_choice_id_4' => false,
 				),
 			),
 			'product_shipping_rules_shop_order_products' => array(
@@ -345,7 +370,6 @@ class CatalogItemsController extends ShopAppController {
 			//'products',
 			//'product_inventories',
 			'product_inventory_adjustments' => array('fields' => array('product_inventory_id' => 'product_id')),
-			'product_options_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
 			'product_promos' => 'promo_codes',
 			'shop_order_shipping_classes' => 'shipping_classes',
 			'shop_order_shipping_methods' => 'shipping_methods',
@@ -357,8 +381,8 @@ class CatalogItemsController extends ShopAppController {
 				)
 			),
 		);
+		$log = array();
 		$queries = array();
-		$PDO = getModelPdo($this->CatalogItem);
 		foreach ($tables as $srcTable => $config) {
 			if (is_numeric($srcTable)) {
 				$srcTable = $config;
@@ -377,22 +401,55 @@ class CatalogItemsController extends ShopAppController {
 			$dst = "`$dstDb`.`$table`";
 			$src = "`$srcDb`.`$srcTable`";
 			$showQuery = "SHOW COLUMNS FROM $src";
-			debug($showQuery);
 			if (!($M = $PDO->query($showQuery))) {
+				$log[] = "Source table $src not found";
 				continue;
 			}
 			$srcFields = $dstFields = array();
 			while($row = $M->fetch()) {
 				$field = $row['Field'];
+				if (isset($fields[$field]) && $fields[$field] === false) {
+					continue;
+				}
 				$srcFields[] = $field;
 				$dstFields[] = !empty($fields[$field]) ? $fields[$field] : $field;
 			}
-			$dstFields = implode(',', $dstFields);
-			$srcFields = implode(',', $srcFields);
-			$q = "INSERT INTO $dst ($dstFields) SELECT $srcFields FROM $src";
-			$queries[] = $q;
+			$dstFields = '`' . implode('`, `', $dstFields) . '`';
+			$srcFields = '`' . implode('`, `', $srcFields) . '`';
+			try {
+				$PDO->query("SELECT $srcFields FROM $src LIMIT 1");
+			} catch (PDOException $e) {
+				$log[] = "Source table $src not found";
+				$log[] = $e->getMessage();
+				continue;
+			}
+			try {
+				$PDO->query("SELECT $dstFields FROM $dst LIMIT 1");
+			} catch (PDOException $e) {
+				$log[] = "Destination table $dst not found";
+				$log[] = $e->getMessage();
+				continue;
+			}
+			
+			$q = "REPLACE INTO $dst ($dstFields) SELECT $srcFields FROM $src";
+			$queries[$table] = $q;
 		}
-		debug($queries);
+		debug(compact('queries'));
+		foreach ($queries as $table => $q) {
+			try {
+				$PDO->query($q);
+				if ($table == 'catalog_items') {
+					$catalogItems = $this->CatalogItem->find('list');
+					foreach ($catalogItems as $id => $title) {
+						$this->CatalogItem->createProducts($id);
+					}
+				}
+			} catch (PDOException $e) {
+				$log[] = $e->getMessage();
+				break;
+			}
+		}
+		debug(compact('log'));
 		exit();
 	}
 	/*

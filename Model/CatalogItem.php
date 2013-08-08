@@ -134,7 +134,7 @@ class CatalogItem extends ShopAppModel {
 	public function createProducts($id) {
 		$result = $this->find('first', array(
 			'contain' => array('Product'),
-			'conditions' => array($this->alias . '.id' => $id)
+			'conditions' => array($this->escapeField('id') => $id)
 		));
 		$count = $this->Product->optionChoiceCount;
 		$this->CatalogItemOption = ClassRegistry::init('Shop.CatalogItemOption');
@@ -160,16 +160,16 @@ class CatalogItem extends ShopAppModel {
 		foreach ($indexData as $k => $indexVals) {
 			$data[$k] = array('catalog_item_id' => $id);
 			for ($i = 1; $i <= $count; $i++) {
-				$data[$k]['product_option_choice_id_' . $i] = null;
+				$data[$k]["product_option_choice_id_$i"] = null;
 				if (isset($indexVals[$i])) {
-					$data[$k]['product_option_choice_id_' . $i] = $indexVals[$i];
+					$data[$k]["product_option_choice_id_$i"] = $indexVals[$i];
 				}
 			}
 		}
 		foreach ($result['Product'] as $product) {
 			foreach ($data as &$dataRow) {
 				for ($i = 1; $i <= $count; $i++) {
-					$key = 'product_option_choice_id_' . $i;
+					$key = "product_option_choice_id_$i";
 					if ($dataRow[$key] != $product[$key]) {
 						continue 2;
 					}					
@@ -179,7 +179,6 @@ class CatalogItem extends ShopAppModel {
 			}
 		}
 		$this->Product->create();
-		
 		return $this->Product->saveAll($data, array('callbacks' => false));
 	}
 	
