@@ -230,11 +230,10 @@ class CatalogItem extends ShopAppModel {
 			'conditions' => array('Product.catalog_item_id' => $id),
 			'group' => array('Product.catalog_item_id')
 		));
-		return $this->updateAll(array(
-			$this->escapeField('stock') => !empty($result) ? $result[0]['stock'] : 0,
-		), array(
-			$this->escapeField($this->primaryKey) => $id
-		));
+		return $this->updateAll(
+			array($this->escapeField('stock') => !empty($result) ? $result[0]['stock'] : 0), 
+			array($this->escapeField($this->primaryKey) => $id)
+		);
 	}
 
 	function updateAllStock() {
@@ -283,9 +282,7 @@ class CatalogItem extends ShopAppModel {
 	function findPackageChildren($id) {
 		return $this->CatalogItemPackageChild->CatalogItemChild->find('all', array(
 			'fields' => array('*'),
-			'link' => array(				'Shop.CatalogItemPackageChild' => array(
-					'Shop.CatalogItemParent' => array('table' => 'catalog_items')
-				)			),
+			'link' => array(				'Shop.CatalogItemPackageChild' => array('Shop.CatalogItemParent' => array('table' => 'catalog_items'))			),
 			'conditions' => array('CatalogItemParent.id' => $id)
 		));
 	}

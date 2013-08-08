@@ -470,22 +470,26 @@ class CatalogItemsController extends ShopAppController {
 
 		$PDO->query("UPDATE $dstDb.product_inventory_adjustments AS InventoryAdjustment
 			JOIN $srcDb.product_inventory_adjustments AS OldInventoryAdjustment ON InventoryAdjustment.id = OldInventoryAdjustment.id
-			JOIN $dstDb.products AS Product ON Product.catalog_item_id = InventoryAdjustment.product_id AND ((
-					(Product.product_option_choice_id_1 = OldInventoryAdjustment.product_option_choice_id_1) OR
-					(Product.product_option_choice_id_1 IS NULL AND OldInventoryAdjustment.product_option_choice_id_1 IS NULL)
+			JOIN $srcDb.product_inventories AS ProductInventory ON ProductInventory.id = OldInventoryAdjustment.product_inventory_id
+			JOIN $dstDb.products AS Product ON Product.catalog_item_id = ProductInventory.product_id AND ((
+					(Product.product_option_choice_id_1 = ProductInventory.product_option_choice_id_1) OR
+					(Product.product_option_choice_id_1 IS NULL AND ProductInventory.product_option_choice_id_1 IS NULL)
 				) AND (
-					(Product.product_option_choice_id_2 = OldInventoryAdjustment.product_option_choice_id_2) OR
-					(Product.product_option_choice_id_2 IS NULL AND OldInventoryAdjustment.product_option_choice_id_2 IS NULL)
+					(Product.product_option_choice_id_2 = ProductInventory.product_option_choice_id_2) OR
+					(Product.product_option_choice_id_2 IS NULL AND ProductInventory.product_option_choice_id_2 IS NULL)
 				) AND (
-					(Product.product_option_choice_id_3 = OldInventoryAdjustment.product_option_choice_id_3) OR
-					(Product.product_option_choice_id_3 IS NULL AND OldInventoryAdjustment.product_option_choice_id_3 IS NULL)
+					(Product.product_option_choice_id_3 = ProductInventory.product_option_choice_id_3) OR
+					(Product.product_option_choice_id_3 IS NULL AND ProductInventory.product_option_choice_id_3 IS NULL)
 				) AND (
-					(Product.product_option_choice_id_4 = OldInventoryAdjustment.product_option_choice_id_4) OR
-					(Product.product_option_choice_id_4 IS NULL AND OldInventoryAdjustment.product_option_choice_id_4 IS NULL)
+					(Product.product_option_choice_id_4 = ProductInventory.product_option_choice_id_4) OR
+					(Product.product_option_choice_id_4 IS NULL AND ProductInventory.product_option_choice_id_4 IS NULL)
 				)
 			)
 			SET InventoryAdjustment.product_id = Product.id, InventoryAdjustment.title = Product.title");
-
+		$products = $this->CatalogItem->Product->find('list');
+		foreach ($products as $productId => $productTitle) {
+			$this->CatalogItem->Product->updateStock($productId);
+		}
 		debug(compact('log'));
 		exit();
 	}
