@@ -294,14 +294,14 @@ class CatalogItemsController extends ShopAppController {
 
 		
 		$tables = array(
-			'catalog_items' => array('products'),
+			'catalog_items' => 'products',
 			'catalog_item_categories',
 			'catalog_item_categories_catalog_items',
 			'catalog_item_category_links',
 			'catalog_item_images',
 			'catalog_item_options',
 			'catalog_item_packages',
-			'handline_methods',
+			'handling_methods',
 			'invoices',
 			'invoice_payment_methods',
 			'orders',
@@ -321,23 +321,35 @@ class CatalogItemsController extends ShopAppController {
 		);
 		$queries = array();
 		$PDO = getModelPdo($this->CatalogItem);
-		foreach ($tables as $table => $config) {
+		foreach ($tables as $srcTable => $config) {
 			if (is_numeric($table)) {
 				$table = $config;
 				$config = array();
 			}
-			$dst = "`$dstDb`.`$table`";
-			$src = "`$srcDb`.`$table`";
+			if (!is_array($config)) {
+				$config = array('dstTable' => $config);
+			}
+			$config = array_merge(array(
+				'srcFields' => array(),
+			), $config);
+			
+			extract($config);
+			
+			$dst = "`$dstDb`.`$dstTable`";
+			$src = "`$srcDb`.`$srcTable`";
 			$showQuery = "SHOW COLUMNS FROM $src";
 			debug($showQuery);
 			if (!($M = $PDO->query($showQuery))) {
 				continue;
 			}
-			debug($M);
+			$srcFields = $dstFields = array();
 			while($row = $M->fetch()) {
-				debug($row);
+				$srcFields[] = $row['field'];
+				$dstFields[] = !empty($fields[$row['field']]) ? $fields[$row['field']] : $row['field'];
 			}
-			$q = "INSERT INTO $dst SELECT * FROM $src";
+			$dstFields = implode(',', $dstFields);
+			$srcFields = implode(',', $srcFields);
+			$q = "INSERT INTO $dst ($dstFields) SELECT $srcFields FROM $src";
 			$queries[] = $q;
 		}
 		debug($queries);
