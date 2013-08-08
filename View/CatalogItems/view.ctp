@@ -101,9 +101,5 @@
 </div>
 <?php
 if (!empty($isShopAdmin)) {
-	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
-		'action' => 'view',
-		$catalogItem['CatalogItem']['id'],
-		'admin' => true
-	)));
+	echo $this->CatalogItem->adminMenu(array('view', 'edit'), $catalogItem['CatalogItem'], array('urlAdd' => array('admin' => true)));
 }

@@ -32,6 +32,9 @@ class CatalogItemsController extends ShopAppController {
 	function index($categoryId = null) {
 		$rootCategoryId = 1;
 		
+		if (empty($categoryId) && !empty($this->request->params['named']['category'])) {
+			$categoryId = $this->request->params['named']['category'];
+		}
 		//Filters Category
 		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
 		
