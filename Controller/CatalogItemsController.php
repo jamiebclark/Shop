@@ -320,8 +320,7 @@ class CatalogItemsController extends ShopAppController {
 			),
 			'product_option_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
 			'products' => 'catalog_items',
-		);
-		$tables2 = array(
+
 			'product_handlings' => 'handling_methods',
 			'invoices',
 			'invoice_payment_methods',
@@ -353,6 +352,7 @@ class CatalogItemsController extends ShopAppController {
 				'table' => 'order_products',
 				'fields' => array(
 					'shop_order_id' => 'order_id',	//TODO: Update this?
+					'product_id' => 'catalog_item_id',
 					'product_option_choice_id_1' => false,
 					'product_option_choice_id_2' => false,
 					'product_option_choice_id_3' => false,
@@ -449,6 +449,24 @@ class CatalogItemsController extends ShopAppController {
 				break;
 			}
 		}
+		// Adjust Product IDs
+		$PDO->query("UPDATE $dstDb.order_products AS OrderProduct
+			JOIN $srcDb.shop_order_products AS ShopOrderProduct ON ShopOrderProduct.id = OrderProduct.id
+			JOIN $dstDb.products AS Product ON Product.catalog_item_id = ShopOrderProduct.product_id AND ((
+					(Product.product_option_choice_id_1 = ShopOrderProduct.product_option_choice_id_1) OR
+					(Product.product_option_choice_id_1 IS NULL AND ShopOrderProduct.product_option_choice_id_1 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_2 = ShopOrderProduct.product_option_choice_id_2) OR
+					(Product.product_option_choice_id_2 IS NULL AND ShopOrderProduct.product_option_choice_id_2 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_3 = ShopOrderProduct.product_option_choice_id_3) OR
+					(Product.product_option_choice_id_3 IS NULL AND ShopOrderProduct.product_option_choice_id_3 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_4 = ShopOrderProduct.product_option_choice_id_4) OR
+					(Product.product_option_choice_id_4 IS NULL AND ShopOrderProduct.product_option_choice_id_4 IS NULL)
+				)
+			)
+			SET OrderProduct.product_id = Product.id");
 		debug(compact('log'));
 		exit();
 	}

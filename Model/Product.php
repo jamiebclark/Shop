@@ -245,8 +245,7 @@ class Product extends ShopAppModel {
 				$val['ProductOptionChoice'] = array_values($val['ProductOptionChoice']);
 			}
 			if (!empty($data)) {
-				debug($data);
-				$this->CatalogItem->CatalogItemOption->saveAll($data, array('callbacks' => false, 'validate' => false, 'deep' => true));
+			$this->CatalogItem->CatalogItemOption->saveAll($data, array('callbacks' => false, 'validate' => false, 'deep' => true));
 			}
 		}	
 		
