@@ -294,48 +294,87 @@ class CatalogItemsController extends ShopAppController {
 
 		
 		$tables = array(
-			'catalog_items' => 'products',
-			'catalog_item_categories',
-			'catalog_item_categories_catalog_items',
-			'catalog_item_category_links',
-			'catalog_item_images',
-			'catalog_item_options',
-			'catalog_item_packages',
-			'handling_methods',
+			'products' => 'catalog_items',
+			'product_categories' => 'catalog_item_categories',
+			'product_categories_products' => array(
+				'table' => 'catalog_item_categories_catalog_items',
+				'fields' => array(
+					'product_id' => 'catalog_item_id',
+					'product_category_id' => 'catalog_item_category_id',
+				)
+			),
+			//'catalog_item_category_links',
+			'product_images' => array(
+				'table' => 'catalog_item_images',
+				'fields' => array('product_id' => 'catalog_item_id'),
+			),
+			'product_options' => array(
+				'table' => 'catalog_item_options',
+				'fields' => array('product_id' => 'catalog_item_id'),
+			),
+			'product_packages' => array(
+				'table' => 'catalog_item_packages',
+				'fields' => array('product_parent_id' => 'catalog_item_parent_id', 'product_child_id' => 'catalog_item_child_id'),
+			),
+			'product_handlings' => 'handling_methods',
 			'invoices',
 			'invoice_payment_methods',
-			'orders',
-			'orders_handling_methods',
-			'orders_promo_codes',
-			'order_products',
-			'order_products_shipping_rules',
+			'shop_orders' => 'orders',
+			'handling_methods' => 'orders_handling_methods',
+			'product_promos_shop_orders' => array(
+				'table' => 'orders_promo_codes',
+				'fields' => array(
+					'product_promo_id' => 'promo_code_id',
+					'shop_order_id' => 'order_id',
+				),
+			),
+			'shop_order_products' => array(
+				'table' => 'order_products',
+				'fields' => array(
+					'shop_order_id' => 'order_id',	//TODO: Update this?
+				),
+			),
+			'product_shipping_rules_shop_order_products' => array(
+				'table' => 'order_products_shipping_rules',
+				'fields' => array(
+					'product_shipping_rule_id' => 'shipping_rule_id',
+					'shop_order_product_id' => 'order_product_id',
+				)
+			),
 			'paypal_payments',
-			'products',
-			'product_inventories',
-			'product_inventory_adjustments',
-			'product_options_choices',
-			'promo_codes',
-			'shipping_classes',
-			'shipping_methods',
-			'shipping_rules',
+			//'products',
+			//'product_inventories',
+			'product_inventory_adjustments' => array('fields' => array('product_inventory_id' => 'product_id')),,
+			'product_options_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
+			'product_promos' => 'promo_codes',
+			'shop_order_shipping_classes' => 'shipping_classes',
+			'shop_order_shipping_methods' => 'shipping_methods',
+			'product_shipping_rules' => array(
+				'table' => 'shipping_rules',
+				'fields' => array(
+					'product_id' => 'catalog_item_id',
+					'shop_order_class_id' => 'order_class_id',
+				)
+			),
 		);
 		$queries = array();
 		$PDO = getModelPdo($this->CatalogItem);
 		foreach ($tables as $srcTable => $config) {
-			if (is_numeric($srcTable)) {
+			if (is_numeric($dstTable)) {
 				$srcTable = $config;
 				$config = array();
 			}
 			if (!is_array($config)) {
-				$config = array('dstTable' => $config);
+				$config = array('table' => $config);
 			}
 			$config = array_merge(array(
-				'srcFields' => array(),
+				'table' => $srcTable,
+				'fields' => array(),
 			), $config);
 			
 			extract($config);
 			
-			$dst = "`$dstDb`.`$dstTable`";
+			$dst = "`$dstDb`.`$table`";
 			$src = "`$srcDb`.`$srcTable`";
 			$showQuery = "SHOW COLUMNS FROM $src";
 			debug($showQuery);
