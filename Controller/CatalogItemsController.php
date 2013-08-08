@@ -285,6 +285,64 @@ class CatalogItemsController extends ShopAppController {
 		}
 		$this->set(compact('totals', 'totalsOptions', 'catalogItems', 'products', 'monthShift'));
 	}
+	
+	function admin_copy() {
+		$srcDb = 'souper_bowl'; //'webdb';
+		$dstDb = 'souper_bowl_shop'; //'shop';
+		$srcDb = 'webdb';
+		$dstDb = 'shop';
+
+		
+		$tables = array(
+			'catalog_items' => array('products'),
+			'catalog_item_categories',
+			'catalog_item_categories_catalog_items',
+			'catalog_item_category_links',
+			'catalog_item_images',
+			'catalog_item_options',
+			'catalog_item_packages',
+			'handline_methods',
+			'invoices',
+			'invoice_payment_methods',
+			'orders',
+			'orders_handling_methods',
+			'orders_promo_codes',
+			'order_products',
+			'order_products_shipping_rules',
+			'paypal_payments',
+			'products',
+			'product_inventories',
+			'product_inventory_adjustments',
+			'product_options_choices',
+			'promo_codes',
+			'shipping_classes',
+			'shipping_methods',
+			'shipping_rules',
+		);
+		$queries = array();
+		$PDO = getModelPdo($this->CatalogItem);
+		foreach ($tables as $table => $config) {
+			if (is_numeric($table)) {
+				$table = $config;
+				$config = array();
+			}
+			$dst = "`$dstDb`.`$table`";
+			$src = "`$srcDb`.`$table`";
+			$showQuery = "SHOW COLUMNS FROM $src";
+			debug($showQuery);
+			if (!($M = $PDO->query($showQuery))) {
+				continue;
+			}
+			debug($M);
+			while($row = $M->fetch()) {
+				debug($row);
+			}
+			$q = "INSERT INTO $dst SELECT * FROM $src";
+			$queries[] = $q;
+		}
+		debug($queries);
+		exit();
+	}
 	/*
 	function ajax_product_option_select($id = null, $key = null) {
 		$productOptions = $this->Product->ProductOption->find('all', array(
@@ -302,8 +360,9 @@ class CatalogItemsController extends ShopAppController {
 	function _setFormElements() {
 		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
 		$packageChildren = array('' => ' -- Package Content -- ') + $this->CatalogItem->find('list', array(
-			'link' => array('Shop.CatalogItemPackageParent' => array(
-				'table' => 'catalog_item_packages',
+			'link' => array(
+				'Shop.CatalogItemPackageParent' => array(
+				'class' => 'Shop.CatalogItemPackage',
 				'conditions' => array(
 					'CatalogItemPackageParent.catalog_item_parent_id = CatalogItem.id',
 				)
