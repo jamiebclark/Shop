@@ -344,7 +344,7 @@ class CatalogItemsController extends ShopAppController {
 			'paypal_payments',
 			//'products',
 			//'product_inventories',
-			'product_inventory_adjustments' => array('fields' => array('product_inventory_id' => 'product_id')),,
+			'product_inventory_adjustments' => array('fields' => array('product_inventory_id' => 'product_id')),
 			'product_options_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
 			'product_promos' => 'promo_codes',
 			'shop_order_shipping_classes' => 'shipping_classes',
