@@ -322,8 +322,8 @@ class CatalogItemsController extends ShopAppController {
 		$queries = array();
 		$PDO = getModelPdo($this->CatalogItem);
 		foreach ($tables as $srcTable => $config) {
-			if (is_numeric($table)) {
-				$table = $config;
+			if (is_numeric($srcTable)) {
+				$srcTable = $config;
 				$config = array();
 			}
 			if (!is_array($config)) {
