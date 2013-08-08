@@ -360,7 +360,7 @@ class CatalogItemsController extends ShopAppController {
 		$queries = array();
 		$PDO = getModelPdo($this->CatalogItem);
 		foreach ($tables as $srcTable => $config) {
-			if (is_numeric($dstTable)) {
+			if (is_numeric($srcTable)) {
 				$srcTable = $config;
 				$config = array();
 			}
