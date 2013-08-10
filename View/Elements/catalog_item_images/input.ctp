@@ -4,7 +4,7 @@ if (isset($count)) {
 	$prefix .= $count . '.';
 }
 ?>
-<div class="catalog-item-image-input media">
+<div class="catalogitem-image-input media">
 	<?php if ($this->Html->value($prefix . 'filename')): ?>
 		<div class="pull-left">
 		<?php 

@@ -58,4 +58,4 @@ foreach ($totals['year'] as $year => $yearTotals) {	$this->Table->reset();
 				}
 				$this->Table->rowEnd();
 			}
-		}	}	echo $this->Html->tag('h2', $year);	echo $this->Table->output(array('class' => 'catalog-item-totals'));}
+		}	}	echo $this->Html->tag('h2', $year);	echo $this->Table->output(array('class' => 'catalogitem-totals'));}

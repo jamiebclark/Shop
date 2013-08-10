@@ -4,6 +4,11 @@ class CatalogItemsController extends ShopAppController {
 	var $components = array('Shop.ShoppingCart', 'Layout.Table');
 	var $helpers = array(
 		'Shop.CatalogItem', 
+		'Layout.Crumbs' => array(
+			'controllerCrumbs' => array(
+				array('Online Store', array('action' => 'index'))
+			),
+		),
 		//'Layout.DisplayText'
 	);
 	
@@ -21,41 +26,25 @@ class CatalogItemsController extends ShopAppController {
 	}
 	*/
 	
-	function _getCategoryId($categoryId, $rootCategoryId) {
-		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $rootCategoryId);
-		if (!$categoryId) {
-			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
-		}
-		return $categoryId;			
-	}
-	
 	function index($categoryId = null) {
-		$rootCategoryId = 1;
-		
-		if (empty($categoryId) && !empty($this->request->params['named']['category'])) {
-			$categoryId = $this->request->params['named']['category'];
+		//Layout Variables
+		$sessionName = 'CatalogItem.layoutDefault';
+		$layoutDefault = array('layout' => 'thumb', 'per_page' => 12);
+		if ($this->Session->check($sessionName)) {
+			$layoutDefault = array_merge($layoutDefault, $this->Session->read($sessionName));
+		} 
+		$layouts = array('thumb' => 'Thumbnails', 'list' => 'List');
+		$perPages = array(8, 12, 24);
+		$perPages = array_combine($perPages, $perPages);
+		if (!empty($this->request->data['CatalogItem'])) {
+			$layoutDefault = array_merge($layoutDefault, $this->request->data['CatalogItem']);
 		}
-		//Filters Category
-		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
+		$this->Session->write($sessionName, $layoutDefault);
 		
-		//Loads Category
-		$catalogItemCategory = $this->CatalogItem->CatalogItemCategory->read(null, $categoryId);
+		$this->paginate = $this->_findOptions(array('limit' => $layoutDefault['per_page']), $categoryId);
 
-		//Category List
-		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findActiveCategories($categoryId);
-		
-		//Category Path
-		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId, $rootCategoryId);
-		
-		/*
-		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findChildren($categoryId, false, array(
-			'CatalogItemCategory.active' => 1
-		));
-		*/
-		
-		$this->paginate = $this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId);
-		$catalogItems = $this->paginate();
-		$this->set(compact('catalogItems', 'catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
+		$catalogItems = $this->paginate('CatalogItem');
+		$this->set(compact('catalogItems', 'layoutDefault', 'layouts', 'perPages'));
 	}
 	
 	function view ($id = null) {
@@ -105,16 +94,16 @@ class CatalogItemsController extends ShopAppController {
 		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions', 'catalogItemCategories'));
 	}
 	
-	function admin_index() {
-		$this->CatalogItem->updateAllStock();
-		
-		$this->paginate = array('conditions' => array('CatalogItem.active' => 1));
+	function admin_index($categoryId = null) {
+		//$this->CatalogItem->updateAllStock();
+		$this->paginate = $this->_findOptions(array('conditions' => array('CatalogItem.active' => 1)), $categoryId);
+
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 	
-	function admin_inactive() {
-		$this->paginate = array('conditions' => array('CatalogItem.active' => 0));
+	function admin_inactive($categoryId = null) {
+		$this->paginate = $this->_findOptions(array('conditions' => array('CatalogItem.active' => 0)), $categoryId);
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
@@ -181,6 +170,7 @@ class CatalogItemsController extends ShopAppController {
 					'CatalogItemPackageChild' => array(
 						'link' => array(
 							'Shop.CatalogItemChild' => array(
+								'class' => 'Shop.CatalogItem',
 								'conditions' => 'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
 							)
 						)
@@ -522,4 +512,46 @@ class CatalogItemsController extends ShopAppController {
 		));
 		$this->set(compact('packageChildren'));
 	}
+
+	function _getCategoryId($categoryId, $rootCategoryId) {
+		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $rootCategoryId);
+		if (!$categoryId) {
+			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
+		}
+		return $categoryId;			
+	}
+
+	function _findOptions($options = array(), $categoryId = null) {
+		$options = array();
+		if ($categoryId = $this->_findCatalogItemCategoryId($categoryId)) {
+			$options = array_merge($this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId), $options);
+		}
+		return $options;
+	}
+	
+	function _findCatalogItemCategoryId($categoryId = null) {
+		$rootCategoryId = 1;
+		if (empty($categoryId) && !empty($this->request->params['named']['category'])) {
+			$categoryId = $this->request->params['named']['category'];
+		}
+		//Filters Category
+		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
+		
+		//Loads Category
+		$catalogItemCategory = $this->CatalogItem->CatalogItemCategory->read(null, $categoryId);
+
+		//Category List
+		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findActiveCategories($categoryId);
+		
+		//Category Path
+		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId, $rootCategoryId);
+		
+		/*
+		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findChildren($categoryId, false, array(
+			'CatalogItemCategory.active' => 1
+		));
+		*/
+		$this->set(compact('catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
+		return $categoryId;
+	}	
 }

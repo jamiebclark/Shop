@@ -2,14 +2,24 @@
 @import "../../../Layout/webroot/scss/bootstrap/variables";
 @import "../../../Layout/webroot/scss/variables";
 
+@import "catalog-item-categories";
+
 .nav-catalogitemcategories {
 	li a {
 		font-size: $fontSizeLarge;
+		line-height: 1 !important;
 	}
 }
 
 .qty, .cash {
 	font-size: 20px;
+}
+.cash-sale {
+	color: #660000;
+}
+.cash-old {
+	color: #666;
+	text-decoration: line-through;
 }
 th.cash, td.cash {
 	width: 120px;
@@ -22,7 +32,7 @@ th.cash {
 	.pull-right {
 		line-height: normal;
 	}
-	.catalog-item-price {
+	.catalogitem-price {
 		font {
 			font-size: 36px;
 		}
@@ -55,22 +65,7 @@ form.canceled {
 	@include trackBadge(dhl, #D80612, #FFCB01);
 }
 
-.media {
-	.img, .bd,.rght {
-		overflow: hidden;
-		zoom: 1;
-	}
-	.img {
-		float: left;
-		margin-right: 10px;
-	}
-	.rght {
-		float: right;
-		margin-left: 10px;
-	}
-}
-
-.catalog-item-package-children {
+.catalogitem-package-children {
 	.thumb {
 		width: 40px;
 		img {
@@ -81,7 +76,7 @@ form.canceled {
 		line-height: 40px;
 	}
 }
-.catalog-item-admin-list {
+.catalogitem-admin-list {
 	img.media-object {
 		width: 80px;
 	}

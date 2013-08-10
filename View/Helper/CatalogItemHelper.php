@@ -10,6 +10,11 @@ class CatalogItemHelper extends ModelViewHelper {
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	function beforeRender($viewFile, $options = array()) {
+		$this->Asset->css('Shop.style');
+		return parent::beforeRender($viewFile, $options);
+	}
+	
 	function media($result, $options = array()) {
 		$result = $this->_getResult($result);
 		$options = array_merge(array(
@@ -18,7 +23,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			'dir' => 'thumb',
 		), $options);
 		if (!empty($result['short_description'])) {
-			$options['after'] = $this->DisplayText->text($result['short_description']);
+			$options['after'] = $this->DisplayText->text($result['short_description'], array('tag' => 'p'));
 		}
 		return parent::media($result, $options);
 	}
@@ -35,7 +40,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			$title = $this->Html->link($title, $options['url']);
 		}
 		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
-		return $this->Html->div('catalog-item media', $thumb . $this->Html->div('media-body', $body));
+		return $this->Html->div('catalogitem media', $thumb . $this->Html->div('media-body', $body));
 	}
 	*/
 	
@@ -76,7 +81,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			'class' => '',
 			'escape' => true,
 		), $options);
-		$options['class'] .= ' catalog-item';
+		$options['class'] .= ' catalogitem';
 		$url = Param::keyCheck($options, 'url', false, $this->url($CatalogItem));
 		
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
@@ -87,7 +92,8 @@ class CatalogItemHelper extends ModelViewHelper {
 			'controller' => 'catalog_items', 
 			'action' => 'view', 
 			$CatalogItem['id'],
-			Inflector::slug($CatalogItem['title'])
+			Inflector::slug($CatalogItem['title']),
+			'plugin' => 'shop',
 		);
 	}
 	
@@ -105,7 +111,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		if (empty($notes)) {
 			return '';
 		} else {
-			return $this->Html->div('catalog-item-notes', 
+			return $this->Html->div('catalogitem-notes', 
 				'<ul><li>'.implode('</li><li>', $notes).'</li></ul>'
 			);
 		}
@@ -154,13 +160,13 @@ class CatalogItemHelper extends ModelViewHelper {
 	function price($catalogItem) {
 		$out = '';
 		if ($catalogItem['sale'] > 0) {
-			$out .= $this->cash($catalogItem['sale'], array('class' => 'sale'));
+			$out .= $this->cash($catalogItem['sale'], array('class' => 'cash-sale'));
 			$out .= ' ';
-			$out .= $this->cash($catalogItem['price'], array('class' => 'old'));
+			$out .= $this->cash($catalogItem['price'], array('class' => 'cash-old'));
 		} else {
 			$out .= $this->cash($catalogItem['price']);
 		}
-		return $this->Html->tag('span', $out, array('class' => 'catalog-item-price'));
+		return $this->Html->tag('span', $out, array('class' => 'catalogitem-price'));
 	}		function cash($num, $options = array()) {
 		$options = array_merge(array('tag' => 'font'), $options);
 		extract($this->addClass($options, 'cash'));
@@ -185,8 +191,10 @@ class CatalogItemHelper extends ModelViewHelper {
 				}
 				$list .= $this->Html->link($title, $url);
 			}
-			$out .= $this->Html->div('catalog-item-category', $list);
+			$out .= $this->Html->div('catalogitemcategory',
+				$this->Html->tag('span', $list, array('class' => 'badge badge-catalogitem-category'))
+			);
 		}
-		return $this->Html->div('catalog-item-categories', $out);
+		return $this->Html->div('catalogitemcategory-list', $out);
 	}
 }

@@ -99,40 +99,45 @@ class CatalogItemCategory extends ShopAppModel {
 	
 	function findActiveCategories($parentId = null) {
 		//Finds any categories with active, non-hidden products associated
-		$conditions = array(
-			'CatalogItem.active' => 1,
-			'CatalogItem.hidden' => 0,
-		);
-		if (!empty($parentId) && ($result = $this->read(array('lft', 'rght'), $parentId))) {
-			$conditions[$this->alias . '.lft BETWEEN ? AND ?'] = array(
-				$result[$this->alias]['lft'], $result[$this->alias]['rght']
-			);
-		}
-		$this->create();
-		//Finds all active categories
-		$result = $this->find('list', array(
-			'link' => array('Shop.CatalogItem' => array('type' => 'INNER')),
-			'conditions' => $conditions,
-			'group' => 'CatalogItemCategory.id',
+		return $this->find('all', array(
+			'conditions' => array(
+				$this->escapeField('parent_id') => $parentId,
+				$this->escapeField('active_catalog_item_count') . ' > 0',
+			)
 		));
-		if (!empty($result)) {
-			return $this->find('list', array(
-				'joins' => array(
-					array(
-						'table' => 'catalog_item_categories',
-						'alias' => 'CatalogItemCategoryChild',
-						'conditions' => array(
-							'CatalogItemCategoryChild.lft BETWEEN CatalogItemCategory.lft AND CatalogItemCategory.rght',
-							'CatalogItemCategoryChild.id' => array_keys($result),
-						)
+	}
+	
+	function updateTotals() {
+		$alias = $this->alias;
+		$result = $this->find('all', array(
+			'recursive' => -1,
+			'fields' => array(
+				$this->escapeField('id'),
+				'COUNT(CatalogItem.id) AS `catalog_item_count`',
+				'SUM(IF(CatalogItem.hidden = 0 AND CatalogItem.active = 1,1,0)) AS `active_catalog_item_count`',
+			), 
+			'joins' => array(
+				array(
+					'table' => 'catalog_item_categories',
+					'alias' => 'ChildCatalogItemCategory',
+					'conditions' => array("ChildCatalogItemCategory.lft BETWEEN $alias.lft AND $alias.rght"),
+				), array(
+					'table' => 'catalog_item_categories_catalog_items',
+					'alias' => 'CatalogItemCategoriesCatalogItem',
+					'conditions' => array("CatalogItemCategoriesCatalogItem.catalog_item_category_id = ChildCatalogItemCategory.id"),
+				), array(
+					'table' => 'catalog_items',
+					'alias' => 'CatalogItem',
+					'conditions' => array(
+						'CatalogItem.id = CatalogItemCategoriesCatalogItem.catalog_item_id',
 					)
-				),
-				'conditions' => array(
-					$this->alias . '.parent_id' => $parentId,
 				)
-			));
-		} else {
-			return null;
+			), 
+			'group' => $this->escapeField('id')));
+		$data = array();
+		foreach ($result as $row) {
+			$data[] = array('id' => $row[$this->alias]['id']) + $row[0];
 		}
+		return $this->saveAll($data, array('validate' => false, 'callbacks' => false));
 	}
 }

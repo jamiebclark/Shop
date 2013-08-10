@@ -19,7 +19,7 @@ foreach ($catalogItems as $catalogItem) {
 	), array('class' => $active ? null : 'inactive'));
 }
 echo $this->Table->output(array(
-	'class' => 'catalog-item-admin-list',
+	'class' => 'catalogitem-admin-list',
 	'paginate' => true,
 	'withChecked' => array('delete', 'active', 'inactive'),
 ));	

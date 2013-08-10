@@ -2,9 +2,7 @@
 $this->Crumbs->title('Image');
 $this->Crumbs->setParent('CatalogItem', $catalogItemImage['CatalogItem']);
 
-echo $this->CatalogItem->thumb($catalogItemImage['CatalogItemImage'], array(
-	'class' => 'catalog-item-image-view'
-));
+echo $this->CatalogItem->thumb($catalogItemImage['CatalogItemImage'], array('class' => 'catalogitem-image-view'));
 if (count($catalogItemImages) > 1) {
 	echo $this->element('catalog_item_images/thumb_list');
 }

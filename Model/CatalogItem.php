@@ -74,6 +74,8 @@ class CatalogItem extends ShopAppModel {
 		$id = $this->id;
 		$this->createProducts($id);
 		$this->updateProductTitles($id);
+		$this->CatalogItemCategory->updateTotals();
+		
 		$result = $this->read(null, $id);
 		if (empty($result[$this->alias]['filename'])) {
 			$this->setThumbnail($id);
