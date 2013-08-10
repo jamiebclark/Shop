@@ -29,6 +29,15 @@ class Product extends ShopAppModel {
 		parent::__construct($id, $table, $ds);
 	}
 	
+	function afterSave($created) {
+		if ($created) {
+			$id = $this->id;
+			$this->updateTitle($id);
+			$this->read(null, $id);
+		}
+		return parent::afterSave($created);
+	}
+	
 	function beforeDelete() {
 		// Finds the Catalog Item ID to be updated after the deletion
 		$result = $this->read('catalog_item_id', $this->id);
@@ -63,8 +72,8 @@ class Product extends ShopAppModel {
 			return $data['product_id'];
 		}
 		$conditions = array(
-			$this->alias . '.catalog_item_id' => $data['catalog_item_id'],
-			$this->alias . '.active' => 1,
+			$this->escapeField('catalog_item_id') => $data['catalog_item_id'],
+			$this->escapeField('active') => 1,
 		);
 		for ($i = 1; $i <= $this->optionChoiceCount; $i++) {
 			$key = 'product_option_choice_id_' . $i;
@@ -77,8 +86,8 @@ class Product extends ShopAppModel {
 	
 	function adjustStock($id, $amt) {
 		return $this->updateAll(
-			array($this->alias . '.stock' => $this->alias . '.stock + ' . $amt),
-			array($this->alias . '.id' => $id)
+			array($this->escapeField('stock') => $this->escapeField('stock') . ' + ' . $amt),
+			array($this->escapeField('id') => $id)
 		);
 	}
 	
@@ -245,8 +254,7 @@ class Product extends ShopAppModel {
 				$val['ProductOptionChoice'] = array_values($val['ProductOptionChoice']);
 			}
 			if (!empty($data)) {
-				debug($data);
-				$this->CatalogItem->CatalogItemOption->saveAll($data, array('callbacks' => false, 'validate' => false, 'deep' => true));
+			$this->CatalogItem->CatalogItemOption->saveAll($data, array('callbacks' => false, 'validate' => false, 'deep' => true));
 			}
 		}	
 		
@@ -285,7 +293,6 @@ class Product extends ShopAppModel {
 				}
 			}
 			if (!empty($data)) {
-				debug($data);
 				return $this->CatalogItem->CatalogItemOption->saveAll(array_values($data));
 			}
 		}

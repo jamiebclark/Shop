@@ -43,4 +43,4 @@ foreach ($result as $k => $catalogItemPackage):
 		echo $this->Form->hidden($prefix . 'parent_id', array('value' => $orderProductId));
 	}
 endforeach;
-echo $this->Table->output(array('class' => 'catalog-item-package-children', 'div' => false));
+echo $this->Table->output(array('class' => 'catalogitem-package-children', 'div' => false));

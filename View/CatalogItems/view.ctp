@@ -1,22 +1,22 @@
 <style type="text/css">
-.catalog-item-image-thumb-list img {
+.catalogitem-image-thumb-list img {
 	display: block;
 	float: left;
 	width: 33%;
 }
-.catalog-item-images .main {
+.catalogitem-images .main {
 	width: 100%;
 }
-.add-cart .catalog-item-price {
+.add-cart .catalogitem-price {
 	line-height: 80px;
 }
-.add-cart .catalog-item-price .cash {
+.add-cart .catalogitem-price .cash {
 	font-size: 40px;
 }
 </style>
-<div class="catalog-item-view row">
+<div class="catalogitem-view row">
 <?php echo $this->Form->create('OrderProduct', array('action' => 'add')); ?>
-	<div class="span3 catalog-item-images"><?php
+	<div class="span3 catalogitem-images"><?php
 	echo $this->CatalogItem->thumb(
 		$catalogItem['CatalogItem'], array(
 			'div' => false, 
@@ -101,9 +101,5 @@
 </div>
 <?php
 if (!empty($isShopAdmin)) {
-	echo $this->Layout->adminMenu(array('view', 'edit'), array('url' => array(
-		'action' => 'view',
-		$catalogItem['CatalogItem']['id'],
-		'admin' => true
-	)));
+	echo $this->CatalogItem->adminMenu(array('view', 'edit'), $catalogItem['CatalogItem'], array('urlAdd' => array('admin' => true)));
 }

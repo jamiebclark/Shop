@@ -9,15 +9,9 @@ class CatalogItemImage extends ShopAppModel {
 			'upload_dir' => 'img/catalog_item_images/',
 			'update' => array('filename'),
 			'dirs' => array(
-				'thumb' => array(
-					'setSoft' => array(160, 160),
-				),
-				'mid' => array(
-					'setSoft' => array(320, 320),
-				),
-				'' => array(
-					'max' => array(600, 400)
-				)
+				'thumb' => array('setSoft' => array(160, 160)),
+				'mid' => array('setSoft' => array(320, 320)),
+				'' => array('max' => array(600, 400))
 			)
 		),
 		//'Shop.BlankDelete' => array('title'),

@@ -9,10 +9,11 @@ $prefix = 'ShippingRule.';
 if (isset($count)) {
 	$prefix .= "$count.";
 }
+$catalogItemId = !empty($this->request->data['CatalogItem']['id']) ? $this->request->data['CatalogItem']['id'] : null;
 echo $this->Form->inputs(array(
 	'fieldset' => false,
 	$prefix . 'id' => array('type' => 'hidden'),
-	$prefix . 'catalog_item_id' => array('type' => 'hidden', 'value' => $this->request->data['CatalogItem']['id']),
+	$prefix . 'catalog_item_id' => array('type' => 'hidden', 'value' => $catalogItemId),
 ));
 ?>
 <div class="row-fluid shipping-rule-input">

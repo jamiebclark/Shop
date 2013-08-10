@@ -6,22 +6,47 @@ class CatalogItemHelper extends ModelViewHelper {
 	var $name = 'CatalogItem';
 	var $modelPlugin = 'Shop';
 	
-	var $helpers = array(		'Html', 		'Form', 		'Photo', 	);
+	var $helpers = array(
+		'Html', 
+		'Form', 
+		'Photo', 
+	);
 	
 	var $thumbDir = 'catalog_item_images/';
 	
+	function beforeRender($viewFile, $options = array()) {
+		$this->Asset->css('Shop.style');
+		return parent::beforeRender($viewFile, $options);
+	}
+	
 	function media($result, $options = array()) {
-		$catalogItem = $this->_getResult($result);
+		$result = $this->_getResult($result);
 		$options = array_merge(array(
 			'titleTag' => 'h3',
+			'right' => $this->price($result),
+			'dir' => 'thumb',
 		), $options);
-		
-		if (!empty($options['price'])) {
-			$options['right'] = $this->price($catalogItem);
-			unset($options['price']);
+		if (!empty($result['short_description'])) {
+			$options['after'] = $this->DisplayText->text($result['short_description'], array('tag' => 'p'));
 		}
 		return parent::media($result, $options);
 	}
+	/*
+	function media($catalogItem, $options = array()) {
+		$options = array_merge(array(
+			'url' => $this->url($catalogItem),
+			'dir' => 'thumb',
+		), $options);
+		$thumbOptions = $this->addClass($options, 'media-object');
+		$thumb = $this->Html->div('pull-left', $this->thumb($catalogItem, $thumbOptions));
+		$title = $catalogItem['title'];
+		if (!empty($options['url'])) {
+			$title = $this->Html->link($title, $options['url']);
+		}
+		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
+		return $this->Html->div('catalogitem media', $thumb . $this->Html->div('media-body', $body));
+	}
+	*/
 	
 	/*
 	function thumb($catalogItem, $options = array()) {
@@ -60,7 +85,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			'class' => '',
 			'escape' => true,
 		), $options);
-		$options['class'] .= ' catalog-item';
+		$options['class'] .= ' catalogitem';
 		$url = Param::keyCheck($options, 'url', false, $this->url($CatalogItem));
 		
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
@@ -71,7 +96,8 @@ class CatalogItemHelper extends ModelViewHelper {
 			'controller' => 'catalog_items', 
 			'action' => 'view', 
 			$CatalogItem['id'],
-			Inflector::slug($CatalogItem['title'])
+			Inflector::slug($CatalogItem['title']),
+			'plugin' => 'shop',
 		);
 	}
 	
@@ -89,7 +115,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		if (empty($notes)) {
 			return '';
 		} else {
-			return $this->Html->div('catalog-item-notes', 
+			return $this->Html->div('catalogitem-notes', 
 				'<ul><li>'.implode('</li><li>', $notes).'</li></ul>'
 			);
 		}
@@ -138,21 +164,24 @@ class CatalogItemHelper extends ModelViewHelper {
 	function price($catalogItem) {
 		$out = '';
 		if ($catalogItem['sale'] > 0) {
-			$out .= $this->cash($catalogItem['sale'], array('class' => 'sale'));
+			$out .= $this->cash($catalogItem['sale'], array('class' => 'cash-sale'));
 			$out .= ' ';
-			$out .= $this->cash($catalogItem['price'], array('class' => 'old'));
+			$out .= $this->cash($catalogItem['price'], array('class' => 'cash-old'));
 		} else {
 			$out .= $this->cash($catalogItem['price']);
 		}
-		return $this->Html->tag('span', $out, array('class' => 'catalog-item-price'));
-	}		function cash($num, $options = array()) {
+		return $this->Html->tag('span', $out, array('class' => 'catalogitem-price'));
+	}
+	
+	function cash($num, $options = array()) {
 		$options = array_merge(array('tag' => 'font'), $options);
 		extract($this->addClass($options, 'cash'));
 		$out = '$' . number_format($num, $num == round($num) ? 0 : 2);
 		if (!empty($tag)) {
 			$out = $this->Html->tag($tag, $out, compact('class', 'style'));
 		}
-		return $out;	}
+		return $out;
+	}
 	
 	function hasStock($catalogItem) {
 		return !empty($catalogItem['stock']) || !empty($catalogItem['unlimited']);
@@ -169,8 +198,10 @@ class CatalogItemHelper extends ModelViewHelper {
 				}
 				$list .= $this->Html->link($title, $url);
 			}
-			$out .= $this->Html->div('catalog-item-category', $list);
+			$out .= $this->Html->div('catalogitemcategory',
+				$this->Html->tag('span', $list, array('class' => 'badge badge-catalogitem-category'))
+			);
 		}
-		return $this->Html->div('catalog-item-categories', $out);
+		return $this->Html->div('catalogitemcategory-list', $out);
 	}
 }

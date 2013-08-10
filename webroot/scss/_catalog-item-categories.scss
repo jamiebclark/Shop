@@ -1,0 +1,16 @@
+.badge-catalogitem-category {
+	background-color: #CCC;
+	a {
+		color: white;
+		text-decoration: none;
+		&:hover {
+			color: white;
+			text-decoration: underline;
+		}
+	}
+}
+.catalogitemcategory-list {
+	.catalogitemcategory {
+		margin-bottom: $baseLineHeight / 2;
+	}
+}

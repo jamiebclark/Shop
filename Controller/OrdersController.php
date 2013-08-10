@@ -38,7 +38,7 @@ class OrdersController extends ShopAppController {
 	}
 	
 
-	function edit() {
+	function edit($id = null) {
 		$saveAttrs = array(
 			'success' => array(
 				'redirect' => array('action' => 'view', 'ID'),

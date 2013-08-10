@@ -1,23 +1,15 @@
+<h2>Product Packages</h2>
+<p class="note">If this product is a grouping of other products in the store, list them below</p>
 <?php
-echo $this->element('products/admin_heading', array(
-	'crumbs' => array(
-		array($this->request->data['Product']['title'], array('action' => 'view', $this->request->data['Product']['id'])),
-		'Packages'
-	),
-));
-
-echo $this->Html->tag('h1', 'Product Packages');
-echo $this->Html->tag('p', 'If this product is a grouping of other products in the store, list them below');
-echo $this->Html->div('orderProductsForm');
 echo $this->Form->create();
-echo $this->Form->hidden('Product.id', array('value' => $this->request->data['Product']['id']));
+echo $this->Form->hidden('CatalogItem.id');
 
 $min = 5;
 $buffer = 2;
 
 $max = $buffer;
-if (!empty($this->request->data['ProductPackageChild'])) {
-	$max += count($this->request->data['ProductPackageChild']);
+if (!empty($this->request->data['CatalogItemPackageChild'])) {
+	$max += count($this->request->data['CatalogItemPackageChild']);
 }
 if ($max < $min) {
 	$max = $min;

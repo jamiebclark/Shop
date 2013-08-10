@@ -4,6 +4,11 @@ class CatalogItemsController extends ShopAppController {
 	var $components = array('Shop.ShoppingCart', 'Layout.Table');
 	var $helpers = array(
 		'Shop.CatalogItem', 
+		'Layout.Crumbs' => array(
+			'controllerCrumbs' => array(
+				array('Online Store', array('action' => 'index'))
+			),
+		),
 		//'Layout.DisplayText'
 	);
 	
@@ -21,38 +26,25 @@ class CatalogItemsController extends ShopAppController {
 	}
 	*/
 	
-	function _getCategoryId($categoryId, $rootCategoryId) {
-		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $rootCategoryId);
-		if (!$categoryId) {
-			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
-		}
-		return $categoryId;			
-	}
-	
 	function index($categoryId = null) {
-		$rootCategoryId = 1;
+		//Layout Variables
+		$sessionName = 'CatalogItem.layoutDefault';
+		$layoutDefault = array('layout' => 'thumb', 'per_page' => 12);
+		if ($this->Session->check($sessionName)) {
+			$layoutDefault = array_merge($layoutDefault, $this->Session->read($sessionName));
+		} 
+		$layouts = array('thumb' => 'Thumbnails', 'list' => 'List');
+		$perPages = array(8, 12, 24);
+		$perPages = array_combine($perPages, $perPages);
+		if (!empty($this->request->data['CatalogItem'])) {
+			$layoutDefault = array_merge($layoutDefault, $this->request->data['CatalogItem']);
+		}
+		$this->Session->write($sessionName, $layoutDefault);
 		
-		//Filters Category
-		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
-		
-		//Loads Category
-		$catalogItemCategory = $this->CatalogItem->CatalogItemCategory->read(null, $categoryId);
+		$this->paginate = $this->_findOptions(array('limit' => $layoutDefault['per_page']), $categoryId);
 
-		//Category List
-		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findActiveCategories($categoryId);
-		
-		//Category Path
-		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId, $rootCategoryId);
-		
-		/*
-		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findChildren($categoryId, false, array(
-			'CatalogItemCategory.active' => 1
-		));
-		*/
-		
-		$this->paginate = $this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId);
-		$catalogItems = $this->paginate();
-		$this->set(compact('catalogItems', 'catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
+		$catalogItems = $this->paginate('CatalogItem');
+		$this->set(compact('catalogItems', 'layoutDefault', 'layouts', 'perPages'));
 	}
 	
 	function view ($id = null) {
@@ -102,16 +94,16 @@ class CatalogItemsController extends ShopAppController {
 		$this->set(compact('catalogItem', 'catalogItemOptions', 'catalogItemChildOptions', 'catalogItemCategories'));
 	}
 	
-	function admin_index() {
-		$this->CatalogItem->updateAllStock();
-		
-		$this->paginate = array('conditions' => array('CatalogItem.active' => 1));
+	function admin_index($categoryId = null) {
+		//$this->CatalogItem->updateAllStock();
+		$this->paginate = $this->_findOptions(array('conditions' => array('CatalogItem.active' => 1)), $categoryId);
+
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
 	
-	function admin_inactive() {
-		$this->paginate = array('conditions' => array('CatalogItem.active' => 0));
+	function admin_inactive($categoryId = null) {
+		$this->paginate = $this->_findOptions(array('conditions' => array('CatalogItem.active' => 0)), $categoryId);
 		$catalogItems = $this->paginate();
 		$this->set(compact('catalogItems'));
 	}
@@ -178,6 +170,7 @@ class CatalogItemsController extends ShopAppController {
 					'CatalogItemPackageChild' => array(
 						'link' => array(
 							'Shop.CatalogItemChild' => array(
+								'class' => 'Shop.CatalogItem',
 								'conditions' => 'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
 							)
 						)
@@ -282,6 +275,214 @@ class CatalogItemsController extends ShopAppController {
 		}
 		$this->set(compact('totals', 'totalsOptions', 'catalogItems', 'products', 'monthShift'));
 	}
+	
+	function admin_copy() {
+		$PDO = new PDO('mysql:host=65.60.39.82;db=webdb;charset=utf8;', 'souper_remote', '1Fv5y4cc');
+		$PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+		$srcDb = 'souper_bowl'; //'webdb';
+		$dstDb = 'souper_bowl_shop'; //'shop';
+		$srcDb = 'webdb';
+		$dstDb = 'shop';
+
+		
+		$tables = array(
+			'product_categories' => 'catalog_item_categories',
+			'product_categories_products' => array(
+				'table' => 'catalog_item_categories_catalog_items',
+				'fields' => array(
+					'product_id' => 'catalog_item_id',
+					'product_category_id' => 'catalog_item_category_id',
+				)
+			),
+			//'catalog_item_category_links',
+			'product_images' => array(
+				'table' => 'catalog_item_images',
+				'fields' => array('product_id' => 'catalog_item_id'),
+			),
+			'product_options' => array(
+				'table' => 'catalog_item_options',
+				'fields' => array('product_id' => 'catalog_item_id'),
+			),
+			'product_packages' => array(
+				'table' => 'catalog_item_packages',
+				'fields' => array('product_parent_id' => 'catalog_item_parent_id', 'product_child_id' => 'catalog_item_child_id'),
+			),
+			'product_option_choices' => array('fields' => array('product_option_id' => 'catalog_item_option_id')),
+			'products' => 'catalog_items',
+
+			'product_handlings' => 'handling_methods',
+			'invoices',
+			'invoice_payment_methods',
+			'shop_orders' => array(
+				'table' => 'orders',
+				'fields' => array(
+					'shop_order_product_count' => false,
+					//'shop_order_shipping_id'//
+					'shop_order_shipping_method_id' => 'shipping_method_id',
+					'cancelled' => 'canceled',
+					
+				)
+			),
+			'product_handlings_shop_orders' => array(
+				'table' => 'orders_handling_methods',
+				'fields' => array(
+					'product_handling_id' => 'handling_method_id',
+					'shop_order_id' => 'order_id',
+				),
+			),
+			'product_promos_shop_orders' => array(
+				'table' => 'orders_promo_codes',
+				'fields' => array(
+					'product_promo_id' => 'promo_code_id',
+					'shop_order_id' => 'order_id',
+				),
+			),
+			'shop_order_products' => array(
+				'table' => 'order_products',
+				'fields' => array(
+					'shop_order_id' => 'order_id',	//TODO: Update this?
+					'product_id' => 'catalog_item_id',
+					'product_option_choice_id_1' => false,
+					'product_option_choice_id_2' => false,
+					'product_option_choice_id_3' => false,
+					'product_option_choice_id_4' => false,
+				),
+			),
+			'product_shipping_rules_shop_order_products' => array(
+				'table' => 'order_products_shipping_rules',
+				'fields' => array(
+					'product_shipping_rule_id' => 'shipping_rule_id',
+					'shop_order_product_id' => 'order_product_id',
+				)
+			),
+			'paypal_payments',
+			//'products',
+			//'product_inventories',
+			'product_inventory_adjustments' => array('fields' => array('product_inventory_id' => 'product_id')),
+			'product_promos' => 'promo_codes',
+			'shop_order_shipping_classes' => 'shipping_classes',
+			'shop_order_shipping_methods' => 'shipping_methods',
+			'product_shipping_rules' => array(
+				'table' => 'shipping_rules',
+				'fields' => array(
+					'product_id' => 'catalog_item_id',
+					'shop_order_class_id' => 'order_class_id',
+				)
+			),
+		);
+		$log = array();
+		$queries = array();
+		foreach ($tables as $srcTable => $config) {
+			if (is_numeric($srcTable)) {
+				$srcTable = $config;
+				$config = array();
+			}
+			if (!is_array($config)) {
+				$config = array('table' => $config);
+			}
+			$config = array_merge(array(
+				'table' => $srcTable,
+				'fields' => array(),
+			), $config);
+			
+			extract($config);
+			
+			$dst = "`$dstDb`.`$table`";
+			$src = "`$srcDb`.`$srcTable`";
+			$showQuery = "SHOW COLUMNS FROM $src";
+			if (!($M = $PDO->query($showQuery))) {
+				$log[] = "Source table $src not found";
+				continue;
+			}
+			$srcFields = $dstFields = array();
+			while($row = $M->fetch()) {
+				$field = $row['Field'];
+				if (isset($fields[$field]) && $fields[$field] === false) {
+					continue;
+				}
+				$srcFields[] = $field;
+				$dstFields[] = !empty($fields[$field]) ? $fields[$field] : $field;
+			}
+			$dstFields = '`' . implode('`, `', $dstFields) . '`';
+			$srcFields = '`' . implode('`, `', $srcFields) . '`';
+			try {
+				$PDO->query("SELECT $srcFields FROM $src LIMIT 1");
+			} catch (PDOException $e) {
+				$log[] = "Source table $src not found";
+				$log[] = $e->getMessage();
+				continue;
+			}
+			try {
+				$PDO->query("SELECT $dstFields FROM $dst LIMIT 1");
+			} catch (PDOException $e) {
+				$log[] = "Destination table $dst not found";
+				$log[] = $e->getMessage();
+				continue;
+			}
+			
+			$q = "REPLACE INTO $dst ($dstFields) SELECT $srcFields FROM $src";
+			$queries[$table] = $q;
+		}
+		debug(compact('queries'));
+		foreach ($queries as $table => $q) {
+			try {
+				$PDO->query($q);
+				if ($table == 'catalog_items') {
+					$catalogItems = $this->CatalogItem->find('list');
+					foreach ($catalogItems as $id => $title) {
+						$this->CatalogItem->createProducts($id);
+					}
+				}
+			} catch (PDOException $e) {
+				$log[] = $e->getMessage();
+				break;
+			}
+		}
+		// Adjust Product IDs
+		$PDO->query("UPDATE $dstDb.order_products AS OrderProduct
+			JOIN $srcDb.shop_order_products AS ShopOrderProduct ON ShopOrderProduct.id = OrderProduct.id
+			JOIN $dstDb.products AS Product ON Product.catalog_item_id = ShopOrderProduct.product_id AND ((
+					(Product.product_option_choice_id_1 = ShopOrderProduct.product_option_choice_id_1) OR
+					(Product.product_option_choice_id_1 IS NULL AND ShopOrderProduct.product_option_choice_id_1 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_2 = ShopOrderProduct.product_option_choice_id_2) OR
+					(Product.product_option_choice_id_2 IS NULL AND ShopOrderProduct.product_option_choice_id_2 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_3 = ShopOrderProduct.product_option_choice_id_3) OR
+					(Product.product_option_choice_id_3 IS NULL AND ShopOrderProduct.product_option_choice_id_3 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_4 = ShopOrderProduct.product_option_choice_id_4) OR
+					(Product.product_option_choice_id_4 IS NULL AND ShopOrderProduct.product_option_choice_id_4 IS NULL)
+				)
+			)
+			SET OrderProduct.product_id = Product.id");
+
+		$PDO->query("UPDATE $dstDb.product_inventory_adjustments AS InventoryAdjustment
+			JOIN $srcDb.product_inventory_adjustments AS OldInventoryAdjustment ON InventoryAdjustment.id = OldInventoryAdjustment.id
+			JOIN $srcDb.product_inventories AS ProductInventory ON ProductInventory.id = OldInventoryAdjustment.product_inventory_id
+			JOIN $dstDb.products AS Product ON Product.catalog_item_id = ProductInventory.product_id AND ((
+					(Product.product_option_choice_id_1 = ProductInventory.product_option_choice_id_1) OR
+					(Product.product_option_choice_id_1 IS NULL AND ProductInventory.product_option_choice_id_1 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_2 = ProductInventory.product_option_choice_id_2) OR
+					(Product.product_option_choice_id_2 IS NULL AND ProductInventory.product_option_choice_id_2 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_3 = ProductInventory.product_option_choice_id_3) OR
+					(Product.product_option_choice_id_3 IS NULL AND ProductInventory.product_option_choice_id_3 IS NULL)
+				) AND (
+					(Product.product_option_choice_id_4 = ProductInventory.product_option_choice_id_4) OR
+					(Product.product_option_choice_id_4 IS NULL AND ProductInventory.product_option_choice_id_4 IS NULL)
+				)
+			)
+			SET InventoryAdjustment.product_id = Product.id, InventoryAdjustment.title = Product.title");
+		$products = $this->CatalogItem->Product->find('list');
+		foreach ($products as $productId => $productTitle) {
+			$this->CatalogItem->Product->updateStock($productId);
+		}
+		debug(compact('log'));
+		exit();
+	}
 	/*
 	function ajax_product_option_select($id = null, $key = null) {
 		$productOptions = $this->Product->ProductOption->find('all', array(
@@ -299,8 +500,9 @@ class CatalogItemsController extends ShopAppController {
 	function _setFormElements() {
 		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
 		$packageChildren = array('' => ' -- Package Content -- ') + $this->CatalogItem->find('list', array(
-			'link' => array('Shop.CatalogItemPackageParent' => array(
-				'table' => 'catalog_item_packages',
+			'link' => array(
+				'Shop.CatalogItemPackageParent' => array(
+				'class' => 'Shop.CatalogItemPackage',
 				'conditions' => array(
 					'CatalogItemPackageParent.catalog_item_parent_id = CatalogItem.id',
 				)
@@ -310,4 +512,46 @@ class CatalogItemsController extends ShopAppController {
 		));
 		$this->set(compact('packageChildren'));
 	}
+
+	function _getCategoryId($categoryId, $rootCategoryId) {
+		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $rootCategoryId);
+		if (!$categoryId) {
+			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
+		}
+		return $categoryId;			
+	}
+
+	function _findOptions($options = array(), $categoryId = null) {
+		$options = array();
+		if ($categoryId = $this->_findCatalogItemCategoryId($categoryId)) {
+			$options = array_merge($this->CatalogItem->CatalogItemCategory->findCatalogItemsOptions($categoryId), $options);
+		}
+		return $options;
+	}
+	
+	function _findCatalogItemCategoryId($categoryId = null) {
+		$rootCategoryId = 1;
+		if (empty($categoryId) && !empty($this->request->params['named']['category'])) {
+			$categoryId = $this->request->params['named']['category'];
+		}
+		//Filters Category
+		$categoryId = $this->_getCategoryId($categoryId, $rootCategoryId);
+		
+		//Loads Category
+		$catalogItemCategory = $this->CatalogItem->CatalogItemCategory->read(null, $categoryId);
+
+		//Category List
+		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findActiveCategories($categoryId);
+		
+		//Category Path
+		$catalogItemCategoryPath = $this->CatalogItem->CatalogItemCategory->getPath($categoryId, $rootCategoryId);
+		
+		/*
+		$catalogItemCategories = $this->CatalogItem->CatalogItemCategory->findChildren($categoryId, false, array(
+			'CatalogItemCategory.active' => 1
+		));
+		*/
+		$this->set(compact('catalogItemCategory', 'catalogItemCategories', 'catalogItemCategoryPath'));
+		return $categoryId;
+	}	
 }
