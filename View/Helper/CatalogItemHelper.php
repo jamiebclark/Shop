@@ -10,22 +10,18 @@ class CatalogItemHelper extends ModelViewHelper {
 	
 	var $thumbDir = 'catalog_item_images/';
 	
-	/*
-	function media($catalogItem, $options = array()) {
+	function media($result, $options = array()) {
+		$catalogItem = $this->_getResult($result);
 		$options = array_merge(array(
-			'url' => $this->url($catalogItem),
-			'dir' => 'thumb',
+			'titleTag' => 'h3',
 		), $options);
-		$thumbOptions = $this->addClass($options, 'media-object');
-		$thumb = $this->Html->div('pull-left', $this->thumb($catalogItem, $thumbOptions));
-		$title = $catalogItem['title'];
-		if (!empty($options['url'])) {
-			$title = $this->Html->link($title, $options['url']);
+		
+		if (!empty($options['price'])) {
+			$options['right'] = $this->price($catalogItem);
+			unset($options['price']);
 		}
-		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
-		return $this->Html->div('catalog-item media', $thumb . $this->Html->div('media-body', $body));
+		return parent::media($result, $options);
 	}
-	*/
 	
 	/*
 	function thumb($catalogItem, $options = array()) {
