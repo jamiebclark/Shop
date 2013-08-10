@@ -16,6 +16,8 @@ class ShopSchema extends CakeSchema {
 		'lft' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'rght' => array('type' => 'integer', 'null' => false, 'default' => null),
 		'title' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'catalog_item_count' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 4),
+		'active_catalog_item_count' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 4),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'parent_id' => array('column' => 'parent_id', 'unique' => 0)
