@@ -1,11 +1,16 @@
 <?php echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id']); ?>
 <div class="row">
 <div class="span8">
+<h4><?php echo $catalogItem['CatalogItem']['title']; ?></h4>
+<h5>Short Description</h5>
 <?php
+echo $this->DisplayText->text($catalogItem['CatalogItem']['short_description'], array('class' => 'well'));
+?>
+<h5>Description</h5>
+<?php
+echo $this->DisplayText->text($catalogItem['CatalogItem']['description'], array('class' => 'well'));
+
 echo $this->Layout->infoResultTable($catalogItem['CatalogItem'], array(
-		'title',
-		'short_description',
-		'description',
 		'price' => array('format' => 'cash'),
 		'sale' => array('format' => 'cash', 'notEmpty', 'class' => 'sale'),
 		'stock' => array(

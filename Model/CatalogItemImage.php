@@ -1,4 +1,5 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItemImage extends ShopAppModel {
 	var $name = 'CatalogItemImage';
 	var $actsAs = array(

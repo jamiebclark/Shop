@@ -1,8 +1,17 @@
 <?php
 echo $this->element('catalog_item_categories/path');
-echo $this->Layout->defaultHeader($catalogItemCategory['CatalogItemCategory']['id']);
+if (!empty($catalogItemCategory['CatalogItemCategory']['parent_id'])) {
+	echo $this->Html->tag('h5', $this->Html->link(
+		'Up one level', 
+		array('action' => 'view', $catalogItemCategory['CatalogItemCategory']['parent_id'])
+	));
+}
+
+echo $this->Layout->defaultHeader($catalogItemCategory['CatalogItemCategory']['id'], array(), array(
+	'title' => $catalogItemCategory['CatalogItemCategory']['title'],
+));
 ?>
-<h2>Child Categories</h2>
+<h3>Child Categories</h3>
 <div class="well">
 	<ul>
 	<?php foreach ($children as $child): ?>
@@ -13,7 +22,7 @@ echo $this->Layout->defaultHeader($catalogItemCategory['CatalogItemCategory']['i
 	</ul>
 </div>
 
-<h2>Catalog Items in Category</h2>
+<h3>Catalog Items in Category</h3>
 <div class="well">
 	<?php 
 	foreach ($catalogItems as $k => $catalogItem):

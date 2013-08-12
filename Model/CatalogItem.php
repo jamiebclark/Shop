@@ -39,7 +39,8 @@ class CatalogItem extends ShopAppModel {
 			'foreignKey' => 'catalog_item_parent_id',
 		),
 	);
-	var $hasAndBelongsToMany = array('Shop.CatalogItemCategory');
+	var $hasAndBelongsToMany = array(
+		'Shop.CatalogItemCategory');
 	
 	var $validate = array(
 		'title' => array(

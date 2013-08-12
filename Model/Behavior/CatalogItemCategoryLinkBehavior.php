@@ -32,7 +32,7 @@ class CatalogItemCategoryLinkBehavior extends ModelBehavior {
 					'dependent' => true,
 				)
 			)
-		), true);
+		), false);
 		$this->CatalogItemCategoryLink->bindModel(array(
 			'belongsTo' => array(
 				$Model->alias => array(
@@ -40,20 +40,24 @@ class CatalogItemCategoryLinkBehavior extends ModelBehavior {
 					'conditions' => array('CatalogItemCategoryLink.model' => $Model->alias),
 				)
 			)
-		), true);
+		), false);
 	}
 	
 	public function afterSave(Model $Model, $created) {
-		$this->updateCatalogItemCategoryLink($Model, $this->id);
+		$this->updateCatalogItemCategoryLink($Model, $Model->id);
 		return parent::afterSave($Model, $created);
 	}
 	
 	public function updateCatalogItemCategoryLink(Model $Model, $id) {
-		$result = $Model->find('first', array(
-			'link' => array('Shop.CatalogItemCategoryLink' => array('Shop.CatalogItemCategory')),
-			'conditions' => array($Model->escapeField($Model->primaryKey) => $id),
-		));
-		$linkId = !empty($result['CatalogItemCategoryLink']) ? $result['CatalogItemCategoryLink']['id'] : null;
+		$parentCategoryId = $this->settings[$Model->alias]['catalog_item_category_id'];
+		$result = $Model->read(null, $id);
+		$link = $this->CatalogItemCategoryLink->findByModelId($Model->alias, $id);
+		$linkId = $categoryId = null;
+		if (!empty($link['CatalogItemCategoryLink'])) {
+			$link = $link['CatalogItemCategoryLink'];
+			$linkId = $link['id'];
+			$categoryId = $link['catalog_item_category_id'];
+		}
 		return $this->CatalogItemCategoryLink->saveAll(array(
 			'CatalogItemCategoryLink' => array(
 				'id' => $linkId,
@@ -61,7 +65,8 @@ class CatalogItemCategoryLinkBehavior extends ModelBehavior {
 				'model_id' => $id,
 			),
 			'CatalogItemCategory' => array(
-				'id' => $this->settings[$Model->alias]['catalog_item_category_id'],
+				'id' => $categoryId,
+				'parent_id' => $parentCategoryId,
 				'title' => $Model->getCatalogItemCategoryLinkTitle($result),
 			),
 		));

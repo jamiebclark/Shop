@@ -1,6 +1,7 @@
 <?php
 class CatalogItemImagesController extends ShopAppController {
 	var $name = 'CatalogItemImages';
+	var $components = array('Layout.Table');
 	var $helpers = array('Shop.CatalogItem');
 
 	function index($catalogItemId = null) {

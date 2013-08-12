@@ -5,11 +5,11 @@ echo $this->Form->create('CatalogItemCategory');
 echo $this->Form->inputs(array(
 	'legend' => 'Category',
 	'id',
-	'parent_id',
+	'parent_id' => array('class' => 'select-collapse'),
 	'title',
 	'CatalogItem.CatalogItem' => array(
 		'multiple' => 'checkbox',
 		'options' => $catalogItems,
 	)
 ));
-echo $this->Form->end($add ? 'Add New Category' : 'Update Category');
+echo $this->FormLayout->end($add ? 'Add New Category' : 'Update Category');

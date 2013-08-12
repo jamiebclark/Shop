@@ -1,4 +1,5 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItemCategory extends ShopAppModel {
 	var $name = 'CatalogItemCategory';
 	var $actsAs = array(

@@ -9,4 +9,14 @@ class CatalogItemCategoryLink extends ShopAppModel {
 		$this->CatalogItemCategory->delete($result[$this->alias]['catalog_item_category_id']);
 		return parent::beforeDelete();
 	}
+	
+	function findByModelId($model, $modelId) {
+		return $this->find('first', array(
+			'recursive' => -1,
+			'conditions' => array(
+				$this->escapeField('model') => $model,
+				$this->escapeField('model_id') => $modelId,
+			)
+		));
+	}
 }

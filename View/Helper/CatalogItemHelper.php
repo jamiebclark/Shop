@@ -26,6 +26,9 @@ class CatalogItemHelper extends ModelViewHelper {
 			'right' => $this->price($result),
 			'dir' => 'thumb',
 		), $options);
+		if (empty($result['active'])) {
+			$options = $this->addClass($options, 'inactive');
+		}
 		if (!empty($result['short_description'])) {
 			$options['after'] = $this->DisplayText->text($result['short_description'], array('tag' => 'p'));
 		}

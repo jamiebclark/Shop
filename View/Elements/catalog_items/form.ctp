@@ -11,7 +11,7 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 			'id',
 			'title' => array('class' => 'input-block-level'),
 			'short_description' => array('class' => 'input-block-level'),
-			'description' => array('escape' => false, 'class' => 'input-block-level'),
+			'description' => array('escape' => false, 'class' => 'input-block-level', 'rows' => 10),
 		));
 		?>
 		<div class="form-horizontal"><?php

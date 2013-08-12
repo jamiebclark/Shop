@@ -2,7 +2,8 @@
 echo $this->Layout->defaultHeader();
 $this->Table->reset();
 foreach ($catalogItemImages as $catalogItemImage) {
-	$url = array('action' => 'view', $catalogItemImage['CatalogItemImage']['id']);
+	$url = $this->ModelView->url($catalogItemImage['CatalogItemImage']);
+	$this->Table->checkbox($catalogItemImage['CatalogItemImage']['id']);
 	$this->Table->cells(array(
 		array(
 			$this->CatalogItem->thumb($catalogItemImage['CatalogItem'], array(
@@ -22,4 +23,7 @@ foreach ($catalogItemImages as $catalogItemImage) {
 		)
 	), true);
 }
-echo $this->Table->output(array('paginate' => true));
+echo $this->Table->output(array(
+	'paginate' => true,
+	'withChecked' => array('delete')
+));
