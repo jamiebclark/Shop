@@ -4,7 +4,7 @@ echo $this->Form->hidden('id');
 $span = 6;
 ?>
 <div class="row">
-	<div class="span7">
+	<div class="span4">
 		<h3>Customer Info</h3>
 		<?php
 		echo $this->FormLayout->inputRow(array('first_name', 'last_name'));
@@ -12,7 +12,7 @@ $span = 6;
 		echo $this->FormLayout->inputRow(array('email', 'phone'));
 		?>
 	</div>
-	<div class="span5">
+	<div class="span6">
 		<h3>Payment Info</h3>
 		<?php
 		echo $this->Form->input('amt', array(
@@ -39,15 +39,28 @@ $span = 6;
 </div>
 <?php echo $this->FormLayout->submitPrimary('Update'); ?>
 
-<fieldset><legend>Admin Settings</legend>
-	<p>How the Invoice is connected to other models in the database</p>
+<fieldset class="form-horizontal"><legend>Admin Settings</legend>
+	<p class="note">How the Invoice is connected to other models in the database</p>
 	<?php
-	echo $this->FormLayout->inputRow(array(
-		'model_id' => array('type' => 'id', 'label' => 'Model ID'),
-		'model',
-		'model_title',
+	echo $this->FormLayout->inputs(array(
+		'model' => array(
+			'label' => 'Model Name',
+			'helpInline' => 'The name of the model linked to the Invoice',
+		),
+		'model_id' => array(
+			'type' => 'id', 
+			'label' => 'Model ID',
+			'helpInline' => 'The ID number linking the Invoice to the model in the system',
+		),
+		'model_title' => array(
+			'label' => 'Model Display',
+			'helpInline' => 'How the model will be displayed when it\'s displayed in the Invoice',
+		),
+		'user_id' => array(
+			'type' => 'id', 
+			'label' => 'User ID',
+			'helpInline' => 'The User ID of the person who created the Invoice',
+		)
 	));
-	echo $this->FormLayout->input('user_id', array('type' => 'id', 'label' => 'User ID'));
-	?>
-</fieldset>
+?></fieldset>
 <?php echo $this->Form->end(); ?>
