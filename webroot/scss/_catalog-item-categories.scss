@@ -13,4 +13,9 @@
 	.catalogitemcategory {
 		margin-bottom: $baseLineHeight / 2;
 	}
+	li em {
+		font-size: $fontSizeSmall;
+		color: $textColorLighter;
+		font-style: normal;
+	}
 }

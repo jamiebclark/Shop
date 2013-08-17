@@ -15,7 +15,7 @@ foreach ($catalogItems as $catalogItem) {
 		), 
 		array($this->CatalogItem->inventory($catalogItem['CatalogItem']), 'Stock'),
 		array($this->Layout->boolOutput($active), 'Active', 'active'),		
-		array($this->CatalogItem->actionMenu(array('view', 'edit', 'active', 'delete'), compact('url', 'active')), 'Actions')
+		array($this->CatalogItem->actionMenu(array('view', 'edit', 'active', 'delete'), $catalogItem['CatalogItem']), 'Actions')
 	), array('class' => $active ? null : 'inactive'));
 }
 echo $this->Table->output(array(

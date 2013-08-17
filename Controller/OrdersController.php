@@ -34,6 +34,9 @@ class OrdersController extends ShopAppController {
 	}
 	*/	
 	function view($id = null) {
+		if (empty($id)) {
+			$id = $this->ShoppingCart->getCartId();
+		}
 		$this->request->data = $this->FormData->findModel($id);
 	}
 	

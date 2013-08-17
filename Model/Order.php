@@ -6,7 +6,7 @@ class Order extends ShopAppModel {
 	var $displayField = 'title';
 	var $actsAs = array(
 		'Layout.DateValidate',
-		'Location.Mappable',
+		'Location.Mappable' => array('validate' => true),
 		'Shop.InvoiceSync' => array(
 			'title' => 'Store Order',
 			'fields' => array(
@@ -35,9 +35,7 @@ class Order extends ShopAppModel {
 	);
 	var $belongsTo = array(
 		'Shop.Invoice', 
-		'ShippingMethod' => array(
-			'className' => 'Shop.ShippingMethod',
-		),
+		'ShippingMethod' => array('className' => 'Shop.ShippingMethod'),
 	);
 	var $hasAndBelongsToMany = array(
 		'Shop.PromoCode', 

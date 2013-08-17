@@ -105,18 +105,13 @@ echo $this->Table->output();
 				$catalogItem['CatalogItem']['id']
 			))
 		);
-		$this->Table->reset();
-		foreach ($catalogItem['CatalogItemImage'] as $catalogItemImage) {
-			$url = array('controller' => 'catalog_item_images', 'action' => 'view', $catalogItemImage['id']);
-			$this->Table->cells(array(
-				array($this->CatalogItem->thumb(
-					$catalogItemImage, 
-					array('dir' => 'thumb', 'url' => $url)
-				)), 
-				array($this->CatalogItem->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url'))),
-			), true);
-		}
-		echo $this->Table->output(array('class' => 'orderCatalogItemsForm'));
+		echo $this->CatalogItemImage->mediaList($catalogItem['CatalogItemImage'], array(
+			'dir' => 'thumb',
+			'size' => 'smaller',
+			'title' => false,
+			'link' => true,
+			'actionMenu' => array('edit', 'delete', 'move_up', 'move_down'),
+		));
 	?>
 	</div>
 </div>

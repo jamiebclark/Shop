@@ -3,7 +3,6 @@
  * Behavior that automatcially syncs fields between model and the Invoice model
  *
  **/
-
 App::uses('InflectorPlus', 'Shop.Lib');
 class InvoiceSyncBehavior extends ModelBehavior {
 	var $settings = array();
@@ -20,7 +19,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param Model $Model Model using the behavior
  * @param array $settings Settings to override for model.
  * @return void
- */
+ **/
 	function setup(Model &$Model, $settings = array()) {
 		$default = array(
 			'title' => InflectorPlus::humanize($Model->alias),
@@ -38,7 +37,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		);
 		
 		$Invoice = ClassRegistry::init('Shop.Invoice');
-		$Invoice->bindModel(array('hasOne' => array($this->getModelName($Model))), false);
+		$Invoice->bindModel(array('hasOne' => array($Model->alias => array('className' => $this->getModelName($Model)))), false);
 		if (empty($Invoice->syncedModels)) {
 			$Invoice->syncedModels = array();
 		}
@@ -128,7 +127,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 	private function getModelName(Model $Model) {
 		$alias = $Model->alias;
 		if (!empty($Model->plugin)) {
-			$alias = "{$Model->plugin}.$model";
+			$alias = "{$Model->plugin}.$alias";
 		}
 		return $alias;
 	}

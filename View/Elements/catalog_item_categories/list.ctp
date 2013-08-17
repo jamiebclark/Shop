@@ -1,14 +1,15 @@
-<div class="catalogitem-category-list">
+<div class="catalogitemcategory-list scrollfix">
 <?php
 if (!empty($catalogItemCategory)) {
 	$title = '';
 	if (!empty($catalogItemCategory['CatalogItemCategory']['parent_id'])) {
-		echo $this->Html->tag('h5', $this->Html->link(
-			$this->Html->image('icn/16x16/folder_up.png') . ' Up',
+		$title = $this->Iconic->icon('arrow_up');
+		$title .= " {$catalogItemCategory['CatalogItemCategory']['title']}";
+		$title = $this->Html->link(
+			$title, 
 			array('category' => $catalogItemCategory['CatalogItemCategory']['parent_id']),
 			array('escape' => false)
-		));
-		$title = $catalogItemCategory['CatalogItemCategory']['title'];
+		);
 	} else {
 		$title = 'Categories';
 	}
@@ -21,7 +22,7 @@ if (!empty($catalogItemCategories)) {
 		$id = $catalogItemCategory['id'];
 		$title = $catalogItemCategory['title'];
 		$count = number_format($catalogItemCategory['active_catalog_item_count']);
-		$title .= " ($count)";
+		$title .= " <em>($count)</em>";
 		$list[] = array($title, array('action' => 'index', $id));
 	}
 	echo $this->Layout->nav($list, array('class' => 'nav-catalogitemcategories nav-pills nav-stacked'));

@@ -7,6 +7,9 @@ $default = array(
 	'small' => false,
 	'condensed' => false,
 	'delete' => null,
+	'title' => false,
+	'titleTag' => 'h2',
+	'titleUrl' => true,
 );
 extract(array_merge($default, compact(array_keys($default))));
 
@@ -31,6 +34,18 @@ if ($form) {
 ?>
 <div class="<?php echo $wrapClass;?>">
 <?php
+if ($title) {
+	if ($titleUrl) {
+		if ($titleUrl === true) {
+			$titleUrl = array('controller' => 'orders', 'action' => 'view', $order['Order']['id']);
+		}
+		$title = $this->Html->link($title, $titleUrl);
+	}
+	if (!empty($titleTag)) {
+		echo $this->Html->tag($titleTag, $title);
+	}
+}
+
 if ($form) {
 	echo $this->Form->create('Order', array('action' => 'edit'));
 	echo $this->Form->hidden('id', array('value' => $order['Order']['id']));
@@ -222,7 +237,7 @@ if ($form && !$emptyCart):	?>
 	<?php
 	echo $this->FormLayout->buttons(array(
 		'Checkout' => array(
-			'class' => 'btn btn-primary pull-right',
+			'class' => 'btn btn-large btn-primary pull-right',
 			'name' => 'checkout',
 		),
 		'Continue Shopping' => array(

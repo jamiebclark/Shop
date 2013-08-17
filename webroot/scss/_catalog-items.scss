@@ -1,0 +1,13 @@
+.form-catalogitem-layout {
+	margin: 10px 0;
+	label, select, input, button {
+		height: $baseLineHeight;
+		line-height: $baseLineHeight;
+		font-size: $fontSizeSmall;
+		padding: 0;
+		margin-left: 5px;
+	}
+	input, button {
+		padding: 0 5px;
+	}
+}

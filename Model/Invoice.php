@@ -3,14 +3,10 @@ App::uses('InvoiceEmail', 'Shop.Network\Email');
 class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
-		'Location.Mappable', 
+		'Location.Mappable' => array('validate' => true), 
 		'Shop.ChangedFields'
 	);
-
-	var $virtualFields = array(
-		'title' => 'CONCAT("Invoice #", $ALIAS.id)',
-	);
-	
+	var $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
 	var $order = '$ALIAS.created DESC';
 	
 	var $hasOne = array(
@@ -71,7 +67,7 @@ class Invoice extends ShopAppModel {
 	function beforeFind($queryData) {
 		$queryData['fields'] = array_merge(array('*'), (array) $queryData['fields']);
 		foreach ($this->hasOne as $alias) {
-			$queryData['link'][] = $alias;
+			$queryData['link'][] = $alias['className'];
 		}
 		return parent::beforeFind($queryData);
 	}

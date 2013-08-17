@@ -1,59 +1,53 @@
-<h1>Shipping</h1>
 <?php  echo $this->Form->create('Order'); ?>
 <div class="row">
-	<div class="span7">
-	<?php  
-		$span = 6;
-		echo $this->Form->inputs(array(
-			'id' => array('type' => 'hidden'),
-			'Invoice.id' => array('type' => 'hidden'),
-			'fieldset' => false,
-		));
+	<div class="span6">
+		<h2>Shipping</h2><?php  
+		echo $this->Form->hidden('id');
+		echo $this->Form->hidden('Invoice.id');
+
 		echo $this->FormLayout->inputRow(array('first_name', 'last_name'));
-		echo $this->AddressBookForm->inputAddress('Order', array('placeholder' => true));
-		
+		echo $this->AddressBookForm->inputAddress('Order');
+
+		echo $this->Layout->toggle('', $this->AddressBookForm->inputAddress('Invoice', array(
+				'before' => '<h4>Billing Information</h4>' . $this->FormLayout->inputRow(array('Invoice.first_name', 'Invoice.last_name'))
+			)),
+			'Billing information is same as Shipping', 
+			array('name' => 'same_billing')
+		);
 		echo $this->FormLayout->inputRows(array(
 			array(
 				'email' => array(
+					'type' => 'email',
 					'helpBlock' => 'We can keep you up to date on when your order has shipped',
 					'placeholder' => 'yourname@email.com',
 				),
 			),
 			array(
 				'phone' => array(
+					'type' => 'phone',
 					'helpBlock' => 'We need a phone number to add your order to Fed-Ex',
 					'placeholder' => '(xxx) xxx-xxxx',
 				),
 			)
 		));
-	?>
-		<fieldset>
-			<legend>Billing Information</legend>
-		<?php
-		echo $this->Layout->toggle('', $this->AddressBookForm->inputAddress('Invoice', array(
-				'placeholder' => true,
-				'before' => $this->FormLayout->inputRow(array('Invoice.first_name', 'Invoice.last_name'))
-			)),
-			'Billing information is same as Shipping', 
-			array('name' => 'same_billing')
-		);
-		?>
-		</fieldset>
-	</div>
-	<div class="span5">
-	<?php
-	echo $this->element('orders/cart', array(
-		'condensed' => true,
-		'form' => false,
-		'links' => false,
-		'images' => false,
-	));
-	?>
-	</div>
+	?></div>
+	<div class="span6"><?php
+		echo $this->element('orders/cart', array(
+			'condensed' => true,
+			'form' => false,
+			'links' => false,
+			'images' => false,
+			'title' => 'Cart Contents',
+			'titleUrl' => true,
+			'titleTag' => 'h3',
+		));
+	?></div>
 </div>
 <?php
 echo $this->FormLayout->buttons(array(
-	'Complete Order' => array('class' => 'btn-primary'),
+	'Complete Order' => array(
+		'class' => 'btn-primary btn-large pull-right'
+	),
 	'Edit Cart' => array(
 		'url' => array('action' => 'view', $order['Order']['id']),
 		'class' => 'prev',

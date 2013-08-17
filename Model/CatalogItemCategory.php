@@ -110,31 +110,57 @@ class CatalogItemCategory extends ShopAppModel {
 	
 	function updateTotals() {
 		$alias = $this->alias;
-		$result = $this->find('all', array(
+		$active = array(
+			'CatalogItem.hidden = 0',
+			'CatalogItem.active = 1',
+			'CatalogItem.stock > 0',
+		);
+		
+		$options = array(
 			'recursive' => -1,
 			'fields' => array(
 				$this->escapeField('id'),
-				'COUNT(CatalogItem.id) AS `catalog_item_count`',
-				'SUM(IF(CatalogItem.hidden = 0 AND CatalogItem.active = 1,1,0)) AS `active_catalog_item_count`',
+				'COUNT(DISTINCT(CatalogItem.id)) AS `catalog_item_count`',
+				'COUNT(DISTINCT(ActiveCatalogItem.id)) AS `active_catalog_item_count`',
 			), 
 			'joins' => array(
 				array(
 					'table' => 'catalog_item_categories',
 					'alias' => 'ChildCatalogItemCategory',
 					'conditions' => array("ChildCatalogItemCategory.lft BETWEEN $alias.lft AND $alias.rght"),
-				), array(
+				), 
+				
+				array(
 					'table' => 'catalog_item_categories_catalog_items',
 					'alias' => 'CatalogItemCategoriesCatalogItem',
+					'type' => 'LEFT',
 					'conditions' => array("CatalogItemCategoriesCatalogItem.catalog_item_category_id = ChildCatalogItemCategory.id"),
-				), array(
+				), 
+				array(
 					'table' => 'catalog_items',
 					'alias' => 'CatalogItem',
-					'conditions' => array(
-						'CatalogItem.id = CatalogItemCategoriesCatalogItem.catalog_item_id',
+					'type' => 'LEFT',
+					'conditions' => array('CatalogItem.id = CatalogItemCategoriesCatalogItem.catalog_item_id')
+				), 
+				
+				array(
+					'table' => 'catalog_item_categories_catalog_items',
+					'alias' => 'ActiveCatalogItemCategoriesCatalogItem',
+					'type' => 'LEFT',
+					'conditions' => array("ActiveCatalogItemCategoriesCatalogItem.catalog_item_category_id = ChildCatalogItemCategory.id"),
+				), 
+				array(
+					'table' => 'catalog_items',
+					'alias' => 'ActiveCatalogItem',
+					'type' => 'LEFT',
+					'conditions' => $this->CatalogItem->publicConditions(
+						array('ActiveCatalogItem.id = ActiveCatalogItemCategoriesCatalogItem.catalog_item_id'), 
+						'ActiveCatalogItem'
 					)
 				)
 			), 
-			'group' => $this->escapeField('id')));
+			'group' => $this->escapeField('id'));
+		$result = $this->find('all', $options);
 		$data = array();
 		foreach ($result as $row) {
 			$data[] = array('id' => $row[$this->alias]['id']) + $row[0];

@@ -3,9 +3,14 @@ class CatalogItemCategoriesController extends ShopAppController {
 	var $name = 'CatalogItemCategories';
 	var $helpers = array('Layout.CollapseList');
 	
-	function admin_index() {
+	function admin_index($catalogItemId = null) {
+		$defaultCatalogItemId = 1;
+		if (empty($catalogItemId)) {
+			$catalogItemId = $defaultCatalogItemId;
+		}
 		$catalogItemCategories = $this->CatalogItemCategory->find('threaded');
 		$this->set(compact('catalogItemCategories'));
+		$this->set('selected', $catalogItemId);
 	}
 	
 	function admin_view($id = null) {

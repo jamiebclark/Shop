@@ -3,7 +3,7 @@ if (!empty($info) || (!isset($blank) || $blank !== false)) {
 	if (empty($mode)) {
 		$mode = 'infoTable';
 	}
-	
+	$titleTag = 'h4';
 	if ($mode == 'definitionList') {
 		$output = $this->Layout->definitionList($info, array('class' => 'fullWidth'));
 	} else {
@@ -15,13 +15,15 @@ if (!empty($info) || (!isset($blank) || $blank !== false)) {
 	}
 	
 	if ($tag == 'fieldset') {
-		echo $this->Layout->fieldset($title, $output );
-	} else {
-		echo $this->Html->tag($tag);
-		if (!empty($title)) {
-			echo $this->Html->tag('h2', $title);
-		}
-		echo $output;
-		echo "</$tag>\n";
+		$titleTag = 'legend';
 	}
+	if (!empty($title)) {
+		if (!empty($url)) {
+			$title = $this->Html->link($title, $url);
+		}
+		$title = $this->Html->tag($titleTag, $title);
+	} else {
+		$title = '';
+	}
+	echo $this->Html->tag($tag, $title . $output);
 }

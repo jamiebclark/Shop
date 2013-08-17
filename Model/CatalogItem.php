@@ -84,6 +84,29 @@ class CatalogItem extends ShopAppModel {
 		return parent::afterSave($created);	
 	}
 	
+	function beforeFind($queryData) {
+		if (isset($queryData['public'])) {
+			$queryData['conditions'] = $this->publicConditions($queryData['conditions'], $this->alias);
+			unset($queryData['public']);
+		}
+		return parent::beforeFind($queryData);
+	}
+	
+	function publicConditions($conditions = array(), $alias = null) {
+		if (empty($alias)) {
+			$alias = $this->alias;
+		}
+		$conditions[]["$alias.active"] = 1;
+		$conditions[]["$alias.hidden"] = 0;
+		$conditions[] = array(
+			'OR' => array(
+				"$alias.stock >" => 0,
+				"$alias.unlimited" => 1,
+			)
+		);
+		return $conditions;
+	}
+	
 /**
  * Finds all images associated with CatalogItem and returns the first as the thumbnail
  *

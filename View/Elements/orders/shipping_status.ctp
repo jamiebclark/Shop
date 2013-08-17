@@ -18,4 +18,5 @@ if (empty($order['Order']['addline1'])) {
 		$info['Tracking'] = $this->Order->tracking($order);
 	}
 }
-echo $this->element('orders/status', compact('info', 'blank', 'title', 'mode', 'tag'));
+$url = array('controller' => 'orders', 'action' => 'shipping', $order['Order']['id']);
+echo $this->element('orders/status', compact('info', 'blank', 'title', 'mode', 'tag', 'url'));
