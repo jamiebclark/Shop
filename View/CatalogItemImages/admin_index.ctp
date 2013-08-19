@@ -18,7 +18,7 @@ foreach ($catalogItemImages as $catalogItemImage) {
 				), array('class' => 'secondary')),
 			'Catalog Item',
 		), array(
-			$this->ModelView->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), compact('url')),
+			$this->ModelView->actionMenu(array('view', 'edit', 'delete', 'move_up', 'move_down'), $catalogItemImage['CatalogItemImage']),
 			'Actions',
 		)
 	), true);
