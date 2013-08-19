@@ -32,7 +32,7 @@ foreach ($products as $product) {
 		), 
 		array($this->CatalogItem->inventory($qty, $unlimited), 'Quantity in Stock'), 
 		array($this->Calendar->niceShort($product['Product']['modified']), 'Last Updated'), 
-		array($this->Product->actionMenu(array('active', 'add', 'delete'), compact('url', 'active')), 'Actions')
+		array($this->Product->actionMenu(array('active', 'add', 'delete'), $product['Product']), 'Actions')
 	), array('class' => $rowClass));
 }
 echo $this->Table->output(array(

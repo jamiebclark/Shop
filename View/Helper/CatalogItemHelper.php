@@ -94,12 +94,13 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
 	}
 	
-	function url($CatalogItem) {
+	function url($result) {
+		$result = $this->_getResult($result);
 		return array(
 			'controller' => 'catalog_items', 
 			'action' => 'view', 
-			$CatalogItem['id'],
-			Inflector::slug($CatalogItem['title']),
+			$result['id'],
+			Inflector::slug($result['title']),
 			'plugin' => 'shop',
 		);
 	}
