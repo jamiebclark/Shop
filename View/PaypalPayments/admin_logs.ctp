@@ -6,6 +6,7 @@
 }
 </style>
 <h2>PayPal Payment Log</h2>
+<?php echo $this->Html->link('Test', array('action' => 'test')); ?>
 <h3><?php echo $logFile; ?></h3>
 <div class="row">
 	<div class="span9">

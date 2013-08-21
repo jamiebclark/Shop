@@ -1,5 +1,4 @@
 <?php
-App::uses('InvoiceEmail', 'Shop.Network/Email');
 
 class PaypalPaymentsController extends ShopAppController {
 	public $name = 'PaypalPayments';
@@ -17,6 +16,12 @@ class PaypalPaymentsController extends ShopAppController {
 			$this->_logDir = APP . 'Plugin/Shop/' . $this->_logDir;
 		}
 		return parent::beforeFilter($options);
+	}
+	
+	function admin_test($txnId = null) {
+		$post = array('txn_id' => $txnId);
+		$this->_savePost($post, true);
+		$this->redirect(array('action' => 'logs'));
 	}
 	
 	function admin_logs($logFile = null) {
@@ -84,42 +89,7 @@ class PaypalPaymentsController extends ShopAppController {
 				// check that receiver_email is your Primary PayPal email
 				// check that payment_amount/payment_currency are correct
 				// process payment
-					if($_POST['txn_id'] != '') {
-						//Checks for existing transaction
-						$paypalPayment = $this->PaypalPayment->findByTxnId($_POST['txn_id']);
-						
-						if (!empty($paypalPayment)) {
-							$this->_log('Updating existing payment ID: ' . $paypalPayment['PaypalPayment']['id']);
-							$_POST['id'] = $paypalPayment['PaypalPayment']['id'];
-						}
-							
-						if (!$this->PaypalPayment->save($_POST)) {
-							$this->_log('Error saving info');
-						} else {
-							$this->_log('Successfully saved Paypal IPN info');
-							
-							$this->_log('Finding Invoice ID: ' . $this->PaypalPayment->id);
-							$invoice = $this->PaypalPayment->Invoice->find('first', array(
-								'link' => array('Shop.PaypalPayment'),
-								'conditions' => array('PaypalPayment.id' => $this->PaypalPayment->id)
-							));
-							if (empty($invoice)) {
-								$this->_log('Could not load Invoice to send notification email');
-							} else {
-								$this->_log('Invoice Found. Sending Email');
-								$InvoiceEmail = new InvoiceEmail();
-								$this->_log('Created InvoiceEmail Object');
-								if ($InvoiceEmail->sendAdminPaid($invoice)) {
-									$this->_log('Sent notification email to admin');
-								} else {
-									$this->_log('Error sending notification email');
-								}
-								$this->_log('Finished Email');
-							}
-						}
-					} else {
-						$this->_log('TxnID was blank. Skipping.');
-					}
+					$this->_savePost($_POST);
 				} else if (strcmp ($res, "INVALID") == 0) {
 					// log for manual investigation
 					$this->_log('Invalid Socket Connection. Aborting.');
@@ -131,6 +101,57 @@ class PaypalPaymentsController extends ShopAppController {
 		$this->_logClose();
 		$this->layout = 'ajax';
 		exit();
+	}
+	
+	function _savePost($post = null, $test = false) {
+		$this->_log('Saving POST value');
+		if ($test) {
+			$this->_log('TESTING ONLY');
+		}
+		if($post['txn_id'] != '') {
+			//Checks for existing transaction
+			$this->_log('Tranaction ID: ' . $post['txn_id']);
+			$paypalPayment = $this->PaypalPayment->findByTxnId($post['txn_id']);
+			
+			if (!empty($paypalPayment)) {
+				$this->_log('Updating existing payment ID: ' . $paypalPayment['PaypalPayment']['id']);
+				$post['id'] = $paypalPayment['PaypalPayment']['id'];
+			}
+				
+			if (!$test && !$this->PaypalPayment->save($post)) {
+				$this->_log('Error saving info');
+			} else {
+				if ($test) {
+					$this->PaypalPayment->id = $post['id'];
+				}
+				
+				$this->_log('Successfully saved Paypal IPN info');
+				$this->_log('Finding Invoice ID: ' . $this->PaypalPayment->id);
+				
+				$invoice = $this->PaypalPayment->Invoice->find('first', array(
+					'link' => array('Shop.PaypalPayment'),
+					'conditions' => array('PaypalPayment.id' => $this->PaypalPayment->id)
+				));
+				if (empty($invoice)) {
+					$this->_log('Could not load Invoice to send notification email');
+				} else {
+					$this->_log('Invoice Found. Sending Email');
+					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
+					
+					App::uses('InvoiceEmail', 'Shop.Network/Email');
+					$InvoiceEmail = new InvoiceEmail();
+					$this->_log('Created InvoiceEmail Object');
+					if ($InvoiceEmail->sendAdminPaid($invoice)) {
+						$this->_log('Sent notification email to admin');
+					} else {
+						$this->_log('Error sending notification email');
+					}
+					$this->_log('Finished Email');
+				}
+			}
+		} else {
+			$this->_log('TxnID was blank. Skipping.');
+		}
 	}
 	
 	function admin_fix() {
