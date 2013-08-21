@@ -24,9 +24,15 @@ class PaypalPaymentsController extends ShopAppController {
 		}
 
 		// post back to PayPal system to validate
+		$header="POST /cgi-bin/webscr HTTP/1.1\r\n";
+		$header .="Content-Type: application/x-www-form-urlencoded\r\n";
+		$header .="Host: www.paypal.com\r\n";
+		$header .="Connection: close\r\n\r\n";
+		/** Old outdated 1.0 Header
 		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+		*/
 
 		$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		if (!$fp) {
@@ -55,20 +61,24 @@ class PaypalPaymentsController extends ShopAppController {
 							$this->_log('Error saving info');
 						} else {
 							$this->_log('Successfully saved Paypal IPN info');
+							
+							$this->_log('Finding Invoice ID: ' . $this->PaypalPayment->id);
 							$invoice = $this->PaypalPayment->Invoice->find('first', array(
 								'link' => array('Shop.PaypalPayment'),
-								'conditions' => array(
-									'PaypalPayment.id' => $this->PaypalPayment->id,
-								)
+								'conditions' => array('PaypalPayment.id' => $this->PaypalPayment->id)
 							));
 							if (empty($invoice)) {
 								$this->_log('Could not load Invoice to send notification email');
 							} else {
-								if (InvoiceEmail::sendAdminPaid($invoice)) {
+								$this->_log('Invoice Found. Sending Email');
+								$InvoiceEmail = new InvoiceEmail();
+								$this->_log('Created InvoiceEmail Object');
+								if (InvoiceEmail->sendAdminPaid($invoice)) {
 									$this->_log('Sent notification email to admin');
 								} else {
 									$this->_log('Error sending notification email');
 								}
+								$this->_log('Finished Email');
 							}
 						}
 					} else {
