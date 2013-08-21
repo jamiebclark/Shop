@@ -64,18 +64,20 @@ class ShopAppController extends AppController {
 		} else {
 			$shopSettingsEncrypt = $this->Session->read($sessionName);
 		}
-		if (empty($shopSettingsDecrypt)) {
+		if (empty($shopSettingsDecrypt) && !empty($shopSettingsEncrypt)) {
 			foreach ($shopSettingsEncrypt as $name => $value) {
 				$shopSettingsDecrypt[$name] = base64_decode($value);
 			}
 		}
-		if (empty($shopSettingsEncrypt)) {
+		if (empty($shopSettingsEncrypt) && !empty($shopSettingsDecrypt)) {
 			foreach ($shopSettingsDecrypt as $name => $value) {
 				$shopSettingsEncrypt[$name] = base64_encode($value);
 			}
 		}
-		foreach ($shopSettingsDecrypt as $name => $val) {
-			define($name, $val);
+		if (!empty($shopSettingsDecrypt)) {
+			foreach ($shopSettingsDecrypt as $name => $val) {
+				define($name, $val);
+			}
 		}
 		return $this->Session->write($sessionName, $shopSettingsEncrypt);
 	}
