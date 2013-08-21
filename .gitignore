@@ -8,4 +8,6 @@
 
 /webroot/logs/*
 !/webroot/logs/empty
+/webroot/logs/ipn/*
+!/webroot/logs/ipn/
 !/webroot/logs/ipn/empty
