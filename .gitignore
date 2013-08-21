@@ -5,3 +5,7 @@
 /webroot/img/catalog_item_images/*
 !/webroot/img/catalog_item_images/
 !/webroot/img/catalog_item_images/empty
+
+/webroot/logs/ipn/*
+!/webroot/logs/ipn
+!/webroot/logs/ipn/empty

@@ -7,10 +7,42 @@ class PaypalPaymentsController extends ShopAppController {
 	//public $components = array('Shop.InvoiceEmail');
 	
 	//Log Variables
+	private $_logDir = "webroot/logs/ipn/";
 	private $_logFile;
 	private $_logResource;
 	private $_logFailed = false;
 
+	function beforeFilter($options = array()) {
+		if ($this->_logDir[0] != '/') {
+			$this->_logDir = APP . 'Plugin/Shop/' . $this->_logDir;
+		}
+		return parent::beforeFilter($options);
+	}
+	
+	function admin_logs($file = null) {
+		if (!($folder = opendir($this->_logDir))) {
+			throw new Exception('Could not open directory: ' . $this->_logDir);
+		}
+		$logFiles = array();
+		while(($logFile = readdir($folder)) !== false) {
+			if ($logFile[0] == '.') {
+				continue;
+			}
+			$logFiles[$logFile] = $logFile;
+		}
+		closedir($folder);
+		krsort($logFiles);
+		
+		if (empty($logFile) || empty($files[$file])) {
+			$logFile = array_pop($logFiles);
+		}
+		$logFilePath = $this->_logDir . $logFile;
+		if (is_file($logFilePath)) {
+			$logFileContent = file_get_contents($logFilePath);
+		}
+		$this->set(compact('logFiles', 'logFile', 'logFileContent'));
+	}
+	
 	function ipn() {
 		$this->_log('Received IPN');
 
@@ -26,22 +58,26 @@ class PaypalPaymentsController extends ShopAppController {
 		// post back to PayPal system to validate
 		$header="POST /cgi-bin/webscr HTTP/1.1\r\n";
 		$header .="Content-Type: application/x-www-form-urlencoded\r\n";
+		$header .= "Content-Length: " . strlen($req) . "\r\n";
 		$header .="Host: www.paypal.com\r\n";
 		$header .="Connection: close\r\n\r\n";
 		/** Old outdated 1.0 Header
 		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 		*/
+		//$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+		
 
 		$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		if (!$fp) {
 			// HTTP ERROR
 			$this->_log('Could not connect to Paypal Socket. Aborting.');
 		} else {
+			$this->_log('Socket Opened Successfully');
 			fputs ($fp, $header . $req);
 			while (!feof($fp)) {
 				$res = fgets ($fp, 1024);
+				$this->_log($res);
 				if (strcmp ($res, "VERIFIED") == 0 && $_POST['payment_status'] = 'Completed') {
 				// check the payment_status is Completed
 				// check that txn_id has not been previously processed
@@ -73,7 +109,7 @@ class PaypalPaymentsController extends ShopAppController {
 								$this->_log('Invoice Found. Sending Email');
 								$InvoiceEmail = new InvoiceEmail();
 								$this->_log('Created InvoiceEmail Object');
-								if (InvoiceEmail->sendAdminPaid($invoice)) {
+								if ($InvoiceEmail->sendAdminPaid($invoice)) {
 									$this->_log('Sent notification email to admin');
 								} else {
 									$this->_log('Error sending notification email');
@@ -89,6 +125,7 @@ class PaypalPaymentsController extends ShopAppController {
 					$this->_log('Invalid Socket Connection. Aborting.');
 				}
 			}
+			$this->_log('Closing Socket');
 			fclose ($fp);
 		}
 		$this->_logClose();
@@ -118,8 +155,8 @@ class PaypalPaymentsController extends ShopAppController {
 	}
 	
 	function _logOpen() {
-		$dir = '/home/souper/page_logs/ipn/';
-		$this->_logFile = $dir . date('Y-m-d').'.log';
+		//$dir = '/home/souper/page_logs/ipn/';
+		$this->_logFile = $this->_logDir . date('Y-m-d').'.log';
 		$this->_logResource = fopen($this->_logFile, 'a');
 		if (!$this->_logResource) {
 			$this->_logFailed = true;
