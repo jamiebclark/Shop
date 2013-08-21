@@ -19,21 +19,21 @@ class PaypalPaymentsController extends ShopAppController {
 		return parent::beforeFilter($options);
 	}
 	
-	function admin_logs($file = null) {
+	function admin_logs($logFile = null) {
 		if (!($folder = opendir($this->_logDir))) {
 			throw new Exception('Could not open directory: ' . $this->_logDir);
 		}
 		$logFiles = array();
-		while(($logFile = readdir($folder)) !== false) {
-			if ($logFile[0] == '.') {
+		while(($file = readdir($folder)) !== false) {
+			if ($file[0] == '.' || $file == 'empty')  {
 				continue;
 			}
-			$logFiles[$logFile] = $logFile;
+			$logFiles[$file] = $file;
 		}
 		closedir($folder);
 		krsort($logFiles);
 		
-		if (empty($logFile) || empty($files[$file])) {
+		if (empty($logFile) || empty($files[$logFile])) {
 			$logFile = array_pop($logFiles);
 		}
 		$logFilePath = $this->_logDir . $logFile;
