@@ -14,9 +14,12 @@
 	<div class="span3">
 		<div class="log-list">
 			<ul class="nav nav-list">
-			<?php foreach ($logFiles as $file): ?>
-				<li><?php echo $this->Html->link($file, array(0 => $file)); ?></li>
-			<?php endforeach; ?>
+			<?php foreach ($logFiles as $file):
+				echo $this->Html->tag('li',
+					$this->Html->link($file, array(0 => $file)),
+					array('class' => $file == $logFile ? 'active' : null)
+				);
+			endforeach; ?>
 			</ul>	
 		</div>
 	</div>

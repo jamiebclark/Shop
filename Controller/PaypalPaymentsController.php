@@ -33,8 +33,8 @@ class PaypalPaymentsController extends ShopAppController {
 		closedir($folder);
 		krsort($logFiles);
 		
-		if (empty($logFile) || empty($files[$logFile])) {
-			$logFile = array_pop($logFiles);
+		if (empty($logFile) || empty($logFiles[$logFile])) {
+			$logFile = array_shift($logFiles);
 		}
 		$logFilePath = $this->_logDir . $logFile;
 		if (is_file($logFilePath)) {
