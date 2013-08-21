@@ -139,12 +139,16 @@ class PaypalPaymentsController extends ShopAppController {
 					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
 					
 					App::uses('InvoiceEmail', 'Shop.Network/Email');
-					$InvoiceEmail = new InvoiceEmail();
-					$this->_log('Created InvoiceEmail Object');
-					if ($InvoiceEmail->sendAdminPaid($invoice)) {
-						$this->_log('Sent notification email to admin');
+					if (!empty(COMPANY_ADMIN_EMAILS)) {
+						$InvoiceEmail = new InvoiceEmail();
+						$this->_log('Created InvoiceEmail Object');
+						if ($InvoiceEmail->sendAdminPaid($invoice)) {
+							$this->_log('Sent notification email to admins: ' . COMPANY_ADMIN_EMAILS);
+						} else {
+							$this->_log('Error sending notification email');
+						}
 					} else {
-						$this->_log('Error sending notification email');
+						$this->_log('No Admin Emails set, so nothing is being sent');
 					}
 					$this->_log('Finished Email');
 				}

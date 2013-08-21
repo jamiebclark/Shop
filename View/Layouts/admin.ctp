@@ -10,5 +10,6 @@ echo $this->Layout->navBar(array(
 	array('Shipping', array('controller' => 'shipping_methods', 'action' => 'index')),
 	array('Invoices', array('controller' => 'invoices', 'action' => 'index')),
 	array('PayPal', array('controller' => 'paypal_payments', 'action' => 'logs')),
+	array('Settings', array('controller' => 'shop_settings', 'action' => 'index')),
 ), 'Online Store', array('currentSelect' => array('controller')));
 echo $this->fetch('content');

@@ -27,7 +27,11 @@ class ShopAppController extends AppController {
 	
 	function beforeFilter() {
 		//Makes sure everything is loaded
+		$this->_setShopSettings();
+		
+		/*
 		$vars = array();
+		
 		if (!defined('SHOP_VARS_LOADED')) {
 			$vars['noBootstrap'] = true;
 		}
@@ -40,20 +44,40 @@ class ShopAppController extends AppController {
 			$this->layout = 'setup';
 			$this->render('Shop./CatalogItems/setup');
 		}
+		*/
 		parent::beforeFilter();		
 	}
 	
 	function beforeRender() {
 		parent::beforeRender();
 		
-		//Set Variables
-		$loggedUserId = 1;
-		$isShopAdmin = true;
-		$this->set(compact('loggedUserId', 'isShopAdmin'));
-		
 		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
 			$this->layout = 'admin';
 		}
+	}
+
+	function _setShopSettings($reset = false) {
+		$sessionName = 'Shop.settings';
+		$shopSettingsEncrypt = $shopSettingsDecrypt = array();
+		if ($reset || $this->Session->check($sessionName)) {
+			$shopSettingsDecrypt = ClassRegistry::init('Shop.ShopSetting')->find('list');
+		} else {
+			$shopSettingsEncrypt = $this->Session->read($sessionName);
+		}
+		if (empty($shopSettingsDecrypt)) {
+			foreach ($shopSettingsEncrypt as $name => $value) {
+				$shopSettingsDecrypt[$name] = base64_decode($value);
+			}
+		}
+		if (empty($shopSettingsEncrypt)) {
+			foreach ($shopSettingsDecrypt as $name => $value) {
+				$shopSettingsEncrypt[$name] = base64_encode($value);
+			}
+		}
+		foreach ($shopSettingsDecrypt as $name => $val) {
+			define($name, $val);
+		}
+		return $this->Session->write($sessionName, $shopSettingsEncrypt);
 	}
 	
 	function _redirectHome() {
