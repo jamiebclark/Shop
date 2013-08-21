@@ -139,7 +139,7 @@ class PaypalPaymentsController extends ShopAppController {
 					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
 					
 					App::uses('InvoiceEmail', 'Shop.Network/Email');
-					if (!empty(COMPANY_ADMIN_EMAILS)) {
+					if (defined('COMPANY_ADMIN_EMAILS')) {
 						$InvoiceEmail = new InvoiceEmail();
 						$this->_log('Created InvoiceEmail Object');
 						if ($InvoiceEmail->sendAdminPaid($invoice)) {
