@@ -43,7 +43,7 @@ dd, dt {
 }
 </style>
 <h2>Your Order Has Shipped</h2>
-<h3><?php echo $this->Order->link($order['Order']);?></h3>
+<h3><?php echo $this->Order->publicLink($order['Order']);?></h3>
 <p>Just a quick not to let you know your order has shipped</p>
 
 <?php foreach ($info as $title => $definitions): ?>
@@ -59,5 +59,5 @@ dd, dt {
 </div>
 
 <p>You can continue to check the status at <?php echo $this->Html->link(
-	'our online store', $this->Order->url($order['Order'])
+	'our online store', $this->Order->publicUrl($order['Order'])
 );?></p>

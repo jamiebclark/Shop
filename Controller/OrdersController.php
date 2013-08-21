@@ -1,4 +1,6 @@
 <?php
+App::uses('OrderEmail', 'Shop.Network/Email');
+App::uses('InvoiceEmail', 'Shop.Network/Email');
 class OrdersController extends ShopAppController {
 	var $name = 'Orders';
 	
@@ -114,12 +116,11 @@ class OrdersController extends ShopAppController {
 	
 	function admin_view($id = null) {
 		$order = $this->FormData->editData($id);
-	
 		$this->set(array(
 			'archived' => $order['Order']['archived'],
 			'canceled' => $order['Order']['canceled'],
 		));
-		
+
 		//$this->_setFormElements();
 
 		//$this->Order->query('UPDATE webdb.order_products SET sub_total = price * quantity');

@@ -16,13 +16,17 @@ class ShopEmail extends SuperEmail {
 		parent::__construct($config);
 	}
 	
+	function setHelpers() {
+		if (!empty($this->helpers)) {
+			$this->helpers($this->helpers);
+		}
+	}
+	
 	function sendResult($result) {
 		if (empty($result[$this->model]['email'])) {
 			return null;
 		}
-		if (!empty($this->helpers)) {
-			$this->helpers($this->helpers);
-		}
+		$this->setHelpers();
 		return $this
 			->to($result[$this->model]['email'])
 			->send();

@@ -20,7 +20,7 @@ class OrderEmail extends ShopEmail {
  * @param array $invoice An Invoice model result
  * @return CakeEmail send
  **/
-	function sendShipped($order) {
+	public function sendShipped($order) {
 		return $this
 			->subject("Your order has shipped [#{$order['Order']['id']}]")
 			->emailFormat('copy')

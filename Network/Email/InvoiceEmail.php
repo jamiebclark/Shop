@@ -5,9 +5,12 @@ class InvoiceEmail extends ShopEmail {
 	var $helpers = array(
 		'Shop.Invoice',
 		'Html',
+		'Layout.AddressBook',
+		'Layout.Calendar',
+		'Layout.Layout',
 		'Layout.DisplayText',
 		'SuperEmail.Email',
-		'Layout.AddressBook',
+
 	);
 	
 /**
@@ -32,9 +35,12 @@ class InvoiceEmail extends ShopEmail {
  * @return CakeEmail send
  **/
 	function sendAdminPaid($invoice) {
-		return $this
-			->to(COMPANY_ADMIN_EMAILS)
-			->emailFormat('copy');
-			->send();
+		$Email = $this->to(COMPANY_ADMIN_EMAILS);
+		$Email->emailFormat('copy');
+		$Email->viewVars(compact('invoice'));
+		$Email->template('Shop.Invoice/admin_paid');
+		$Email->subject("Online Payment completed for {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}");
+		$Email->setHelpers();
+		return $Email->send();
 	}
 }

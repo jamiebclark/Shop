@@ -13,7 +13,7 @@
 		<div class="disclaimer">
 		You are being sent this message regarding the status of an <?php echo $this->Html->link(
 			'order you placed online',
-			$this->Order->url($order['Order'])
+			$this->Order->publicUrl($order['Order'])
 		);?>. You have not been subscribed to any lists as a result of this.
 		</div>
 	<?php endif; ?>

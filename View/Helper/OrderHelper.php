@@ -18,6 +18,22 @@ class OrderHelper extends ModelViewHelper {
 		return parent::title($result, $options);
 	}
 	
+	public function url($result, $options = array()) {
+		$url = parent::url($result, $options);
+		if (!empty($options['public'])) {
+			$url['admin'] = false;
+		}
+		return $url;			
+	}
+	
+	public function publicUrl($result, $options = array()) {
+		return $this->url($result, array('public' => true) + $options);
+	}
+	
+	public function publicLink($result, $options = array()) {
+		return $this->link($result, array('public' => true) + $options);
+	}
+	
 	/*
 	public function url($order) {
 		return array(
@@ -88,7 +104,10 @@ class OrderHelper extends ModelViewHelper {
 	public function paid($result) {
 		if (!($title = $this->Invoice->paid($result['Invoice']))) {
 			$title = $this->Html->link('Not paid yet', array(
-				'controller' => 'orders', 'action' => 'checkout', $result['Order']['id']
+				'controller' => 'orders', 
+				'action' => 'checkout', 
+				$result['Order']['id'],
+				'admin' => false,
 			));
 		}
 		return $this->status($result, $title);
