@@ -110,7 +110,7 @@ class PaypalPaymentsController extends ShopAppController {
 		}
 		if($post['txn_id'] != '') {
 			//Checks for existing transaction
-			$this->_log('Tranaction ID: ' . $post['txn_id']);
+			$this->_log('Transaction ID: ' . $post['txn_id']);
 			$paypalPayment = $this->PaypalPayment->findByTxnId($post['txn_id']);
 			
 			if (!empty($paypalPayment)) {

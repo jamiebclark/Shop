@@ -59,7 +59,7 @@ class ShopAppController extends AppController {
 	function _setShopSettings($reset = false) {
 		$sessionName = 'Shop.settings';
 		$shopSettingsEncrypt = $shopSettingsDecrypt = array();
-		if ($reset || $this->Session->check($sessionName)) {
+		if ($reset || !$this->Session->check($sessionName)) {
 			$shopSettingsDecrypt = ClassRegistry::init('Shop.ShopSetting')->find('list');
 		} else {
 			$shopSettingsEncrypt = $this->Session->read($sessionName);

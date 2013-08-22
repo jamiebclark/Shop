@@ -49,6 +49,11 @@ echo $this->ShopSetting->inputs(array(
 		'helpInline' => 'Where the user should be taken if they cancel their order',
 	),
 ), array('legend' => 'PayPal Info', 'note' => 'Information linking to your PayPal account'));
-	
+
+echo $this->ShopSetting->inputs(array(
+	'EMAIL_BACKGROUND_COLOR',
+	'EMAIL_HEADING_STYLE',
+), array('legend' => 'Email Style'));
+
 echo $this->ShopSetting->input('SHOP_VARS_LOADED', array('value' => 1, 'type' => 'hidden'));
 echo $this->FormLayout->end('Update');
