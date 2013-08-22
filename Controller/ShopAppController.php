@@ -25,9 +25,15 @@ class ShopAppController extends AppController {
 		'Layout.Table',
 	);
 	
+	// Keeps track of when the global variables have been set
+	private $_shopSettingsSet = false;
+	
 	function beforeFilter() {
+	
 		//Makes sure everything is loaded
-		$this->_setShopSettings();
+		if (empty($this->request->data['ShopSetting'])) {
+			$this->_setShopSettings();
+		}
 		
 		/*
 		$vars = array();
@@ -50,6 +56,11 @@ class ShopAppController extends AppController {
 	
 	function beforeRender() {
 		parent::beforeRender();
+		
+		// Checks one last time that global settings have been set
+		if (!$this->_shopSettingsSet) {
+			$this->_setShopSettings();
+		}
 		
 		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
 			$this->layout = 'admin';
@@ -78,6 +89,7 @@ class ShopAppController extends AppController {
 			foreach ($shopSettingsDecrypt as $name => $val) {
 				define($name, $val);
 			}
+			$this->_shopSettingsSet = true;
 		}
 		return $this->Session->write($sessionName, $shopSettingsEncrypt);
 	}
