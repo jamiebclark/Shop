@@ -20,8 +20,12 @@ echo $this->ShopSetting->inputs(array(
 	'COMPANY_EMAIL_PASSWORD' => array(
 		'type' => 'password',
 	),
-	'COMPANY_EMAIL_HOST',
-	'COMPANY_EMAIL_TRANSPORT',
+	'COMPANY_EMAIL_HOST' => array(
+		'default' => 'ssl://smtp.gmail.com',
+	),
+	'COMPANY_EMAIL_TRANSPORT' => array(
+		'default' => 'Smtp',
+	),
 	'COMPANY_EMAIL_PORT' => array(
 		'type' => 'number',
 		'default' => 465,

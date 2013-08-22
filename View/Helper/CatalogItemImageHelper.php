@@ -4,5 +4,7 @@ class CatalogItemImageHelper extends ModelViewHelper {
 	var $name = 'CatalogItemImage';
 	var $modelPlugin = 'Shop';
 	var $thumbDir = 'catalog_item_images/';
+	var $defaultDir = 'thumb';
+	var $defaultMediaDir = 'thumb';
 
 }
