@@ -47,6 +47,7 @@ class PaypalPaymentsController extends ShopAppController {
 		if (empty($logFile) || empty($logFiles[$logFile])) {
 			$logFile = array_shift($logFiles);
 		}
+		$logFileContent = '';
 		$logFilePath = $this->_logDir . $logFile;
 		if (is_file($logFilePath)) {
 			$logFileContent = file_get_contents($logFilePath);

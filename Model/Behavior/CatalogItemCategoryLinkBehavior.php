@@ -50,7 +50,7 @@ class CatalogItemCategoryLinkBehavior extends ModelBehavior {
 	
 	public function updateCatalogItemCategoryLink(Model $Model, $id) {
 		$parentCategoryId = $this->settings[$Model->alias]['catalog_item_category_id'];
-		$result = $Model->read(null, $id);
+		$result = $Model->find('first', array('recursive' => -1, 'conditions' => array($Model->escapeField($Model->displayKey) => $id)));
 		$link = $this->CatalogItemCategoryLink->findByModelId($Model->alias, $id);
 		$linkId = $categoryId = null;
 		if (!empty($link['CatalogItemCategoryLink'])) {
