@@ -20,10 +20,9 @@ class InvoiceEmail extends ShopEmail {
  * @return CakeEmail send
  **/
 	function sendPaid($invoice) {
-		return $this
-			->emailFormat('copy')
+		$this->emailFormat('copy')
 			->viewVars(compact('invoice'))
-			->subject('Your invoice has been successfully paid')
+			->subject("Online payment successful: {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}")
 			->template('Shop.Invoice/paid')
 			->sendResult($invoice);
 	}
@@ -39,7 +38,7 @@ class InvoiceEmail extends ShopEmail {
 		$Email->emailFormat('copy');
 		$Email->viewVars(compact('invoice'));
 		$Email->template('Shop.Invoice/admin_paid');
-		$Email->subject("Online Payment completed for {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}");
+		$Email->subject("Online payment successful for {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}");
 		$Email->setHelpers();
 		return $Email->send();
 	}

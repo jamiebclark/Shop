@@ -149,6 +149,7 @@ class ShopSchema extends CakeSchema {
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'paid' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'paid_email' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'paypal_payment_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'key' => 'unique'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
@@ -230,6 +231,8 @@ class ShopSchema extends CakeSchema {
 		'email' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'phone' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'same_billing' => array('type' => 'boolean', 'null' => false, 'default' => '1'),
+		'shipped_email' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'paid_email' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'created' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => false, 'default' => null),
 		'canceled' => array('type' => 'boolean', 'null' => false, 'default' => null),
@@ -437,7 +440,7 @@ class ShopSchema extends CakeSchema {
 	);
 	public $shop_settings = array(
 		'name' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 36, 'key' => 'primary', 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
-		'value' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 128, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
+		'value' => array('type' => 'text', 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'charset' => 'latin1'),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'name', 'unique' => 1)
 		),

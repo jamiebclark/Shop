@@ -17,21 +17,27 @@ class InvoiceHelper extends ModelViewHelper {
 	var $mailingAddress = COMPANY_ADDRESS;
 	
 	function address($invoice) {
+		$invoice = $this->_getResult($invoice);
 		return $this->AddressBook->address($invoice, array(
 			'beforeField' => array(array('first_name', 'last_name')),
 		));
 	}
 
-	public function paid($invoice) {
+	public function paid($result) {
+		$invoice = $this->_getResult($result);
 		if ($invoice['paid']) {
-			return 'Paid ' . $this->Calendar->niceShort($invoice['paid'], 
-				array('time' => false));
+			$paid = 'Paid ' . $this->Calendar->niceShort($invoice['paid'], array('time' => false));
+			if (!empty($result['InvoicePaymentMethod'])) {
+				$paid .= " (<em>{$result['InvoicePaymentMethod']['title']}</em>)";
+			}
+			return $paid;
 		} else {
 			return false;
 		}
 	}
 	
 	public function amount($invoice) {
+		$invoice = $this->_getResult($invoice);
 		$out = '$' . number_format($invoice['amt'], 2);
 		if (!empty($invoice['recur'])) {
 			$out .= ' every month for ' . number_format($invoice['recur']) . ' months';
@@ -40,6 +46,7 @@ class InvoiceHelper extends ModelViewHelper {
 	}
 	
 	public function title($invoice, $options = array()) {
+		$invoice = $this->_getResult($invoice);
 		if (empty($options['text'])) {
 			$options['text'] = 'Invoice #' . $invoice['id'];
 		}
@@ -47,10 +54,12 @@ class InvoiceHelper extends ModelViewHelper {
 	}
 	
 	function relatedTitle($invoice) {
+		$invoice = $this->_getResult($invoice);
 		return "{$invoice['model_title']} #{$invoice['model_id']}";
 	}
 	
 	function relatedLink($invoice, $options = array()) {
+		$invoice = $this->_getResult($invoice);
 		if (empty($invoice['model'])) {
 			return '';
 		}
@@ -61,9 +70,13 @@ class InvoiceHelper extends ModelViewHelper {
 				$invoice['model_id'],
 				'plugin' => strtolower($plugin),
 			);
+		if (!empty($options['public'])) {
+			$url['admin'] = false;
+			unset($options['public']);
+		}
 		return $this->Html->link($this->relatedTitle($invoice), $url, $options);
 	}
-	
+
 	function paypalForm($invoice, $content = null, $options = array()) {
 		$cols = array(
 			'first_name',

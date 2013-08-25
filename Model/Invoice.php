@@ -4,7 +4,11 @@ class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
 		'Location.Mappable' => array('validate' => true), 
-		'Shop.ChangedFields'
+		'Shop.ChangedFields',
+		'Shop.EmailTrigger' => array(
+			'send_paid_email' => 'sendPaidEmail',
+			'send_admin_email' => 'sendAdminPaidEmail',
+		)
 	);
 	var $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
 	var $order = '$ALIAS.created DESC';
@@ -60,8 +64,6 @@ class Invoice extends ShopAppModel {
 		)
 	);
 
-	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
-	private $sendPaidEmail = false;
 	public $syncedModels = array();
 	
 	function beforeFind($queryData) {
@@ -70,14 +72,6 @@ class Invoice extends ShopAppModel {
 			$queryData['link'][] = $alias['className'];
 		}
 		return parent::beforeFind($queryData);
-	}
-	
-	function beforeSave($options = array()) {
-		$data =& $this->getData();
-		if (!empty($data['send_paid_email'])) {
-			$this->sendPaidEmail = true;
-		}
-		return parent::beforeSave($options);
 	}
 	
 	function afterSave($created) {
@@ -89,11 +83,6 @@ class Invoice extends ShopAppModel {
 		if ($created || array_search('paid', $this->changedFields)) {
 			$this->updatePaid($this->id);
 		}
-		
-		if ($this->sendPaidEmail && !empty($result[$this->alias]['paid'])) {
-			$this->sendPaidEmail($this->id);
-		}
-		
 		return parent::afterSave($created);
 	}
 	
@@ -121,7 +110,7 @@ class Invoice extends ShopAppModel {
 			}
 			$contain[] = $model;
 		}
-		$conditions = array($this->alias . '.id' => $id);
+		$conditions = array($this->escapeField('id') => $id);
 		$result = $this->find('first', compact('fields', 'link', 'conditions'));
 		if (!empty($result)) {
 			foreach ($result as $model => $vals) {
@@ -140,8 +129,8 @@ class Invoice extends ShopAppModel {
 		$result = $this->read(null, $id);
 		if ($result[$this->alias]['paid'] && ($Email->sendPaid($result) !== false)) {
 			return $this->updateAll(
-				array("{$this->alias}.paid_email" => 'NOW()'), 
-				array("{$this->alias}.id" => $id)
+				array($this->escapeField('paid_email') => 'NOW()'), 
+				array($this->escapeField('id') => $id)
 			);
 		}
 		return null;
@@ -150,6 +139,9 @@ class Invoice extends ShopAppModel {
 	function sendAdminPaidEmail($id) {
 		$Email = new InvoiceEmail();
 		$result = $this->read(null, $id);
-		return $Email->sendAdminPaid($result);
+		if (!empty($result[$this->alias]['paid'])) {	
+			return $Email->sendAdminPaid($result);
+		}
+		return null;
 	}
 }

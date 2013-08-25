@@ -28,4 +28,19 @@ class OrderEmail extends ShopEmail {
 			->template('Shop.Order/shipped')
 			->sendResult($order);
 	}
+	
+/**
+ * Sends email to customer letting them know their order has been paid
+ *
+ * @param array $invoice An Invoice model result
+ * @return CakeEmail send
+ **/
+	public function sendPaid($order) {
+		return $this
+			->subject("Your order payment was successful [#{$order['Order']['id']}]")
+			->emailFormat('copy')
+			->viewVars(compact('order'))
+			->template('Shop.Order/paid')
+			->sendResult($order);	
+	}
 }

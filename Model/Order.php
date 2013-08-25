@@ -14,6 +14,10 @@ class Order extends ShopAppModel {
 				'total' => 'amt',
 			),
 		),
+		'Shop.EmailTrigger' => array(
+			'send_shipped_email' => 'sendShippedEmail',
+		//	'send_paid_email' => 'sendPaidEmail',
+		),
 	);	
 	var $order = array('Order.created DESC');
 	var $recursive = -1;
@@ -64,11 +68,6 @@ class Order extends ShopAppModel {
 		if (empty($data['country'])) {
 			$data['country'] = 'US';
 		}
-		
-		if (!empty($data['send_shipped_email'])) {
-			$this->sendShippedEmail = true;
-		}
-
 		return parent::beforeSave();
 	}
 	
@@ -79,7 +78,7 @@ class Order extends ShopAppModel {
 		$order = $this->find('first', array(
 			'fields' => '*',
 			'link' => array('Shop.Invoice'),
-			'conditions' => array($this->alias . '.id' => $this->id)
+			'conditions' => array($this->escapeField('id') => $this->id)
 		));
 		
 		//Updates invoice with billing address if set
@@ -92,10 +91,7 @@ class Order extends ShopAppModel {
 		$this->updateAll(compact('archived'), array($this->alias . '.id' => $this->id));
 		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $this->id));
 		$this->updateProductStock($this->id);
-		
-		if ($this->sendShippedEmail && !empty($order['Order']['shipped'])) {
-			$this->sendShippedEmail($this->id);
-		}
+
 		return parent::afterSave($created);
 	}
 	
@@ -103,7 +99,7 @@ class Order extends ShopAppModel {
 		$orderProducts = $this->OrderProduct->find('all', array(
 			'fields' => 'OrderProduct.product_id',
 			'link' => array($this->alias),
-			'conditions' => array($this->alias . '.id' => $id),
+			'conditions' => array($this->escapeField('id') => $id),
 			'group' => 'OrderProduct.product_id',
 		));
 		foreach ($orderProducts as $orderProduct) {
@@ -129,7 +125,7 @@ class Order extends ShopAppModel {
 				'SUM(OrderProduct.shipping) AS shipping',
 			),
 			'link' => array('Shop.OrderProduct'),
-			'group' => $this->alias . '.id',
+			'group' => $this->escapeField('id'),
 		);
 		$options['conditions']['Order.id'] = $id;
 		$result = $this->find('first', $options);
@@ -141,7 +137,7 @@ class Order extends ShopAppModel {
 				'-1 * SUM(OrdersPromoCode.amt + OrdersPromoCode.pct * ' . $subTotal . ') AS promo_discount',
 			),
 			'link' => array('Shop.OrdersHandlingMethod', 'Shop.OrdersPromoCode'),
-			'group' => $this->alias . '.id',
+			'group' => $this->escapeField('id'),
 		);
 		$options['conditions']['Order.id'] = $id;
 		$result = $this->find('first', $options);
@@ -153,13 +149,13 @@ class Order extends ShopAppModel {
 		$total = array_sum($totals);
 		$totals['total'] = $total;
 		
-		return $this->updateAll($totals, array($this->alias . '.id' => $id));
+		return $this->updateAll($totals, array($this->escapeField('id') => $id));
 	}
 	
 	function findProductOptions($id = null) {
 		$products = $this->OrderProduct->Product->find('list', array(
 			'link' => array('Shop.OrderProduct' => 'Shop.' . $this->alias),
-			'conditions' => array($this->alias . '.id' => $id)
+			'conditions' => array($this->escapeField('id') => $id)
 		));
 		return $products;
 	}
@@ -214,11 +210,9 @@ class Order extends ShopAppModel {
 			'contain' => array(
 				'Invoice', 'ShippingMethod',
 				'OrdersHandlingMethod', 'OrdersPromoCode',
-				'OrderProduct' => array(
-					'Product' => array('CatalogItem'),
-				)
+				'OrderProduct' => array('Product' => array('CatalogItem'))
 			),
-			'conditions' => array('Order.id' => $id)
+			'conditions' => array($this->escapeField('id') => $id)
 		));
 	}
 	
@@ -235,16 +229,27 @@ class Order extends ShopAppModel {
 	}
 	
 	function sendShippedEmail($id) {
-		$order = $this->findOrder($id);
+		$result = $this->findOrder($id);
 		$Email = new OrderEmail();
-		if ($Email->sendShipped($order) !== false) {
-			$this->sendShippedEmail = false;
+		if (!empty($result[$this->alias]['shipped']) && ($Email->sendShipped($result) !== false)) {
 			return $this->updateAll(
-				array("{$this->alias}.shipped_email" => 'NOW()'), 
-				array("{$this->alias}.id" => $id)
+				array($this->escapeField('shipped_email') => 'NOW()'), 
+				array($this->escapeField('id') => $id)
 			);
 		}
 		return false;
+	}
+	
+	function sendPaidEmail($id) {
+		$result = $this->findOrder($id);
+		$Email = new OrderEmail();
+		if (!empty($result['Invoice']['paid']) && ($Email->sendPaid($result) !== false)) {
+			return $this->updateAll(
+				array($this->escapeField('paid_email') => 'NOW()'), 
+				array($this->escapeField('id') => $id)
+			);
+		}
+		return false;	
 	}
 
 	/*OLD FIND ORDER

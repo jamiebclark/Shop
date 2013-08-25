@@ -3,13 +3,11 @@ $result = $invoice;
 if (!empty($invoice['Invoice'])) {
 	$invoice = $invoice['Invoice'];
 }
-
 $payment = array(
 	'Invoice ID#' => $invoice['id'],
 	'Related' => $this->Invoice->relatedLink($invoice),
 	'Amount' => $this->Invoice->amount($invoice),
-	'Paid' => $this->Invoice->paid($invoice),
-	'Paid By' => '',
+	'Paid' => $this->Invoice->paid($result),
 	'Created' => $this->Calendar->niceShort($invoice['created']),
 	'Last Modified' => $this->Calendar->niceShort($invoice['modified']),
 );
@@ -26,11 +24,11 @@ if (isset($result['PaymentMethod'])) {
 ?>
 <div class="row-fluid">
 	<div class="span6">
-		<h2>Payment Information</h2>
+		<h3>Payment Information</h3>
 		<?php echo $this->Layout->infoTable($payment); ?>
 	</div>
 	<div class="span6">
-		<h2>Customer Information</h2>
+		<h3>Customer Information</h3>
 		<?php echo $this->Layout->infoTable($customer); ?>
 	</div>
 </div>

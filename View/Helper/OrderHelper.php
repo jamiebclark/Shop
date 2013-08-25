@@ -93,10 +93,9 @@ class OrderHelper extends ModelViewHelper {
 	public function shipped($result) {
 		$order = !empty($result['Order']) ? $result['Order'] : $result;
 		if ($order['shipped']) {
-			$title = 'Shipped ' . $this->Calendar->niceShort(
-				$order['shipped'], array('time' => false));
+			$title = 'Shipped ' . date('n/j/Y', strtotime($order['shipped']));
 		} else {
-			$title = 'No shipped yet';
+			$title = 'Not shipped yet';
 		}
 		return $this->status($result, $title);
 	}

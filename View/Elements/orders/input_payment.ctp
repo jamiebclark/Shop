@@ -1,5 +1,4 @@
-<div class="form-horizontal">
-	<?php
+<div class="form-horizontal"><?php
 	echo $this->Form->hidden('Invoice.id');
 	if ($this->Html->value('Invoice.id')) {
 		echo $this->FormLayout->fakeInput(
@@ -34,10 +33,8 @@
 	);
 	if ($this->Html->value('Invoice.paid_email')) {
 		$paidEmailOptions['helpBlock'] .= ' <em>Previously sent ';
-		$paidEmailOptions['helpBlock'] .= $this->Calendar->niceShort($this->Html->value('Invoice.paid_email'));
+		$paidEmailOptions['helpBlock'] .= $this->Calendar->niceShort($this->Html->value('Order.paid_email'));
 		$paidEmailOptions['helpBlock'] .= '</em>';
 	}
 	echo $this->Form->input('Invoice.send_paid_email', $paidEmailOptions);
-
-	?>
-</div>
+?></div>

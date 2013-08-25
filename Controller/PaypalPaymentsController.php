@@ -18,6 +18,12 @@ class PaypalPaymentsController extends ShopAppController {
 		return parent::beforeFilter($options);
 	}
 	
+	function admin_index() {
+		$this->paginate = array('order' => array('PaypalPayment.created' => 'DESC'));
+		$paypalPayments = $this->paginate();
+		$this->set(compact('paypalPayments'));
+	}
+	
 	function admin_test($txnId = null) {
 		$post = array('txn_id' => $txnId);
 		$this->_savePost($post, true);
