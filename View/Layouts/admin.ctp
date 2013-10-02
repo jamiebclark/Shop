@@ -1,5 +1,5 @@
 <?php
-$this->extend('default');
+$this->extend('Layout.default');
 echo $this->Layout->navBar(array(
 	array('Orders', array('controller' => 'orders', 'action' => 'index')),
 	array('Catalog Items', array('controller' => 'catalog_items', 'action' => 'index')),
