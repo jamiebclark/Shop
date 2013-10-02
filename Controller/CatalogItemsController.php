@@ -28,6 +28,29 @@ class CatalogItemsController extends ShopAppController {
 	}
 	*/
 	
+	function admin_test($invoiceId = null) {
+		$msg = 'No Invoice ID detected';
+		if (!empty($invoiceId)) {
+			$invoice = $this->CatalogItem->Product->OrderProduct->Order->Invoice->find('first', array(
+				'conditions' => array('Invoice.id' => $invoiceId)
+			));
+			App::uses('InvoiceEmail', 'Shop.Network/Email');
+			$msg = 'No company emails';
+			if (defined('COMPANY_ADMIN_EMAILS')) {
+				$InvoiceEmail = new InvoiceEmail();
+				$msg = 'Created InvoiceEmail Object';
+				if ($InvoiceEmail->sendAdminPaid($invoice)) {
+					$msg = 'Sent notification email to admins: ' . COMPANY_ADMIN_EMAILS;
+				} else {
+					$msg = 'Error sending notification email';
+				}
+			} else {
+				$msg = 'No Admin Emails set, so nothing is being sent';
+			}
+		}
+		$this->Session->setFlash($msg);
+	}
+	
 	function index($categoryId = null) {
 		$categoryId = $this->_getCatalogItemCategoryId($categoryId, false);
 		
