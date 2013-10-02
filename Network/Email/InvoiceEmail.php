@@ -34,7 +34,8 @@ class InvoiceEmail extends ShopEmail {
  * @return CakeEmail send
  **/
 	function sendAdminPaid($invoice) {
-		$Email = $this->to(COMPANY_ADMIN_EMAILS);
+		$emails = array_map('trim', explode(',', COMPANY_ADMIN_EMAILS));
+		$Email = $this->to($emails);
 		$Email->emailFormat('copy');
 		$Email->viewVars(compact('invoice'));
 		$Email->template('Shop.Invoice/admin_paid');
