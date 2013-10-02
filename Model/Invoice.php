@@ -1,5 +1,5 @@
 <?php
-App::uses('InvoiceEmail', 'Shop.Network\Email');
+App::uses('InvoiceEmail', 'Shop.Network/Email');
 class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
