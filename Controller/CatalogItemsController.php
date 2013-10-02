@@ -28,7 +28,7 @@ class CatalogItemsController extends ShopAppController {
 	}
 	*/
 	
-	function admin_test($invoiceId = null) {
+	function admin_test_send($invoiceId = null) {
 		$msg = 'No Invoice ID detected';
 		if (!empty($invoiceId)) {
 			$invoice = $this->CatalogItem->Product->OrderProduct->Order->Invoice->find('first', array(
