@@ -5,16 +5,21 @@ if (defined('EMAIL_STYLE')) {
 ?>
 <table width=700 border=0 cellspacing=0 cellpadding=0 id="email-body">
 	<tr>
-		<td id="email-header">
-			<?php echo $this->DisplayText->text(EMAIL_HEADER_HTML); ?>
-		</td>
+		<td id="email-header"><?php 
+			if (defined('EMAIL_HEADER_HTML')) {
+				echo $this->DisplayText->text(EMAIL_HEADER_HTML); 
+			}
+		?></td>
 	</tr>
 	<tr>
 		<td id="email-content"><?php echo $this->fetch('content'); ?></td>
 	</tr>
 	<tr>
-		<td id="email-footer">
-		<?php echo $this->DisplayText->text(EMAIL_FOOTER_HTML); ?>
+		<td id="email-footer"><?php 
+			if (defined('EMAIL_FOOTER_HTML')) {
+				echo $this->DisplayText->text(EMAIL_FOOTER_HTML); 
+			}
+		?>
 		<?php if (!empty($order)): ?>
 			<div class="disclaimer">
 			You are being sent this message regarding the status of an <?php echo $this->Html->link(

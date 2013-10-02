@@ -29,12 +29,10 @@ class ShopAppController extends AppController {
 	private $_shopSettingsSet = false;
 	
 	function beforeFilter() {
-	
 		//Makes sure everything is loaded
 		if (empty($this->request->data['ShopSetting'])) {
 			$this->_setShopSettings();
 		}
-		
 		/*
 		$vars = array();
 		
@@ -56,12 +54,10 @@ class ShopAppController extends AppController {
 	
 	function beforeRender() {
 		parent::beforeRender();
-		
 		// Checks one last time that global settings have been set
 		if (!$this->_shopSettingsSet) {
 			$this->_setShopSettings();
 		}
-		
 		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
 			$this->layout = 'admin';
 		}
