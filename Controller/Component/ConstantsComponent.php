@@ -16,7 +16,7 @@ class ConstantsComponent extends Component {
 	private $_isSet = false;
 	private $sessionName = 'Shop.settings';
 	
-	public function beforeFilter(Controller $controller) {
+	public function initialize(Controller $controller) {
 		// If a user is making changes to ShopSetting, skips setting the variables until after the saving is complete
 		if (empty($controller->request->data['ShopSetting'])) {
 			$this->setConstants();
@@ -38,6 +38,7 @@ class ConstantsComponent extends Component {
 				define($name, $val);
 			}
 		}
+		$this->_isSet = true;
 		return $this->Session->write($this->sessionName, $encrypted);
 	}
 	
