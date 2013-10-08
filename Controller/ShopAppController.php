@@ -7,6 +7,7 @@ require_once '../Config/core.php';
 
 class ShopAppController extends AppController {
 	var $components = array(
+		'Shop.Constants',
 		'FormData.FormData' => array('plugin' => 'Shop'),
 		'Layout.FormLayout',
 		'Session',
@@ -25,71 +26,14 @@ class ShopAppController extends AppController {
 		'Layout.Table',
 	);
 	
-	// Keeps track of when the global variables have been set
-	private $_shopSettingsSet = false;
-	
-	function beforeFilter() {
-		//Makes sure everything is loaded
-		if (empty($this->request->data['ShopSetting'])) {
-			$this->_setShopSettings();
-		}
-		/*
-		$vars = array();
-		
-		if (!defined('SHOP_VARS_LOADED')) {
-			$vars['noBootstrap'] = true;
-		}
-		if (!ClassRegistry::init('Shop.Order', true)) {
-			$vars['noSchema'] = true;
-		}
-		if (!empty($vars)) {
-			$this->set($vars);
-			$this->helpers = array('Layout.Layout');
-			$this->layout = 'setup';
-			$this->render('Shop./CatalogItems/setup');
-		}
-		*/
-		parent::beforeFilter();		
-	}
-	
 	function beforeRender() {
 		parent::beforeRender();
 		// Checks one last time that global settings have been set
-		if (!$this->_shopSettingsSet) {
-			$this->_setShopSettings();
-		}
 		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
 			$this->layout = 'admin';
 		}
 	}
 
-	function _setShopSettings($reset = false) {
-		$sessionName = 'Shop.settings';
-		$shopSettingsEncrypt = $shopSettingsDecrypt = array();
-		if ($reset || !$this->Session->check($sessionName)) {
-			$shopSettingsDecrypt = ClassRegistry::init('Shop.ShopSetting')->find('list');
-		} else {
-			$shopSettingsEncrypt = $this->Session->read($sessionName);
-		}
-		if (empty($shopSettingsDecrypt) && !empty($shopSettingsEncrypt)) {
-			foreach ($shopSettingsEncrypt as $name => $value) {
-				$shopSettingsDecrypt[$name] = base64_decode($value);
-			}
-		}
-		if (empty($shopSettingsEncrypt) && !empty($shopSettingsDecrypt)) {
-			foreach ($shopSettingsDecrypt as $name => $value) {
-				$shopSettingsEncrypt[$name] = base64_encode($value);
-			}
-		}
-		if (!empty($shopSettingsDecrypt)) {
-			foreach ($shopSettingsDecrypt as $name => $val) {
-				define($name, $val);
-			}
-			$this->_shopSettingsSet = true;
-		}
-		return $this->Session->write($sessionName, $shopSettingsEncrypt);
-	}
-	
 	function _redirectHome() {
 		return $this->redirect(array('controller' => 'catalog_items', 'action' => 'index'));
 	}
