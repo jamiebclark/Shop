@@ -1,4 +1,9 @@
-<div class="form-horizontal"><?php
+<?php 
+$class = 'form-horizontal alert ';
+$class .= $this->Html->value('Invoice.paid') ? 'alert-success' : 'alert-warning';
+?>
+<div class="<?php echo $class;?>">
+	<?php
 	echo $this->Form->hidden('Invoice.id');
 	if ($this->Html->value('Invoice.id')) {
 		echo $this->FormLayout->fakeInput(
@@ -29,7 +34,7 @@
 		'type' => 'checkbox',
 		'label' => 'Send Confirmation Email',
 		'helpBlock' => 'Send the customer an email saying their order has been paid',
-		'checked' => !$this->Html->value('Invoice.paid_email'),
+		'checked' => !$this->Html->value('Invoice.paid') && !$this->Html->value('Invoice.paid_email'),
 	);
 	if ($this->Html->value('Invoice.paid_email')) {
 		$paidEmailOptions['helpBlock'] .= ' <em>Previously sent ';

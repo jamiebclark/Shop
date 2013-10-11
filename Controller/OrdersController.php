@@ -9,6 +9,7 @@ class OrdersController extends ShopAppController {
 		'Shop.Invoice',
 		'Shop.CatalogItem', 
 		'Shop.PaypalForm',
+		'Shop.AmazonForm',
 		'Layout.AddressBook',
 		'Layout.AddressBookForm',
 		'Layout.Crumbs' => array(

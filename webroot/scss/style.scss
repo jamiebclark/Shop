@@ -91,6 +91,7 @@ form.canceled {
 	}
 	.badge.#{$name}, .label.#{$name} {
 		color: black;
+		background-color: $color;
 	}
 }
 @include order-style(order-not-shipped-not-paid, white);

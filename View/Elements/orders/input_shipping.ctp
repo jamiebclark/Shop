@@ -1,4 +1,8 @@
-<div class="form-horizontal">
+<?php 
+$class = 'form-horizontal alert ';
+$class .= $this->Html->value('Order.shipped') ? 'alert-success' : 'alert-warning';
+?>
+<div class="<?php echo $class;?>">
 	<?php
 	echo $this->FormLayout->inputDatetime('shipped', array(
 		'control' => array('today', 'clear'), 
@@ -22,7 +26,7 @@
 		'type' => 'checkbox',
 		'label' => 'Send Confirmation Email',
 		'helpBlock' => 'Send the customer an email saying their order has shipped',
-		'checked' => !$this->Html->value('Order.shipped_email'),
+		'checked' => !$this->Html->value('Order.shipped') && !$this->Html->value('Order.shipped_email'),
 	);
 	if ($this->Html->value('Order.shipped_email')) {
 		$shippedEmailOptions['helpBlock'] .= ' <em>Previously sent ';
