@@ -121,13 +121,6 @@ class OrdersController extends ShopAppController {
 			'archived' => $order['Order']['archived'],
 			'canceled' => $order['Order']['canceled'],
 		));
-
-		//$this->_setFormElements();
-
-		//$this->Order->query('UPDATE webdb.order_products SET sub_total = price * quantity');
-		
-		
-
 	}
 	
 	function admin_edit ($id = null) {
