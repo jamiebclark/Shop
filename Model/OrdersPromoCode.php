@@ -3,7 +3,7 @@ class OrdersPromoCode extends ShopAppModel {
 	var $name = 'OrdersPromoCode';
 	var $belongsTo = array('Shop.PromoCode', 'Shop.Order');	var $actsAs = array('Shop.BlankDelete' => array('AND' => 'code'));
 	
-	function beforeValidate() {
+	function beforeValidate($options = array()) {
 		$data =& $this->getData();
 		$unset = false;
 		//Adding a new Promo

@@ -4,7 +4,7 @@ class PromoCode extends ShopAppModel {
 	var $hasMany = array('Shop.OrdersPromoCode');
 	var $hasAndBelongsToMany = array('Shop.Order');
 	
-	function beforeValidate() {
+	function beforeValidate($options = array()) {
 		$data =& $this->getData();
 		$data['code'] = $this->formatCode($data['code']);
 		

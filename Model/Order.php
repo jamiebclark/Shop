@@ -63,16 +63,16 @@ class Order extends ShopAppModel {
 	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
 	private $sendShippedEmail = false;	
 	
-	function beforeSave() {
+	function beforeSave($options = array()) {
 		$data =& $this->getData();
 		if (empty($data['country'])) {
 			$data['country'] = 'US';
 		}
-		return parent::beforeSave();
+		return parent::beforeSave($options);
 	}
 	
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$this->updateTotal($this->id);
 		
 		$order = $this->find('first', array(

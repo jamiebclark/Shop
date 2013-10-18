@@ -49,7 +49,8 @@ class LinkableBehavior extends ModelBehavior {
 			debug($msg);
 		}
 	}
-		public function beforeFind(&$Model, $query) {
+	
+	public function beforeFind(Model $Model, $query) {
 		$this->debug('Linking : ' . $Model->alias);
 		if (isset($query[$this->_key])) {
 			$optionsDefaults = $this->_defaults + array('reference' => $Model->alias, $this->_key => array());
@@ -78,13 +79,18 @@ class LinkableBehavior extends ModelBehavior {
 						$options['class'] = $options['alias'];
 					} elseif (!empty($options['table']) && empty($options['class'])) {
 						$options['class'] = Inflector::classify(end(explode('.',$options['table'])));
-					}					$options['alias'] = end(pluginSplit($options['alias']));										$_Model =& ClassRegistry::init(array(
+					}
+
+					$aliasSplit = pluginSplit($options['alias']);
+					$options['alias'] = end($aliasSplit);
+					
+					$_Model = ClassRegistry::init(array(
 						'class' => $options['class'],
 						'alias' => $options['alias'],
 						'type' => 'Model',
 					));			// the incoming model to be linked in query
-					$Reference =& ClassRegistry::init($options['reference']); 	// the already in query model that links to $_Model
-					$db =& $_Model->getDataSource();
+					$Reference = ClassRegistry::init($options['reference']); 	// the already in query model that links to $_Model
+					$db = $_Model->getDataSource();
 					$associations = $_Model->getAssociated();
 					if (isset($associations[$Reference->alias])) {
 						$type = $associations[$Reference->alias];
@@ -109,7 +115,8 @@ class LinkableBehavior extends ModelBehavior {
 					unset($modelLink);
 					
 					$this->debug('Linking ' . $Reference->alias . ' to ' . $_Model->alias . ' : type : ' . $type);
-					$this->debug($association);					$this->debug(array('Associations for ' . $_Model->alias, $associations));
+					$this->debug($association);
+					$this->debug(array('Associations for ' . $_Model->alias, $associations));
 					$this->debug($options);
 
 					if (empty($options['conditions'])) {
@@ -212,7 +219,7 @@ class LinkableBehavior extends ModelBehavior {
 	}
 	
 	//Adds models to the link array but first makes sure they haven't already been added
-	function addLinkModel(&$Model, $options, $models) {
+	function addLinkModel(Model $Model, $options, $models) {
 		$cache = !empty($options['link']) ? $this->_linkCache($options['link']) : array();
 		foreach ($models as $model) {
 			if (!isset($cache[$model])) {

@@ -12,7 +12,7 @@ class ProductInventoryAdjustment extends ShopAppModel {
 	var $belongsTo = array('Shop.Product');
 	
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		if ($created || in_array('quantity', $this->changedFields)) {
 			$result = $this->findById($this->id);
 			$quantity = $result[$this->alias]['quantity'];
@@ -25,7 +25,7 @@ class ProductInventoryAdjustment extends ShopAppModel {
 	}
 
 	
-	function beforeDelete() {
+	function beforeDelete($cascade = true) {
 		$result = $this->read(null, $this->id);
 		$result = $result[$this->alias];
 		//Removes the stock from the Product's totals

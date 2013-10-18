@@ -61,11 +61,11 @@ class OrderProduct extends ShopAppModel {
 	var $packageChild;
 	var $updatedChild = array();
 	
-	function beforeValidate() {
+	function beforeValidate($options = array()) {
 		$data =& $this->getData();
 		
 		if (empty($data)) {
-			return parent::beforeValidate();
+			return parent::beforeValidate($options);
 		}
 		
 		//If only catalog_item_id is passed, finds the appropriate product ID
@@ -132,15 +132,15 @@ class OrderProduct extends ShopAppModel {
 			$this->invalidate('quantity', 'Sorry, there is not enough inventory to meet that order request');
 		}
 		
-		return parent::beforeValidate();		
+		return parent::beforeValidate($options);		
 	}
 	
-	function beforeSave() {
+	function beforeSave($options = array()) {
 		$data =& $this->getData();
 		if (!empty($data['id']) && in_array($data['id'], $this->updatedChild)) {
 			$this->data = array();
 		}
-		return parent::beforeSave();
+		return parent::beforeSave($options);
 	}
 	
 	function invalidate($field, $message) {
@@ -150,7 +150,7 @@ class OrderProduct extends ShopAppModel {
 		return parent::invalidate($field, $message);
 	}
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$id = $this->id;
 
 		$result = $this->find('first', array(
@@ -191,9 +191,9 @@ class OrderProduct extends ShopAppModel {
 		return parent::afterSave($created);
 	}
 	
-	function beforeDelete() {
+	function beforeDelete($cascade = true) {
 		$this->current = $this->read(null, $this->id);
-		return parent::beforeDelete();
+		return parent::beforeDelete($cascade);
 	}
 	
 	function afterDelete() {

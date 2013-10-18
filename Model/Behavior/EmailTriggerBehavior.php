@@ -27,7 +27,7 @@ class EmailTriggerBehavior extends ModelBehavior {
 		return parent::beforeSave($Model, $options);
 	}
 	
-	function afterSave(Model $Model, $created) {
+	function afterSave(Model $Model, $created, $options = array()) {
 		if (!empty($this->_triggered[$Model->alias])) {
 			foreach ($this->_triggered[$Model->alias] as $trigger => $true) {
 				$method = $this->triggers[$Model->alias][$trigger];
@@ -38,6 +38,6 @@ class EmailTriggerBehavior extends ModelBehavior {
 				$this->_triggered[$Model->alias][$trigger] = false;
 			}
 		}
-		return parent::afterSave($Model, $created);
+		return parent::afterSave($Model, $created, $options);
 	}
 }

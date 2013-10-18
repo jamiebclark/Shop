@@ -2,16 +2,16 @@
 //Stores an array of values before
 class ChangedFieldsBehavior extends ModelBehavior {
 
-	function setup(&$Model, $settings = array()) {
+	function setup(Model $Model, $settings = array()) {
 		$Model->changedFields = array();
 	}
 	
-	function beforeSave(&$Model) {
+	function beforeSave(Model $Model, $options = array()) {
 		$Model->changedFields = $this->getChangedFields($Model);
 		return true;
 	}
 	
-	function getChangedFields(&$Model) {
+	function getChangedFields(Model $Model) {
 		$changedFields = array();
 		if (!empty($Model->data[$Model->alias])) {
 			$data = $Model->data[$Model->alias];

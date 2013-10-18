@@ -23,7 +23,7 @@ class InvoiceEmailComponent extends Component {
 		parent::__construct($collection, $settings);
 	}
 
-	function initialize(&$controller) {
+	function initialize(Controller $controller) {
 		$this->controller =& $controller;
 		
 		$this->Invoice = ClassRegistry::init('Shop.Invoice');

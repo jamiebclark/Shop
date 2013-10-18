@@ -18,7 +18,7 @@ class CatalogItemPackage extends ShopAppModel {
 		)
 	);
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$result = $this->read(null, $this->id);
 		
 		$this->CatalogItemParent->save(array(

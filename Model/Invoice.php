@@ -74,7 +74,7 @@ class Invoice extends ShopAppModel {
 		return parent::beforeFind($queryData);
 	}
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$result = $this->read(null, $this->id);
 		$data =& $this->getData();
 		

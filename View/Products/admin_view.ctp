@@ -22,7 +22,7 @@ if (!empty($products)) {
 		if ($product['Product']['id'] == $otherProduct['Product']['id']) {
 			$active = $key;
 		}
-		$list[] = array($title, $this->Product->url($otherProduct['Product']), compact('class', 'active'));
+		$list[] = array($title, $this->Product->modelUrl($otherProduct['Product']), compact('class', 'active'));
 	}
 	$info['Other Options'] = $this->Layout->nav($list, array('class' => 'nav-list'));
 }

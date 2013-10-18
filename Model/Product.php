@@ -29,7 +29,7 @@ class Product extends ShopAppModel {
 		parent::__construct($id, $table, $ds);
 	}
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		if ($created) {
 			$id = $this->id;
 			$this->updateTitle($id);
@@ -38,11 +38,11 @@ class Product extends ShopAppModel {
 		return parent::afterSave($created);
 	}
 	
-	function beforeDelete() {
+	function beforeDelete($cascade = true) {
 		// Finds the Catalog Item ID to be updated after the deletion
 		$result = $this->read('catalog_item_id', $this->id);
 		$this->deletedProductCatalogItemId = $result[$this->alias]['catalog_item_id'];
-		return parent::beforeDelete();
+		return parent::beforeDelete($cascade);
 	}
 	
 	function afterDelete() {

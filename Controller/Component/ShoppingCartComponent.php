@@ -18,7 +18,7 @@ class ShoppingCartComponent extends Component {
 		parent::__construct($collection, $settings);
 	}
 
-	public function initialize(&$controller) {
+	public function initialize(Controller $controller) {
 		$this->controller =& $controller;
 
 		//Prevents storing cart information if user is in an admin page

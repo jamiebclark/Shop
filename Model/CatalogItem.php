@@ -71,7 +71,7 @@ class CatalogItem extends ShopAppModel {
 		return parent::beforeValidate($options);
 	}
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$id = $this->id;
 		$this->createProducts($id);
 		$this->updateProductTitles($id);

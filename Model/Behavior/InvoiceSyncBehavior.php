@@ -20,7 +20,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param array $settings Settings to override for model.
  * @return void
  **/
-	function setup(Model &$Model, $settings = array()) {
+	function setup(Model $Model, $settings = array()) {
 		$default = array(
 			'title' => InflectorPlus::humanize($Model->alias),
 			'fields' => array(),
@@ -44,9 +44,9 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		$Invoice->syncedModels[$Model->alias] = $Model->alias;
 	}
 	
-	function afterSave(Model &$Model, $created) {
+	function afterSave(Model $Model, $created, $options = array()) {
 		$this->copyModelToInvoice($Model, $Model->id);
-		return parent::afterSave($Model, $created);
+		return parent::afterSave($Model, $created, $options);
 	}
 	
 /**

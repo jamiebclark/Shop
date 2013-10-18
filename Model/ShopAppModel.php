@@ -5,7 +5,7 @@ class ShopAppModel extends AppModel {
 		'Shop.BlankDelete',
 		'Shop.Linkable',
 		'Shop.PostContain',
-		'Shop.DateValidate',
+		'Layout.DateValidate',
 	);
 
 	var $useDbConfig = 'shop';

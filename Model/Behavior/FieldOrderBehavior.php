@@ -16,7 +16,7 @@ class FieldOrderBehavior extends ModelBehavior {
 	
 	var $settings = array();
 	
-	function setup(&$Model, $settings=array()) {
+	function setup(Model $Model, $settings=array()) {
 		if(!is_array($settings) && !empty($settings)) {
 			$settings = array(
 				'subKeyFields' => array($settings)
@@ -45,7 +45,7 @@ class FieldOrderBehavior extends ModelBehavior {
 		$this->setModelOrder($Model);
 	}
 	
-	function setModelOrder(&$Model) {
+	function setModelOrder(Model $Model) {
 		$settings =& $this->settings[$Model->alias];
 		if (count($settings['subKeyFields']) > 0) {
 			$order = array();
@@ -60,41 +60,41 @@ class FieldOrderBehavior extends ModelBehavior {
 	}
 	
 	/*
-	function afterDelete(&$Model) {
+	function afterDelete(Model $Model) {
 		if (is_numeric($Model->id)) {
 			$this->reorder($Model,$Model->id);
 		}
 	}
 	*/
 	
-	function afterSave(&$Model, $created) {
+	function afterSave(Model $Model, $created, $options = array()) {
 		if ($created) {
 			$this->moveLast($Model, $Model->id);
 		}
 		return true;
 	}
 	
-	function beforeDelete(&$Model) {
+	function beforeDelete(Model $Model, $cascade = true) {
 		$this->moveLast($Model, $Model->id);
 		return true;
 	}
 		
-	function moveUp(&$Model, $id, $delta = 1) {
+	function moveUp(Model $Model, $id, $delta = 1) {
 		return $this->adjustOrder($Model, $id, $delta * -1);
 	}
-	function moveDown(&$Model, $id, $delta = 1) {
+	function moveDown(Model $Model, $id, $delta = 1) {
 		return $this->adjustOrder($Model, $id, $delta);
 	}
 	
-	function moveFirst(&$Model, $id) {
+	function moveFirst(Model $Model, $id) {
 		return $this->setOrder($Model, $id, 0);
 	}
 	
-	function moveLast(&$Model, $id) {
+	function moveLast(Model $Model, $id) {
 		return $this->setOrder($Model, $id, 99999999);
 	}
 	
-	function adjustOrder(&$Model, $id, $delta = 1) {
+	function adjustOrder(Model $Model, $id, $delta = 1) {
 		$settings =& $this->settings[$Model->alias];
 		//Loads info on id
 		$Model->create();
@@ -109,14 +109,14 @@ class FieldOrderBehavior extends ModelBehavior {
 		return $this->setOrder($Model, $id, $newOrder);
 	}
 	
-	function setOrder(&$Model, $id = null, $newOrder = null) {
+	function setOrder(Model $Model, $id = null, $newOrder = null) {
 		$settings =& $this->settings[$Model->alias];
 		$result = $this->__getPeers($Model, $id);
 		return $this->_reorderResult($Model, $result, $id, $newOrder);
 	}
 	
 	//Reorders a table on a specific field based on a set of conditions and order commands
-	function updateOrderField(&$Model, $orderField, $conditions = array(), $order = array()) {
+	function updateOrderField(Model $Model, $orderField, $conditions = array(), $order = array()) {
 		if (empty($order)) {
 			$order = array($orderField);
 		}
@@ -160,7 +160,7 @@ class FieldOrderBehavior extends ModelBehavior {
 	}
 	
 	
-	function __getPeers(&$Model, $id) {
+	function __getPeers(Model $Model, $id) {
 		$settings =& $this->settings[$Model->alias];
 		$conditions = array();
 		$order = array();

@@ -37,7 +37,7 @@ class CatalogItemHelper extends ModelViewHelper {
 	/*
 	function media($catalogItem, $options = array()) {
 		$options = array_merge(array(
-			'url' => $this->url($catalogItem),
+			'url' => $this->modelUrl($catalogItem),
 			'dir' => 'thumb',
 		), $options);
 		$thumbOptions = $this->addClass($options, 'media-object');
@@ -60,7 +60,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			unset($options['dir']);
 		}
 		if (!empty($options['url']) && $options['url'] === true) {
-			$options['url'] = $this->url($catalogItem);
+			$options['url'] = $this->modelUrl($catalogItem);
 		}
 		$src .= $catalogItem['filename'];
 		$file = str_replace(array('/','\\'), DS, SHOP_WWW_ROOT . 'img' . DS . $src);
@@ -89,12 +89,12 @@ class CatalogItemHelper extends ModelViewHelper {
 			'escape' => true,
 		), $options);
 		$options['class'] .= ' catalogitem';
-		$url = Param::keyCheck($options, 'url', false, $this->url($CatalogItem));
+		$url = Param::keyCheck($options, 'url', false, $this->modelUrl($CatalogItem));
 		
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
 	}
 	
-	function url($result) {
+	function modelUrl($result, $options = array()) {
 		$result = $this->_getResult($result);
 		return array(
 			'controller' => 'catalog_items', 

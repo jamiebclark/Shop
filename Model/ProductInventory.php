@@ -13,7 +13,7 @@ class ProductInventory extends ShopAppModel {
 	var $belongsTo = array('Shop.Product');
 	var $recursive = 0;
 
-	function beforeSave() {
+	function beforeSave($options = array()) {
 		$data =& $this->getData();
 		if (empty($data['id']) && !empty($data['product_id'])) {
 			unset($data['id']);
@@ -33,9 +33,9 @@ class ProductInventory extends ShopAppModel {
 				return false;
 			}
 		}
-		return parent::beforeSave();
+		return parent::beforeSave($options);
 	}
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$id = $this->id;
 		$result = $this->read(array('product_id'), $id);
 		$productId = $result[$this->alias]['product_id'];

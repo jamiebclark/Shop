@@ -32,7 +32,7 @@ class CatalogItemImage extends ShopAppModel {
 		)
 	);
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		$result = $this->read(null, $this->id);
 		if (!empty($result[$this->alias]['thumb'])) {
 			$this->setThumbnail($this->id);

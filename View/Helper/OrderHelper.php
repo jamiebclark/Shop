@@ -18,8 +18,8 @@ class OrderHelper extends ModelViewHelper {
 		return parent::title($result, $options);
 	}
 	
-	public function url($result, $options = array()) {
-		$url = parent::url($result, $options);
+	public function modelUrl($result, $options = array()) {
+		$url = parent::modelUrl($result, $options);
 		if (!empty($options['public'])) {
 			$url['admin'] = false;
 		}
@@ -27,7 +27,7 @@ class OrderHelper extends ModelViewHelper {
 	}
 	
 	public function publicUrl($result, $options = array()) {
-		return $this->url($result, array('public' => true) + $options);
+		return $this->modelUrl($result, array('public' => true) + $options);
 	}
 	
 	public function publicLink($result, $options = array()) {
@@ -35,7 +35,7 @@ class OrderHelper extends ModelViewHelper {
 	}
 	
 	/*
-	public function url($order) {
+	public function modelUrl($order) {
 		return array(
 			'controller' => 'orders',
 			'action' => 'view',

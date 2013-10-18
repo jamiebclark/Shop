@@ -2,7 +2,7 @@
 echo $this->Layout->defaultHeader();
 $this->Table->reset();
 foreach ($catalogItemImages as $catalogItemImage) {
-	$url = $this->ModelView->url($catalogItemImage['CatalogItemImage']);
+	$url = $this->ModelView->modelUrl($catalogItemImage['CatalogItemImage']);
 	$this->Table->checkbox($catalogItemImage['CatalogItemImage']['id']);
 	$this->Table->cells(array(
 		array(

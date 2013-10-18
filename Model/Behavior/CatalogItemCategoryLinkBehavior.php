@@ -43,9 +43,9 @@ class CatalogItemCategoryLinkBehavior extends ModelBehavior {
 		), false);
 	}
 	
-	public function afterSave(Model $Model, $created) {
+	public function afterSave(Model $Model, $created, $options = array()) {
 		$this->updateCatalogItemCategoryLink($Model, $Model->id);
-		return parent::afterSave($Model, $created);
+		return parent::afterSave($Model, $created, $options);
 	}
 	
 	public function updateCatalogItemCategoryLink(Model $Model, $id) {

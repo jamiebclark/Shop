@@ -9,7 +9,7 @@ class PaypalPayment extends ShopAppModel {
 	);
 	//OnlineStore, Bowlathon
 	
-	function afterSave($created) {
+	function afterSave($created, $options = array()) {
 		//Updates Invoice
 		$id = $this->id;
 		$this->updateCompletedInvoice($id);

@@ -14,7 +14,7 @@ class BlankDeleteBehavior extends ModelBehavior {
 	//This keeps track of which models actually have BlankDelete behavior settings
 	private $hasBlankDelete = array();
 	
-	function setup(&$Model, $settings = array()) {
+	function setup(Model $Model, $settings = array()) {
 		if (!empty($settings)) {
 			$this->hasBlankDelete[$Model->alias] = true;
 			if (!isset($this->settings[$Model->alias])) {
@@ -34,22 +34,22 @@ class BlankDeleteBehavior extends ModelBehavior {
 		}
 	}
 	
-	function beforeValidate($Model) {
+	function beforeValidate(Model $Model ,$options = array()) {
 		$Model->data = $this->checkBlankDelete($Model);
-		return parent::beforeValidate($Model);
+		return parent::beforeValidate($Model, $options);
 	}
 	
-	function beforeSave(Model $Model, $options) {
+	function beforeSave(Model $Model, $options = array()) {
 		$this->confirmDelete = false;
 		$Model->data = $this->checkBlankDelete($Model);
 		return parent::beforeSave($Model, $options);
 	}
 	
-	function afterSave(Model $Model, $created) {
+	function afterSave(Model $Model, $created, $options = array()) {
 		if ($this->confirmDelete) {
 			$Model->delete($Model->id);
 		}
-		return parent::afterSave($Model, $created);
+		return parent::afterSave($Model, $created, $options);
 	}
 
 /**
@@ -82,7 +82,7 @@ class BlankDeleteBehavior extends ModelBehavior {
 			foreach ($passedData as $key => $val) {
 				if (is_array($val) && !is_numeric($key) && ctype_upper($key{0}) && $key != $Model->alias) {
 					if (is_object($Model->{$key})) {
-						$SubModel =& $Model->{$key};
+						$SubModel = $Model->{$key};
 					} else {
 						foreach (CakePlugin::loaded() as $plugin) {
 							if ($SubModel = ClassRegistry::init("$plugin.$key", true)) {
@@ -168,7 +168,9 @@ class BlankDeleteBehavior extends ModelBehavior {
 		if (is_array($val) && isset($val['tmp_name'])) {
 			return empty($val['tmp_name']);
 		}
-		
+		if (is_array($val)) {
+			$val = implode('', $val);
+		}
 		$val = trim($val);
 		$blankVals = array(
 			null,
@@ -182,5 +184,4 @@ class BlankDeleteBehavior extends ModelBehavior {
 		$isBlank = (array_search($val, $blankVals, true) !== false);
 		return $isBlank;
 	}
-
 }

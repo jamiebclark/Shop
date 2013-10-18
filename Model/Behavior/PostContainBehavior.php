@@ -1,26 +1,26 @@
-<?phpApp::uses('Param', 'Shop.Lib');
+<?php
 class PostContainBehavior extends ModelBehavior {
 	var $name = 'PostContain';
 	
 	var $getPostContain = array();
 	
-	//If a value is stored in the 'postContain' within queryData, store it until after the find
-	function beforeFind(&$Model, $queryData) {
-		if (!empty($queryData['postContain'])) {
-			$this->getPostContain[$Model->alias] = $queryData['postContain'];
-			unset($queryData['postContain']);
+	//If a value is stored in the 'postContain' within options, store it until after the find
+	function beforeFind(Model $Model, $options = array()) {
+		if (!empty($options['postContain'])) {
+			$this->getPostContain[$Model->alias] = $options['postContain'];
+			unset($options['postContain']);
 		}
 
-		return $queryData;
+		return parent::beforeFind($Model, $options);
 	}
 	
 	//If a postContain value had been stored before the find, run it
-	function afterFind(&$Model, $results) {
+	function afterFind(Model $Model, $results, $primary = false) {
 		if (!empty($this->getPostContain[$Model->alias])) {
 			$results = $this->postContain($Model, $results, $this->getPostContain[$Model->alias]);
 			unset($this->getPostContain[$Model->alias]);
 		}
-		return $results;
+		return parent::afterFInd($Model, $results, $primary);
 	}
 	
 	/**
@@ -113,7 +113,7 @@ class PostContainBehavior extends ModelBehavior {
 	 * Returns the primaryKeys of a found result
 	 *
 	 **/
-	function ids(&$Model, $result) {
+	function ids(Model $Model, $result) {
 		$ids = array();
 		if (isset($result[$Model->alias][$Model->primaryKey])) {
 			return $result[$Model->alias][$Model->primaryKey];

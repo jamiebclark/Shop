@@ -7,7 +7,7 @@
 class SluggableBehavior extends ModelBehavior {
 	var $settings = array();
 	
-	function setup(&$Model, $settings = array()) {
+	function setup(Model $Model, $settings = array()) {
 		if (empty($this->settings[$Model->alias])) {
 			$this->settings[$Model->alias] = array();
 		}
@@ -25,7 +25,7 @@ class SluggableBehavior extends ModelBehavior {
 		}
 	}
 
-	function beforeSave(&$Model, $options) {
+	function beforeSave(Model $Model, $options = array()) {
 		$slugCol = $this->settings[$Model->alias]['slugColumn'];
 		$titleCol = $this->settings[$Model->alias]['titleColumn'];
 		if (isset($Model->data[$Model->alias][$titleCol])) {
@@ -34,7 +34,7 @@ class SluggableBehavior extends ModelBehavior {
 		return true;
 	}
 		function findBySlug(Model $Model, $slug, $options = array()) {		$slugCol = $this->settings[$Model->alias]['slugColumn'];		$options['conditions'][][$Model->alias . '.' . $slugCol . ' LIKE'] = $slug;		return $Model->find('first', $options);	}	
-	function slugRebuild(&$Model) {
+	function slugRebuild(Model $Model) {
 		$slugCol = $this->settings[$Model->alias]['slugColumn'];
 		$titleCol = $this->settings[$Model->alias]['titleColumn'];
 		$result = $Model->find('all', array(

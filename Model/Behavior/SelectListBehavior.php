@@ -2,7 +2,7 @@
 class SelectListBehavior extends ModelBehavior {
 	var $settings = array();
 	
-	function setup(&$Model, $settings = array()) {
+	function setup(Model $Model, $settings = array()) {
 		if (empty($this->settings[$Model->alias])) {
 			$this->settings[$Model->alias] = array();
 		}
@@ -30,7 +30,7 @@ class SelectListBehavior extends ModelBehavior {
 		}
 	}
 	
-	function selectList(&$Model, $options = array()) {
+	function selectList(Model $Model, $options = array()) {
 		$options = array_merge($this->settings[$Model->alias], (array) $options);
 		extract($options);
 		
@@ -65,7 +65,7 @@ class SelectListBehavior extends ModelBehavior {
 		return $list;
 	}
 	
-	function generatePathList(&$Model, $options = array()) {
+	function generatePathList(Model $Model, $options = array()) {
 		$skipRoot = Param::keyValCheck($options, 'skipRoot', true);
 		$options['fields'][] = '*';
 		$result = $Model->find('threaded', $options);
