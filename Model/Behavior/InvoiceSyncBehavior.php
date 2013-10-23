@@ -49,6 +49,18 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		return parent::afterSave($Model, $created, $options);
 	}
 	
+	function beforeDelete(Model $Model, $cascade = true) {
+		$result = $Model->find('first', array(
+			'contain' => array('Invoice'),
+			'conditions' => array($Model->escapeField($Model->primaryKey) => $Model->id)
+		));
+		//If invoice hasn't been paid, it deletes the invoice too
+		if (!empty($result) && empty($result['Invoice']['paid'])) {
+			$Model->Invoice->deleteAll(array('Invoice.id' => $result['Invoice']['id']), false, false);
+		}
+		return parent::beforeDelete($Model, $cascade);
+	}
+	
 /**
  * Finds all fields stored in settings and saves them to Invoice
  *
@@ -58,6 +70,8 @@ class InvoiceSyncBehavior extends ModelBehavior {
  **/
 	function copyModelToInvoice($Model, $id, $fields = null) {
 		$settings =& $this->settings[$Model->alias];
+		$invoiceSchema = $Model->Invoice->schema();
+		
 		if (empty($fields)) {
 			$fields = $settings['fields'];
 		}
@@ -80,7 +94,16 @@ class InvoiceSyncBehavior extends ModelBehavior {
 				if (is_numeric($modelField)) {
 					$modelField = $invoiceField;
 				}
-				$data['Invoice'][$invoiceField] = $result[$Model->alias][$modelField];
+				if (!empty($result[$Model->alias][$modelField])) {
+					$value = $result[$Model->alias][$modelField];
+				} else if (!empty($invoiceSchema[$invoiceField]['null'])) {
+					$value = null;
+				} else if (in_array($invoiceSchema[$invoiceField]['type'], array('integer', 'float'))) {
+					$value = 0;
+				} else {
+					$value = '';
+				}
+				$data['Invoice'][$invoiceField] = $value;
 			}
 		}
 		return $Model->Invoice->saveAll($data, array('callbacks' => false, 'validate' => false));

@@ -19,7 +19,7 @@ class Order extends ShopAppModel {
 		//	'send_paid_email' => 'sendPaidEmail',
 		),
 	);	
-	var $order = array('Order.created DESC');
+	var $order = array('Order.created' => 'DESC');
 	var $recursive = -1;
 	var $virtualFields = array('title' => 'CONCAT("Order #", $ALIAS.id)');
 	

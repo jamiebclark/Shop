@@ -145,6 +145,37 @@ class Invoice extends ShopAppModel {
 		return null;
 	}
 	
+	public function fixTotals() {
+		$Pdo = getModelPDO($this);
+		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');
+		$startCount = $Sth->rowCount();
+		
+		$ids = array();
+		while ($row = $Sth->fetch()) {
+			$ids[] = $row['id'];
+			if (!empty($row['model']) && !empty($row['model_id'])) {
+				$Model = ClassRegistry::init($row['model'], true);
+				if (!empty($Model)) {
+					//If Invoice has been paid or the Model exists, sync the totals, otherwise delete it
+					if (!empty($row['paid']) || $Model->read(null, $row['model_id'])) {
+						$Model->create();
+						$Model->copyModelToInvoice($row['model_id']);
+					} else {
+						$this->delete($row['id']);
+					}
+				}
+			}
+		}
+		$result = $this->find('all', array('conditions' => array(
+			'Invoice.id' => $ids,
+			'Invoice.amt' => 0,
+		)));
+		$endCount = count($result);
+		if ($startCount != $endCount) {
+			debug("$endCount Found after initially finding $startCount");
+		}
+	}
+	
 	public function fixDuplicates() {
 		$Pdo = getModelPDO($this);
 		$Sth = $Pdo->query('SELECT 
@@ -168,7 +199,6 @@ class Invoice extends ShopAppModel {
 					}
 				}
 			}
-			debug(compact('ids', 'data'));
 			$this->create();
 			//Removes Extra Ids
 			$this->deleteAll(array(

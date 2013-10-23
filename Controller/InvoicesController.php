@@ -24,6 +24,9 @@ class InvoicesController extends ShopAppController {
 	}
 	
 	function admin_index() {
+		$this->Invoice->fixDuplicates();
+		$this->Invoice->fixTotals();
+		
 		if (!empty($this->request->data['Invoice']['id'])) {
 			$invoice = $this->Invoice->findById($this->request->data['Invoice']['id']);
 			if (!empty($invoice)) {
