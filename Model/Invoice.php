@@ -11,7 +11,7 @@ class Invoice extends ShopAppModel {
 		)
 	);
 	var $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
-	var $order = '$ALIAS.created DESC';
+	var $order = array('$ALIAS.created' => 'DESC');
 	
 	var $hasOne = array(
 		'Shop.Order',
@@ -159,14 +159,24 @@ class Invoice extends ShopAppModel {
 			$SthDup->bindParam(':modelId', $row['model_id']);
 			$SthDup->execute();
 			$data = array();
+			$ids = array();
 			while ($invoice = $SthDup->fetch()) {
+				$ids[] = $invoice['id'];
 				foreach ($invoice as $field => $val) {
 					if (!is_numeric($field) && !empty($val)) {
 						$data[$field] = $val;
 					}
 				}
 			}
-			debug($data);
+			debug(compact('ids', 'data'));
+			$this->create();
+			//Removes Extra Ids
+			$this->deleteAll(array(
+				$this->escapeField('id') => $ids,
+				'NOT' => array($this->escapeField('id') => $data['id'])
+			));
+			//Saves Combined Entry
+			$this->save($data, array('callbacks' => false, 'validate' => false));
 		}
 	}
 }
