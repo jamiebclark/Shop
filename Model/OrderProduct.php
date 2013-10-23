@@ -143,7 +143,7 @@ class OrderProduct extends ShopAppModel {
 		return parent::beforeSave($options);
 	}
 	
-	function invalidate($field, $message) {
+	function invalidate($field, $message = true) {
 		if (!empty($this->debug)) {
 			debug($message);
 		}

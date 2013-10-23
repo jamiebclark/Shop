@@ -63,6 +63,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		}
 
 		$result = $Model->find('first', array(
+			'fields' => '*', 
 			'link' => array('Shop.Invoice'),
 			'conditions' => array($Model->alias . '.id' => $id)
 		));
