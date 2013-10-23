@@ -55,7 +55,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 			'conditions' => array($Model->escapeField($Model->primaryKey) => $Model->id)
 		));
 		//If invoice hasn't been paid, it deletes the invoice too
-		if (!empty($result) && empty($result['Invoice']['paid'])) {
+		if (!empty($result['Invoice']['id']) && empty($result['Invoice']['paid'])) {
 			$Model->Invoice->deleteAll(array('Invoice.id' => $result['Invoice']['id']), false, false);
 		}
 		return parent::beforeDelete($Model, $cascade);
