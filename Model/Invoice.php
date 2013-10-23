@@ -144,4 +144,29 @@ class Invoice extends ShopAppModel {
 		}
 		return null;
 	}
+	
+	public function fixDuplicates() {
+		$Pdo = getModelPDO($this);
+		$Sth = $Pdo->query('SELECT 
+			id, model, model_id, COUNT(id) AS dup_count 
+		FROM `invoices` 
+		WHERE model IS NOT NULL AND model IS NOT NULL 
+		GROUP BY model, model_id 
+		HAVING dup_count > 1');
+		$SthDup = $Pdo->prepare('SELECT * FROM `invoices` WHERE model=:model AND model_id=:modelId ORDER BY created ASC');
+		while($row = $Sth->fetch()) {
+			$SthDup->bindParam(':model', $row['model']);
+			$SthDup->bindParam(':modelId', $row['model_id']);
+			$SthDup->execute();
+			$data = array();
+			while ($invoice = $SthDup->fetch()) {
+				foreach ($invoice as $field => $val) {
+					if (!is_numeric($field) && !empty($val)) {
+						$data[$field] = $val;
+					}
+				}
+			}
+			debug($data);
+		}
+	}
 }
