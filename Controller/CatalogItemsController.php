@@ -56,7 +56,7 @@ class CatalogItemsController extends ShopAppController {
 		
 		// Catalog Layout
 		$sessionName = 'CatalogItem.CatalogLayout';
-		$catalogLayout = array('layout' => 'thumb', 'per_page' => 8);
+		$catalogLayout = array('layout' => 'thumb', 'per_page' => 24);
 		if ($this->Session->check($sessionName) && is_array($sessionDefault = $this->Session->read($sessionName))) {
 			$catalogLayout = array_merge($catalogLayout, $sessionDefault);
 		}
