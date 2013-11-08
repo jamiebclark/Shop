@@ -140,8 +140,8 @@ echo $this->Table->output(array('class' => 'handling-methods'));
 
 echo $this->Form->submit('Update', array('class' => 'btn btn-primary')); 
 echo $this->Form->end();
+$this->Asset->blockStart();
 ?>
-<script type="text/javascript">
 (function($) {
 	$.fn.toggleActive = function(find) {
 		return this.each(function() {
@@ -171,6 +171,5 @@ $(document).ready(function() {
 	$('input[name*=auto_price]').toggleActive('input[name*="[price]"]');
 	$('input[name*=auto_handling]').toggleActive('.handling-methods :input');
 });
-
-
-</script>
+<?php
+$this->Asset->blockEnd();

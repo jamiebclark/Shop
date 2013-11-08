@@ -112,7 +112,7 @@ class AmazonFormHelper extends AppHelper {
 			$this->arrayToJs($options)
 		);
 		$out = $this->Html->div(null, '', compact('id'));
-		$out .= $this->Html->tag('script', $script, array('type' => 'text/javascript'));
+		$this->Asset->block($script);
 		return $out;
 	}
 	

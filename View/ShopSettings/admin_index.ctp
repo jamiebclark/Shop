@@ -77,8 +77,9 @@
 		</div>
 	</div>
 </div>
-<?php echo $this->FormLayout->end('Update'); ?>
-<script type="text/javascript">
+<?php echo $this->FormLayout->end('Update'); 
+
+$this->Asset->blockStart(); ?>
 $(document).ready(function() {
 	var textareaFocusHeight = '300px';
 	$('textarea').each(function() {
@@ -96,4 +97,4 @@ $(document).ready(function() {
 			});
 	});
 });
-</script>
+<?php $this->Asset->blockEnd(); ?>
