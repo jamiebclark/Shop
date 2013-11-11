@@ -93,8 +93,8 @@ class OrderProductsController extends ShopAppController {
 	}
 	
 	function admin_add($orderId = null, $productId = null) {
-		$this->_paramCheck('order_id', $orderId);
-		$this->_paramCheck('product_id', $productId);
+		$orderId = $this->_paramCheck('order_id', $orderId);
+		$productId = $this->_paramCheck('product_id', $productId);
 		
 		$default = array('OrderProduct' => array('order_id' => $orderId, 'product_id' => $productId));
 		$this->FormData->addData(compact('default'));
@@ -120,7 +120,7 @@ class OrderProductsController extends ShopAppController {
 		$this->set('products', $this->OrderProduct->Product->selectList());
 	}
 	
-	function _paramCheck($varName, &$var = null) {
+	function _paramCheck($varName, $var = null) {
 		if (empty($var)) {
 			if (isset($this->request->data['OrderProduct'][$varName])) {
 				$var = $this->request->data['OrderProduct'][$varName];
