@@ -120,15 +120,15 @@ class OrderProductsController extends ShopAppController {
 		$this->set('products', $this->OrderProduct->Product->selectList());
 	}
 	
-	function _paramCheck($varName, $var = null) {
-		if (empty($var)) {
-			if (isset($this->request->data['OrderProduct'][$varName])) {
-				$var = $this->request->data['OrderProduct'][$varName];
-			} else if (isset($this->request->named[$varName])) {
-				$var = $this->request->named[$varName];
-			} else if (isset($this->request->query[$varName])) {
-				$var = $this->request->query[$varName];
-			}
+	function _paramCheck($varName, $default = null) {
+		if (empty($default)) {
+			$var = $default;
+		} else if (isset($this->request->data['OrderProduct'][$varName])) {
+			$var = $this->request->data['OrderProduct'][$varName];
+		} else if (isset($this->request->named[$varName])) {
+			$var = $this->request->named[$varName];
+		} else if (isset($this->request->query[$varName])) {
+			$var = $this->request->query[$varName];
 		}
 		return $var;
 	}
