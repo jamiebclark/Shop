@@ -3,6 +3,11 @@ class ProductsController extends ShopAppController {
 	var $name = 'Products';
 	var $components = array('Layout.Activate', 'Layout.Table');
 	
+	//Anticipates bad links of /products/view/$catalogItemId
+	function view ($catalogItemId) {
+		$this->redirect(array('controller' => 'catalog_items', 'action' => 'view', $catalogItemId));
+	}
+	
 	function admin_index($catalogItemId = null) {
 		$this->paginate = array(
 			'fields' => '*',
@@ -80,5 +85,4 @@ class ProductsController extends ShopAppController {
 		$this->set(compact('catalogItem'));
 		$this->set('catalogItemOptions', $this->Product->CatalogItem->CatalogItemOption->findCatalogItemOptions($catalogItemId));
 	}
-	
 }
