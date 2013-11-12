@@ -181,7 +181,7 @@ class Invoice extends ShopAppModel {
 		$Sth = $Pdo->query('SELECT 
 			id, model, model_id, COUNT(id) AS dup_count 
 		FROM `invoices` 
-		WHERE model IS NOT NULL AND model IS NOT NULL AND paid IS NULL
+		WHERE model IS NOT NULL AND model IS NOT NULL 
 		GROUP BY model, model_id 
 		HAVING dup_count > 1');
 		$SthDup = $Pdo->prepare('SELECT * FROM `invoices` WHERE model=:model AND model_id=:modelId ORDER BY created ASC');
