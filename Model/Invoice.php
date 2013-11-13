@@ -145,6 +145,26 @@ class Invoice extends ShopAppModel {
 		return null;
 	}
 	
+/**
+ * Copies PaypalPayment information to Invoice model
+ * 
+ * @param int $id Model id
+ * @param bool $soft If true, only copies into blank invoice fields
+ *
+ **/
+	public function syncPaypal($id, $soft = true) {
+		$result = $this->find('first', array(
+			'fields' => 'PaypalPayment.id',
+			'link' => array('Shop.PaypalPayment'),
+			'conditions' => array($this->escapeField($this->primaryKey) => $id),
+		));
+		if (!empty($result['PaypalPayment']['id'])) {
+			return $this->PaypalPayment->syncInvoice($result['PaypalPayment']['id'], $soft);
+		} else {
+			return null;
+		}
+	}
+	
 	public function fixTotals() {
 		$Pdo = getModelPDO($this);
 		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');

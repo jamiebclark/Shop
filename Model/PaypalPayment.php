@@ -23,15 +23,18 @@ class PaypalPayment extends ShopAppModel {
 		));
 	}
 	
+/**
+ * Takes information from the PayPal table and copies them over to any empty fields in the Invoice model
+ *
+ * @param int $id modelId
+ * @param bool $soft If true, only copies if invoice field is blank
+ **/
 	function syncInvoice($id, $soft = true) {
 		$result = $this->find('first', array(
 			'fields' => array('*'),
 			'link' => array('Shop.Invoice'),
-			'conditions' => array(
-				$this->alias . '.id' => $id
-			)
+			'conditions' => array($this->escapeField($this->primaryKey) => $id)
 		));
-		
 		$syncFields = array(
 			'first_name',
 			'last_name',
@@ -41,7 +44,6 @@ class PaypalPayment extends ShopAppModel {
 			'address_zip' => 'zip',
 			'payer_email' => 'email',
 		);
-		
 		$invoiceData = array();
 		if (!empty($result['Invoice']['id'])) {
 			$invoiceData['id'] = $result['Invoice']['id'];
@@ -50,7 +52,6 @@ class PaypalPayment extends ShopAppModel {
 			$syncFields['mc_gross'] = 'amt';
 			$created = true;
 		}
-		
 		foreach ($syncFields as $paypalField => $invoiceField) {
 			if (is_numeric($paypalField)) {
 				$paypalField = $invoiceField;
@@ -59,13 +60,10 @@ class PaypalPayment extends ShopAppModel {
 				$invoiceData[$invoiceField] = $result[$this->alias][$paypalField];
 			}
 		}
-		
 		if (!empty($invoiceData)) {
-			
 			if ($created) {
 				$invoiceData['created'] = $this->_datePaid($result);
 			}
-			
 			$this->Invoice->create();
 			$data = array(
 				'Invoice' => $invoiceData,

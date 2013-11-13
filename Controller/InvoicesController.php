@@ -41,6 +41,8 @@ class InvoicesController extends ShopAppController {
 	}
 	
 	function admin_view($id = null) {
+		$this->Invoice->syncPaypal($id);
+		
 		if (!empty($this->request->params['named']['notify'])) {
 			$msg = $this->Invoice->sendAdminPaidEmail($id) ? 'Email sent' : 'Error sending email';
 			$this->_redirectMsg(array($id), $msg);
@@ -85,6 +87,25 @@ class InvoicesController extends ShopAppController {
 	
 	function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
+	}
+	
+	function admin_sync_paypal($id = null) {
+		$success = $this->Invoice->syncPaypal($id);
+		$redirect = array('action' => 'view', $id);
+
+		if ($success === false) {
+			$msg = 'Invoice not found';
+			$class = 'alert-error';
+			$redirect = array('action' => 'index');
+		} else if (empty($success)) {
+			$msg = 'PayPal payment not found';
+			$class = 'alert-warning';
+		} else {
+			$msg = 'Synced PayPal information';
+			$class = 'alert-success';
+		}
+		$this->Session->setFlash($msg, 'default', compact('class'));
+		$this->redirect($redirect);
 	}
 	
 	function admin_resend_email($id = null) {		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';

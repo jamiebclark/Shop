@@ -145,6 +145,8 @@ class PaypalPaymentsController extends ShopAppController {
 					$this->_log('Invoice Found. Sending Email');
 					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
 					
+					$this->PaypalPayment->Invoice->syncPaypal($invoice['Invoice']['id']);
+					
 					App::uses('InvoiceEmail', 'Shop.Network/Email');
 					if (defined('COMPANY_ADMIN_EMAILS')) {
 						$InvoiceEmail = new InvoiceEmail();
