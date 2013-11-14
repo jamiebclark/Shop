@@ -135,6 +135,9 @@ class PaypalPaymentsController extends ShopAppController {
 				$this->_log('Successfully saved Paypal IPN info');
 				$this->_log('Finding Invoice ID: ' . $this->PaypalPayment->id);
 				
+				//Makes sure any missing info is copied from PayPal
+				$this->PaypalPayment->syncInvoice($this->PaypalPayment->id);
+				
 				$invoice = $this->PaypalPayment->Invoice->find('first', array(
 					'link' => array('Shop.PaypalPayment'),
 					'conditions' => array('PaypalPayment.id' => $this->PaypalPayment->id)
@@ -144,8 +147,6 @@ class PaypalPaymentsController extends ShopAppController {
 				} else {
 					$this->_log('Invoice Found. Sending Email');
 					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
-					
-					$this->PaypalPayment->Invoice->syncPaypal($invoice['Invoice']['id']);
 					
 					App::uses('InvoiceEmail', 'Shop.Network/Email');
 					if (defined('COMPANY_ADMIN_EMAILS')) {
@@ -157,7 +158,7 @@ class PaypalPaymentsController extends ShopAppController {
 							$this->_log('Error sending notification email');
 						}
 					} else {
-						$this->_log('No Admin Emails set, so nothing is being sent');
+						$this->_log('No admin emails set, so nothing is being sent');
 					}
 					$this->_log('Finished Email');
 				}
