@@ -3,7 +3,7 @@
  * Behavior that automatcially syncs fields between model and the Invoice model
  *
  **/
-App::uses('InflectorPlus', 'Shop.Lib');
+App::uses('InflectorPlus', 'Layout.Lib');
 class InvoiceSyncBehavior extends ModelBehavior {
 	var $settings = array();
 	
