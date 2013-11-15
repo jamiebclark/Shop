@@ -11,7 +11,7 @@ class Invoice extends ShopAppModel {
 		)
 	);
 	var $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
-	var $order = '$ALIAS.created DESC';
+	var $order = array('$ALIAS.created' => 'DESC');
 	
 	var $hasOne = array(
 		'Shop.Order',
@@ -143,5 +143,90 @@ class Invoice extends ShopAppModel {
 			return $Email->sendAdminPaid($result);
 		}
 		return null;
+	}
+	
+/**
+ * Copies PaypalPayment information to Invoice model
+ * 
+ * @param int $id Model id
+ * @param bool $soft If true, only copies into blank invoice fields
+ *
+ **/
+	public function syncPaypal($id, $soft = true) {
+		$result = $this->find('first', array(
+			'fields' => 'PaypalPayment.id',
+			'link' => array('Shop.PaypalPayment'),
+			'conditions' => array($this->escapeField($this->primaryKey) => $id),
+		));
+		if (!empty($result['PaypalPayment']['id'])) {
+			return $this->PaypalPayment->syncInvoice($result['PaypalPayment']['id'], $soft);
+		} else {
+			return null;
+		}
+	}
+	
+	public function fixTotals() {
+		$Pdo = getModelPDO($this);
+		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');
+		$startCount = $Sth->rowCount();
+		
+		$ids = array();
+		while ($row = $Sth->fetch()) {
+			$ids[] = $row['id'];
+			if (!empty($row['model']) && !empty($row['model_id'])) {
+				$Model = ClassRegistry::init($row['model'], true);
+				if (!empty($Model)) {
+					//If Invoice has been paid or the Model exists, sync the totals, otherwise delete it
+					if (!empty($row['paid']) || $Model->read(null, $row['model_id'])) {
+						$Model->create();
+						$Model->copyModelToInvoice($row['model_id']);
+					} else {
+						$this->delete($row['id']);
+					}
+				}
+			}
+		}
+		$result = $this->find('all', array('conditions' => array(
+			'Invoice.id' => $ids,
+			'Invoice.amt' => 0,
+		)));
+		$endCount = count($result);
+		if ($startCount != $endCount) {
+			debug("$endCount Found after initially finding $startCount");
+		}
+	}
+	
+	public function fixDuplicates() {
+		$Pdo = getModelPDO($this);
+		$Sth = $Pdo->query('SELECT 
+			id, model, model_id, COUNT(id) AS dup_count 
+		FROM `invoices` 
+		WHERE model IS NOT NULL AND model IS NOT NULL 
+		GROUP BY model, model_id 
+		HAVING dup_count > 1');
+		$SthDup = $Pdo->prepare('SELECT * FROM `invoices` WHERE model=:model AND model_id=:modelId ORDER BY created ASC');
+		while($row = $Sth->fetch()) {
+			$SthDup->bindParam(':model', $row['model']);
+			$SthDup->bindParam(':modelId', $row['model_id']);
+			$SthDup->execute();
+			$data = array();
+			$ids = array();
+			while ($invoice = $SthDup->fetch()) {
+				$ids[] = $invoice['id'];
+				foreach ($invoice as $field => $val) {
+					if (!is_numeric($field) && !empty($val)) {
+						$data[$field] = $val;
+					}
+				}
+			}
+			$this->create();
+			//Removes Extra Ids
+			$this->deleteAll(array(
+				$this->escapeField('id') => $ids,
+				'NOT' => array($this->escapeField('id') => $data['id'])
+			));
+			//Saves Combined Entry
+			$this->save($data, array('callbacks' => false, 'validate' => false));
+		}
 	}
 }

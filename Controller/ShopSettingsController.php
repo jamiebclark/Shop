@@ -8,7 +8,7 @@ class ShopSettingsController extends ShopAppController {
 			$data = array_values($this->request->data['ShopSetting']);
 			if ($this->ShopSetting->saveAll($data)) {
 				$this->FormData->flashSuccess('Updates Store Settings');
-				$this->_setShopSettings(true);
+				//$this->_setShopSettings(true);
 			} else {
 				$this->FormData->flashError('Failed to update store settings');
 			}

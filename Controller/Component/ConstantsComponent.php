@@ -48,10 +48,14 @@ class ConstantsComponent extends Component {
 	 **/
 	private function getConstants($reset = false) {
 		if ($reset || !$this->Session->check($this->sessionName)) {
-			return $this->getModelConstants();
+			$constants = $this->getModelConstants();
 		} else {
-			return $this->getSessionConstants();
+			$constants = $this->getSessionConstants();
+			if (empty($constants['encrypted']) && empty($constants['decrypted'])) {
+				$constants = $this->getConstants(true);
+			}
 		}
+		return $constants;
 	}
 	
 	/**
