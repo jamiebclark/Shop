@@ -1,7 +1,7 @@
 <?php
 if (is_array($product)) {
 	$defaultCrumbs = array(
-		array($product['Product']['title'], $this->CatalogItem->url($product['Product'])),
+		array($product['Product']['title'], $this->CatalogItem->modelUrl($product['Product'])),
 		array('Images', array('action' => 'index', $product['Product']['id'])),
 	);
 	if (empty($crumbs)) {

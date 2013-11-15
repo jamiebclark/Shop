@@ -5,7 +5,7 @@ foreach ($result as $k => $catalogItemPackage):
 	$prefix = 'ChildOrderProduct.' . $k . '.';
 	$title = $catalogItemPackage['CatalogItemChild']['title'];
 	if (!$catalogItemPackage['CatalogItemChild']['hidden']) {
-		$url = $this->CatalogItem->url($catalogItemPackage['CatalogItemChild']);
+		$url = $this->CatalogItem->modelUrl($catalogItemPackage['CatalogItemChild']);
 		$title = $this->Html->link($title, $url);
 	}
 	$thumb = $this->CatalogItem->thumb($catalogItemPackage['CatalogItemChild'], array(

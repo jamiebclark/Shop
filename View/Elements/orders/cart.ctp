@@ -69,7 +69,7 @@ if (!$emptyCart):
 		//Product
 		$url = null;
 		if (!$hasParent && !$productHidden && $productActive && $links) {
-			$url = $this->CatalogItem->url($catalogItem);
+			$url = $this->CatalogItem->modelUrl($catalogItem);
 		}
 		
 		if ($hasParent && $condensed) {
