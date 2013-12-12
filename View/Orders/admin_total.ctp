@@ -1,8 +1,11 @@
-<?php
-echo $this->element('orders/admin_heading', array(
-	'crumbs' => array('Totals'),
-));
+<h1>Order Totals per Year</h1>
+<h3><?php
+	echo $this->Html->link('Per-product totals', array(
+		'controller' => 'catalog_items', 'action' => 'totals',
+	));
+	?></h3>
 
+<?php
 $this->Table->reset();
 foreach ($totals as $year => $total) {
 	$this->Table->cell(

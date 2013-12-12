@@ -20,8 +20,8 @@ td.sub.title a {
 	text-decoration: underline;
 }
 </style>
-<?php
-echo $this->Layout->defaultHeader();echo $this->element('catalog_items/admin_nav');
+<h1>Product Totals Per-Year</h1>
+<?phpecho $this->element('catalog_items/admin_nav');
 
 $class = 'numeric centered';
 $subClass = $class . ' sub';
