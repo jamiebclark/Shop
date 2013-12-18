@@ -70,10 +70,10 @@ class OrderProductsController extends ShopAppController {
 				);
 			}
 		} else {
-			$this->_redirectMsg(array('controller' => 'products', 'action' => 'index'));
+			$this->redirectMsg(array('controller' => 'products', 'action' => 'index'));
 		}
 		//debug(compact('redirect', 'msg'));
-		$this->_redirectMsg($redirect, $msg, $success);
+		$this->redirectMsg($redirect, $msg, $success);
 	}
 	
 	//Removes an item from a cart
@@ -89,7 +89,7 @@ class OrderProductsController extends ShopAppController {
 				$this->FormData->deleteData($id);
 			}
 		}
-		$this->_redirectMsg(true, 'There was an error deleting the item. Please try again');
+		$this->redirectMsg(true, 'There was an error deleting the item. Please try again');
 	}
 	
 	function admin_add($orderId = null, $productId = null) {

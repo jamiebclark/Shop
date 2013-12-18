@@ -63,7 +63,7 @@ class ProductInventoriesController extends ShopAppController {
 		}
 		$product = $this->ProductInventory->Product->findById($this->request->data['Product']['id']);
 		if (empty($product)) {
-			$this->_redirectMsg(true, 'Could not find product');
+			$this->redirectMsg(true, 'Could not find product');
 		}
 		$this->set(compact('product'));
 		$this->set('productOptions', $this->ProductInventory->Product->ProductOption->findProductOptions($this->request->data['Product']['id']));
@@ -74,6 +74,6 @@ class ProductInventoriesController extends ShopAppController {
 	
 	function admin_rebuild($id = null) {
 		$this->ProductInventory->rebuildQuantity($id);
-		$this->_redirectMsg(array('action' => 'view', $id), 'Rebuilt inventory');
+		$this->redirectMsg(array('action' => 'view', $id), 'Rebuilt inventory');
 	}
 }

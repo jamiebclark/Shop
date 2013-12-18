@@ -6,14 +6,14 @@ App::import('Lib', 'Shop.InflectorPlus');
 require_once '../Config/core.php';
 
 class ShopAppController extends AppController {
-	var $components = array(
+	public $components = array(
 		'Shop.Constants',
 		'FormData.FormData' => array('plugin' => 'Shop'),
 		'Layout.FormLayout',
 		'Session',
 	);
 	
-	var $helpers = array(
+	public $helpers = array(
 		'Layout.Asset',
 		'Layout.Crumbs',
 		'Layout.Calendar', 
@@ -26,7 +26,7 @@ class ShopAppController extends AppController {
 		'Layout.Table',
 	);
 	
-	function beforeRender() {
+	public function beforeRender() {
 		parent::beforeRender();
 		// Checks one last time that global settings have been set
 		if ($this->layout != 'setup' && !empty($this->request->params['prefix'])) {
@@ -34,11 +34,11 @@ class ShopAppController extends AppController {
 		}
 	}
 
-	function _redirectHome() {
+	public function redirectHome() {
 		return $this->redirect(array('controller' => 'catalog_items', 'action' => 'index'));
 	}
 	
-	function _redirectMsg($redirect = true, $msg = null, $success = null) {
+	public function redirectMsg($redirect = true, $msg = null, $success = null) {
 		if (!empty($msg)) {
 			$type = 'info';
 			if ($success === false) {

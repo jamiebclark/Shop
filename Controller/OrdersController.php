@@ -102,7 +102,7 @@ class OrdersController extends ShopAppController {
 			if (!empty($order)) {
 				$this->redirect(array('action' => 'view', $this->request->data['Order']['id']));
 			} else {
-				$this->_redirectMsg(true, 'Could not find Order #' . $this->request->data['Order']['id']);
+				$this->redirectMsg(true, 'Could not find Order #' . $this->request->data['Order']['id']);
 			}
 		}
 
@@ -264,7 +264,7 @@ class OrdersController extends ShopAppController {
 		if (!empty($result)) {
 			$this->ShoppingCart->setCart($result['Order']['id']);
 		} else {
-			$this->_redirectHome();
+			$this->redirectHome();
 		}
 		return $result;
 	}

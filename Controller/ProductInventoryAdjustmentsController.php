@@ -34,7 +34,7 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 		if (!empty($result)) {
 			$this->redirect(array('controller' => 'products', 'action' => 'view', $result['Product']['id']));
 		} else {
-			$this->_redirectMsg(array('controller' => 'products', 'action' => 'index'), 'Could not locate product inventory');
+			$this->redirectMsg(array('controller' => 'products', 'action' => 'index'), 'Could not locate product inventory');
 		}
 	}
 	

@@ -32,7 +32,7 @@ class InvoicesController extends ShopAppController {
 			if (!empty($invoice)) {
 				$this->redirect(array('action' => 'view', $invoice['Invoice']['id']));
 			} else {
-				$this->_redirectMsg(true, 'Invoice #' . $this->request->data['Invoice']['id'] . ' Not Found', false);
+				$this->redirectMsg(true, 'Invoice #' . $this->request->data['Invoice']['id'] . ' Not Found', false);
 			}
 		}
 		
@@ -45,7 +45,7 @@ class InvoicesController extends ShopAppController {
 		
 		if (!empty($this->request->params['named']['notify'])) {
 			$msg = $this->Invoice->sendAdminPaidEmail($id) ? 'Email sent' : 'Error sending email';
-			$this->_redirectMsg(array($id), $msg);
+			$this->redirectMsg(array($id), $msg);
 		}
 		$this->FormData->findModel($id);
 	}
@@ -109,7 +109,7 @@ class InvoicesController extends ShopAppController {
 	}
 	
 	function admin_resend_email($id = null) {		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';
-		} else {			$msg = 'There was an error sending email';		}				$this->_redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
+		} else {			$msg = 'There was an error sending email';		}				$this->redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
 	function admin_copy_payment($id = null) {
 		$invoice = $this->Invoice->find('first', array(
 			'fields' => array('*'),
@@ -125,7 +125,7 @@ class InvoicesController extends ShopAppController {
 				$msg = 'Could not update Invoice information';
 			}
 		}
-		$this->_redirectMsg(true, $msg, $success);
+		$this->redirectMsg(true, $msg, $success);
 	}
 	
 	function _setFormElements() {

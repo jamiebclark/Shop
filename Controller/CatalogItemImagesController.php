@@ -13,7 +13,7 @@ class CatalogItemImagesController extends ShopAppController {
 		$catalogItem = $this->CatalogItemImage->CatalogItem->findById($catalogItemId);
 		
 		if (empty($catalogItemImages)) {
-			$this->_redirectMsg(true, 'No images found for that catalogItem');
+			$this->redirectMsg(true, 'No images found for that catalogItem');
 		} else if (count($catalogItemImages) == 1) {
 			$this->redirect(array('action' => 'view', $catalogItemImages[0]['CatalogItemImage']['id']));
 		}

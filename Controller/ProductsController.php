@@ -80,7 +80,7 @@ class ProductsController extends ShopAppController {
 		$catalogItemId = $this->request->data['CatalogItem']['id'];
 		$catalogItem = $this->Product->CatalogItem->findById($catalogItemId);
 		if (empty($catalogItem)) {
-			$this->_redirectMsg(true, 'Could not find product');
+			$this->redirectMsg(true, 'Could not find product');
 		}
 		$this->set(compact('catalogItem'));
 		$this->set('catalogItemOptions', $this->Product->CatalogItem->CatalogItemOption->findCatalogItemOptions($catalogItemId));

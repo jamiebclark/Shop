@@ -579,7 +579,7 @@ class CatalogItemsController extends ShopAppController {
 
 		$categoryId = $this->CatalogItem->CatalogItemCategory->checkScope($categoryId, $this->rootCategoryId);
 		if (!$categoryId) {
-			return $this->_redirectMsg(array('action' => 'index'), 'Category not found', false);
+			return $this->redirectMsg(array('action' => 'index'), 'Category not found', false);
 		}
 
 		return $categoryId;
