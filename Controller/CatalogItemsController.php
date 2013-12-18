@@ -19,7 +19,7 @@ class CatalogItemsController extends ShopAppController {
 	/*
 	function beforeFilter() {
 		parent::beforeFilter();
-		if (!$this->_loggedUserType('admin')) {
+		if (!$this->LoggedUserTypes->check('admin')) {
 			$this->offline = array(
 				'title' => 'Store Offline',
 				'content' => 'While we get the site up and running, the store is temporarily down. Check back soon!',
