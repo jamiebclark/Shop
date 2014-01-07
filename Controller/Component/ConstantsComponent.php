@@ -29,7 +29,7 @@ class ConstantsComponent extends Component {
 	public function setConstantsInit() {
 		// If a user is making changes to ShopSetting, skips setting the variables until after the saving is complete
 		if (empty($controller->request->data['ShopSetting'])) {
-			$this->setConstants();
+			$this->setConstantsCheck();
 		}
 	}
 	
@@ -47,7 +47,9 @@ class ConstantsComponent extends Component {
 		extract($constants);	//Returns $encrypted and $decrypted
 		if (!empty($decrypted)) {
 			foreach ($decrypted as $name => $val) {
-				define($name, $val);
+				if (!defined($name)) {
+					define($name, $val);
+				}
 			}
 		}
 		$this->_isSet = true;
