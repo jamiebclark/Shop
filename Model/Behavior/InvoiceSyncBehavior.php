@@ -88,7 +88,8 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		));
 		if (!empty($result['Invoice']['id'])) {
 			$data['Invoice']['id'] = $result['Invoice']['id'];
-		}				
+		}
+		
 		if (!empty($fields)) {
 			foreach ($fields as $modelField => $invoiceField) {
 				if (is_numeric($modelField)) {

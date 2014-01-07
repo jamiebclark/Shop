@@ -6,7 +6,10 @@
 class ShoppingCartComponent extends Component {
 	public $name = 'ShoppingCart';
 	public $controller;
-	public $components = array('Session');
+	public $components = array(
+		'Session',
+		'Shop.Constants',
+	);
 	
 	private $_isBlocked = false;		//Tracks if cart ID should be blocked during the current page view
 	
@@ -20,7 +23,8 @@ class ShoppingCartComponent extends Component {
 
 	public function initialize(Controller $controller) {
 		$this->controller =& $controller;
-
+		$this->Constants->setConstantsInit();
+		
 		//Prevents storing cart information if user is in an admin page
 		if (!empty($this->controller->request->params['prefix']) && $this->controller->request->params['prefix'] == 'admin') {
 			$this->blockCart();

@@ -17,19 +17,31 @@ class ConstantsComponent extends Component {
 	private $sessionName = 'Shop.settings';
 	
 	public function initialize(Controller $controller) {
+		$this->setConstantsInit();
+	}
+	
+	public function beforeRender(Controller $controller) {
+		// If setting has been postponed, make sure to handle it here
+		$this->setConstantsCheck();
+	}
+
+	//Sets the constants only if they aren't currently being edited via request data
+	public function setConstantsInit() {
 		// If a user is making changes to ShopSetting, skips setting the variables until after the saving is complete
 		if (empty($controller->request->data['ShopSetting'])) {
 			$this->setConstants();
 		}
 	}
 	
-	public function beforeRender(Controller $controller) {
-		// If setting has been postponed, make sure to handle it here
+	//Sets the constants only if they haven't been set yet
+	public function setConstantsCheck() {
 		if (!$this->_isSet) {
-			$this->setConstants();
+			return $this->setConstants();
+		} else {
+			return null;
 		}
 	}
-
+	
 	public function setConstants($reset = false) {
 		$constants = $this->getConstants($reset);
 		extract($constants);	//Returns $encrypted and $decrypted
