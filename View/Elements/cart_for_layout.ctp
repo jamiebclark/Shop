@@ -5,8 +5,8 @@ if (empty($shoppingCart) && isset($blankEmpty)) {
 }
 ?>
 <?php if (!empty($shoppingCart)): ?>
-	<div id="shop-cart-heading">
-		<?php echo $this->Html->link(
+	<div id="shop-cart-heading"><?php 
+		echo $this->Html->link(
 			'<strong><i class="icon-shopping-cart"></i> Your Cart</strong> ' . $this->DisplayText->cash($shoppingCart['Order']['total']),
 			array(
 				'controller' => 'orders',
@@ -20,6 +20,15 @@ if (empty($shoppingCart) && isset($blankEmpty)) {
 				'class' => 'btn',
 			)
 		);
-		?>
-	</div>
+		echo $this->Html->link(
+			$this->Iconic->icon('x'),
+			array('unset_cart' => 1),
+			array(
+				'escape' => false,
+				'title' => 'Empty your shopping cart',
+				'class' => 'btn',
+			),
+			'Empty your cart?'
+		);
+	?></div>
 <?php endif; ?>
