@@ -1,9 +1,14 @@
 <?php
 echo $this->Form->create('Order');
 echo $this->Form->hidden('id');
+echo $this->Form->hidden('sub_total');
+echo $this->Form->hidden('shipping');
+
 $span = 6;
 
-echo $this->Layout->defaultHeader($order['Order']['id']);
+if (!empty($order['Order']['id'])) {
+	echo $this->Layout->defaultHeader($order['Order']['id']);
+}
 ?>
 
 	<?php	
@@ -21,10 +26,10 @@ echo $this->Layout->defaultHeader($order['Order']['id']);
 	</div>
 	<div class="span7">
 		<h3>Customer Info</h3><?php
-		echo $this->FormLayout->addressInput(compact('span') + array(
+		echo $this->FormLayout->addressInput(array(
 			'placeholder' => true,
-			'before' => $this->FormLayout->inputRow(array('first_name', 'last_name'), compact('span')),
-			'after' => $this->FormLayout->inputRow(array('email', 'phone'), compact('span') + array('placeholder' => true)),
+			'before' => $this->FormLayout->inputRow(array('first_name', 'last_name')),
+			'after' => $this->FormLayout->inputRow(array('email', 'phone'), array('placeholder' => true)),
 		));
 		?>
 	</div>
@@ -69,30 +74,22 @@ $this->Table->reset();
 $inputOptions = array('label' => false, 'class' => 'input-small');
 $cashOptions = $inputOptions + array('prepend' => '$', 'step' => 'any');
 
-foreach($this->request->data['OrderProduct'] as $k => $orderProduct) {
-	$prefix = "OrderProduct.$k.";
-	echo $this->Form->input($prefix . 'id');
-	
-	$this->Table->cells(array(
-		array(
-			$this->Form->input($prefix . 'product_id', array('class' => null) + $inputOptions),
-			'Product'
-		), array(
-			$this->Form->input($prefix . 'price', $cashOptions), 
-			'Price per Item', 
-			array('class' => 'number')
-		), array(
-			$this->Form->input($prefix . 'shipping', $cashOptions),
-			'Shipping', 
-			array('class' => 'number')
-		), array(
-			$this->Form->input($prefix . 'quantity', $inputOptions),
-			'Quantity', 
-			array('class' => 'number')
-		),
-	), true);
-}
-echo $this->Table->output();
+$View = $this;
+echo $this->FormLayout->inputList(function($count) use ($View) {
+	$prefix = "OrderProduct.$count";
+	$out = $View->Form->input("$prefix.id");
+	$out .= $View->FormLayout->inputRow(array(
+		"$prefix.product_id",
+		"$prefix.price" => array('type' => 'cash'),
+		"$prefix.shipping" => array('type' => 'cash'),
+		"$prefix.quantity" => array('type' => 'number'),
+	));
+	return $out;
+}, array(
+	'model' => 'OrderProduct',
+	'addBlank' => 0,
+));
+
 ?>
 
 <h2>Handling</h2>
@@ -145,10 +142,9 @@ $this->Asset->blockStart();
 (function($) {
 	$.fn.toggleActive = function(find) {
 		return this.each(function() {
-			var $toggle = $(this),
-				$find = $(find);
+			var $toggle = $(this);
 			function toggleClick() {
-				$find.each(function() {
+				$(find).each(function() {
 					if ($toggle.is(':checked')) {
 						$(this).data('old-readonly', $(this).prop('readonly'));
 						$(this).prop('readonly', true);

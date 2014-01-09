@@ -91,7 +91,6 @@ class Order extends ShopAppModel {
 		$this->updateAll(compact('archived'), array($this->alias . '.id' => $this->id));
 		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $this->id));
 		$this->updateProductStock($this->id);
-
 		return parent::afterSave($created);
 	}
 	
@@ -148,8 +147,10 @@ class Order extends ShopAppModel {
 
 		$total = array_sum($totals);
 		$totals['total'] = $total;
-		
-		return $this->updateAll($totals, array($this->escapeField('id') => $id));
+		$this->updateAll($totals, array($this->escapeField('id') => $id));
+		//Updates Invoice
+		$this->copyModelToInvoice($this->id);
+		return true;
 	}
 	
 	function findProductOptions($id = null) {

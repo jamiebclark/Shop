@@ -1,2 +1,1 @@
-<?php
-echo $this->element('orders/form');
+<?php echo $this->element('orders/form');
