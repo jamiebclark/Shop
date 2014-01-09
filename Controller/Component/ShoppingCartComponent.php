@@ -28,7 +28,7 @@ class ShoppingCartComponent extends Component {
 		if (!empty($this->controller->request->named['unset_cart'])) {
 			$this->unsetCart();
 			$this->Session->setFlash('Reset Shopping Cart', 'default', array('class' => 'alert-info'));
-			$this->controller->redirect(array('controller' => 'catalog_items', 'action' => 'index', 'shop' => true));
+			$this->controller->redirect(array('controller' => 'catalog_items', 'action' => 'index', 'plugin' => 'shop'));
 		}
 		
 		//Prevents storing cart information if user is in an admin page
