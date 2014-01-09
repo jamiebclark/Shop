@@ -128,7 +128,25 @@ class OrdersController extends ShopAppController {
 	}
 	
 	function admin_add() {
-		$this->FormData->addData();
+		$default = array(
+			'Order' => array(
+				'auto_shipping' => 1,
+				'auto_price' => 1,
+				'auto_handling' => 1,
+				'sub_total' => 0,
+				'shipping' => 0,
+			)
+		);
+		$handlingMethods = $this->Order->HandlingMethod->find('all', array(
+			'conditions' => array('HandlingMethod.active' => 1)
+		));
+		foreach ($handlingMethods as $handlingMethod) {
+			$handlingMethod = $handlingMethod['HandlingMethod'];
+			$handlingMethod['handling_method_id'] = $handlingMethod['id'];
+			unset($handlingMethod['id']);
+			$default['OrdersHandlingMethod'][] = $handlingMethod;
+		}
+		$this->FormData->addData(compact('default'));
 	}
 	
 	function admin_delete($id = null) {

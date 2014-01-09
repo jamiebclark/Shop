@@ -377,7 +377,7 @@ class Product extends ShopAppModel {
 	function selectList($options = array()) {
 		$options['contain']['CatalogItem'] = array();
 		$result = $this->find('all', $options);
-		$select = array('Active' => array(), 'Inactive' => array());
+		$select = array('' => ' --- Select a Product --- ', 'Active' => array(), 'Inactive' => array());
 		foreach ($result as $row) {
 			$key = empty($row['CatalogItem']) || empty($row['CatalogItem']['active']) ? 'Inactive' : 'Active';
 			$title = !empty($row[$this->alias]['title']) ? $row[$this->alias]['title'] : $row['CatalogItem']['title'];
