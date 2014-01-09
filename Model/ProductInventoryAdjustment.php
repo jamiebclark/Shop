@@ -5,12 +5,26 @@
  **/
 App::uses('ShopAppModel', 'Shop.Model');
 class ProductInventoryAdjustment extends ShopAppModel {
-	var $name = 'ProductInventoryAdjustment';
-	var $actsAs = array('Shop.ChangedFields');
-	var $order = 'ProductInventoryAdjustment.available DESC';
+	public $name = 'ProductInventoryAdjustment';
+	public $actsAs = array('Shop.ChangedFields');
+	public $order = array('ProductInventoryAdjustment.available' => 'DESC');
 	
-	var $belongsTo = array('Shop.Product');
+	public $belongsTo = array('Shop.Product');
 	
+	public $validate = array(
+		'product_id' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please select a product first',
+		),
+		'quantity' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please select an amount to add',
+		),
+		'available' => array(
+			'rule' => 'notEmpty',
+			'message' => 'Please let us know when the inventory will be available',
+		)
+	);
 	
 	function afterSave($created, $options = array()) {
 		if ($created || in_array('quantity', $this->changedFields)) {

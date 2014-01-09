@@ -3,7 +3,14 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 	var $name = 'ProductInventoryAdjustments';
 
 	function admin_index() {
-		$this->redirect(array('controller' => 'products'));
+		//$this->redirect(array('controller' => 'products'));
+		$this->paginate = array(
+			'fields' => '*',
+			'link' => array('Shop.Product' => array('Shop.CatalogItem')),
+			'order' => array('ProductInventoryAdjustment.available' => 'DESC')
+		);
+		$productInventoryAdjustments = $this->paginate();
+		$this->set(compact('productInventoryAdjustments'));
 	}
 	
 	function admin_add($productId = null) {
@@ -17,12 +24,15 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 	}
 
 	function _setFormElements() {
-		$productId = $this->request->data['ProductInventoryAdjustment']['product_id'];
-		$product = $this->ProductInventoryAdjustment->Product->find('first', array(
-			'conditions' => array('Product.id' => $productId)
-		));
-		$this->_setCrumbs($product);
-		$this->set(compact('product'));
+		if ($productId = $this->request->data['ProductInventoryAdjustment']['product_id']) {
+			$product = $this->ProductInventoryAdjustment->Product->find('first', array(
+				'conditions' => array('Product.id' => $productId)
+			));
+			$this->_setCrumbs($product);
+		} else {
+			$products = $this->ProductInventoryAdjustment->Product->selectList(array('order' => array('ProductInventory.title' => 'ASC')));
+		}
+		$this->set(compact('product', 'products'));
 	}
 	
 	function admin_edit($id = null) {

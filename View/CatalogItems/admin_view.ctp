@@ -51,6 +51,12 @@ foreach ($catalogItem['ShippingRule'] as $shippingRule) {
 }
 echo $this->Table->output();
 ?>
+<h3>Inventory History</h3>
+<?php 
+echo $this->Html->link('Add Inventory', array('controller' => 'product_inventory_adjustments', 'action' => 'add'));
+echo $this->element('product_inventory_adjustments/table'); 
+
+?>
 </div>
 <div class="span4">
 	<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], array('dir' => 'mid'));?>

@@ -139,6 +139,11 @@ class CatalogItemsController extends ShopAppController {
 			$options = array('conditions' => array('CatalogItem.active' => 1));
 		}
 		$options = $this->_findOptions($options, $categoryId, true);
+		$options['order'] = array(
+			'CatalogItem.active' => 'DESC',
+			'CatalogItem.title' => 'ASC',
+		);
+		
 		$this->paginate = $options;
 
 		$catalogItems = $this->paginate();
@@ -188,6 +193,12 @@ class CatalogItemsController extends ShopAppController {
 				'CatalogItemCategory',
 			)
 		));
+		$productInventoryAdjustments = $this->CatalogItem->Product->ProductInventoryAdjustment->find('all', array(
+			'fields' => '*',
+			'link' => array('Shop.Product' => array('Shop.CatalogItem')),
+			'conditions' => array('CatalogItem.id' => $id),
+			'limit' => 5,
+		));
 		/*
 		$catalogItem = $this->CatalogItem->findById($id);
 		$catalogItem = $this->CatalogItem->postContain($catalogItem, array(
@@ -208,7 +219,7 @@ class CatalogItemsController extends ShopAppController {
 		*/
 		$catalogItemCategories = $this->CatalogItem->findCategories($id);
 		
-		$this->set(compact('catalogItem', 'catalogItemCategories'));
+		$this->set(compact('catalogItem', 'catalogItemCategories', 'productInventoryAdjustments'));
 	}
 	
 	function admin_packages($id = null) {

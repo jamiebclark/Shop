@@ -1,11 +1,17 @@
+<?php
+$productIdType = !empty($product) ? 'hidden' : 'select';
+?>
 <h2>Adjust Inventory</h2>
-<h3><?php echo $product['Product']['title']; ?></h3>
+<?php if (!empty($product)): ?>
+	<h3><?php echo $product['Product']['title']; ?></h3>
+<?php endif; ?>
+
 <?php
 echo $this->Form->create('ProductInventoryAdjustment');
 echo $this->Form->inputs(array(
 	'fieldset' => false,
 	'id' => array('type' => 'hidden'),
-	'product_id' => array('type' => 'hidden'),
+	'product_id' => array('type' => $productIdType),
 	'quantity' => array(
 		'type' => 'number',
 		'label' => 'Amount Added',

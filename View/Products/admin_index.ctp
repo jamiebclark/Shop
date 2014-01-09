@@ -1,5 +1,7 @@
+<p><?php echo $this->Html->link('View Inventory History', array('controller' => 'product_inventory_adjustments', 'action' => 'index')); ?></p>
 <h1>Products</h1>
 <?php
+
 $this->Table->reset();
 foreach ($products as $product) {
 	$id = $product['Product']['id'];

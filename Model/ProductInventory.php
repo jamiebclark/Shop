@@ -1,17 +1,18 @@
 <?php
 App::uses('ShopAppModel', 'Shop.Model');
 class ProductInventory extends ShopAppModel {
-	var $name = 'ProductInventory';
+	public $name = 'ProductInventory';
+	public $actsAs = array('Layout.SelectList');
 	
-	var $hasMany = array(
+	public $hasMany = array(
 		'ProductInventoryAdjustment' => array(
 			'className' => 'Shop.ProductInventoryAdjustment',
 			'dependent' => true,
 		),
 		'Shop.OrderProduct'
 	);
-	var $belongsTo = array('Shop.Product');
-	var $recursive = 0;
+	public $belongsTo = array('Shop.Product');
+	public $recursive = 0;
 
 	function beforeSave($options = array()) {
 		$data =& $this->getData();
