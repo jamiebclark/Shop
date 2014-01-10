@@ -92,9 +92,7 @@ class PaypalPaymentsController extends ShopAppController {
 			fputs ($fp, $header . $req);
 			while (!feof($fp)) {
 				$res = fgets ($fp, 1024);
-				$this->_log("RESULT:");
-				$this->_log($res);
-				$this->_log("END RESULT");
+				$this->_log('Result Line "' . $res . '" = ' . strcmp ($res, "VERIFIED"));
 				
 				if (strcmp ($res, "VERIFIED") == 0) {
 					$this->_log('Connection verified');
