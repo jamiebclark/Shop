@@ -79,6 +79,9 @@ class PaypalPaymentsController extends ShopAppController {
 		*/
 		//$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 		
+		$this->_log("REQUEST");
+		$this->_log($req);
+		$this->_log("END REQUEST");
 
 		$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		if (!$fp) {
@@ -89,14 +92,24 @@ class PaypalPaymentsController extends ShopAppController {
 			fputs ($fp, $header . $req);
 			while (!feof($fp)) {
 				$res = fgets ($fp, 1024);
+				$this->_log("RESULT:");
 				$this->_log($res);
-				if (strcmp ($res, "VERIFIED") == 0 && $_POST['payment_status'] = 'Completed') {
-				// check the payment_status is Completed
-				// check that txn_id has not been previously processed
-				// check that receiver_email is your Primary PayPal email
-				// check that payment_amount/payment_currency are correct
-				// process payment
-					$this->_savePost($_POST);
+				$this->_log("END RESULT");
+				
+				if (strcmp ($res, "VERIFIED") == 0) {
+					$this->_log('Connection verified');
+					if ($_POST['payment_status'] == 'Completed') {
+						$this->_log('Payment has status "Completed". Saving');
+						// check the payment_status is Completed
+						// check that txn_id has not been previously processed
+						// check that receiver_email is your Primary PayPal email
+						// check that payment_amount/payment_currency are correct
+						// process payment
+						$this->_log('Connection verified. Saving.');
+						$this->_savePost($_POST);
+					} else {
+						$this->_log('Payment status is "' . $_POST['payment_status'] . '". Skipping.');
+					}
 				} else if (strcmp ($res, "INVALID") == 0) {
 					// log for manual investigation
 					$this->_log('Invalid Socket Connection. Aborting.');
