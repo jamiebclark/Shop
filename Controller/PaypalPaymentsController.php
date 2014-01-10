@@ -91,7 +91,7 @@ class PaypalPaymentsController extends ShopAppController {
 			$this->_log('Socket Opened Successfully');
 			fputs ($fp, $header . $req);
 			while (!feof($fp)) {
-				$res = fgets ($fp, 1024);
+				$res = trim(fgets ($fp, 1024));
 				$this->_log('Result Line "' . $res . '" = ' . strcmp ($res, "VERIFIED"));
 				
 				if (strcmp ($res, "VERIFIED") == 0) {
