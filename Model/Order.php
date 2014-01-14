@@ -73,28 +73,43 @@ class Order extends ShopAppModel {
 	
 	
 	function afterSave($created, $options = array()) {
-		$this->updateTotal($this->id);
+		$id = $this->id;
+		$this->updateTotal($id);
 		
-		$order = $this->find('first', array(
-			'fields' => '*',
-			'link' => array('Shop.Invoice'),
-			'conditions' => array($this->escapeField('id') => $this->id)
-		));
-		
+		$order = $this->read(null, $id);
 		//Updates invoice with billing address if set
 		if (!empty($order[$this->alias]['same_billing'])) {
-			$this->setSameBilling($this->id);
+			$this->setSameBilling($id);
 		}
-
-		//Archives or Un-Archives order products based on payment and shipping status
-		$archived = round(!empty($order['Invoice']['paid']) || !empty($order['Order']['shipped']));
-		$this->updateAll(compact('archived'), array($this->alias . '.id' => $this->id));
-		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $this->id));
-		$this->updateProductStock($this->id);
+		$this->updateArchived($id);
+		$this->updateProductStock($id);
+		
 		return parent::afterSave($created);
 	}
 	
-	function updateProductStock($id) {
+	public function afterCopyInvoiceToModel($id, $invoiceId) {
+		$this->updateArchived($id);
+		$this->updateProductStock($id);
+		return parent::afterCopyInvoiceToModel($id, $invoiceId);
+	}
+	
+	//Checks if an order should be marked as archived
+	public function updateArchived($id) {
+		$order = $this->find('first', array(
+			'fields' => '*',
+			'link' => array('Shop.Invoice'),
+			'conditions' => array($this->escapeField('id') => $id)
+		));
+		
+		//Archives or Un-Archives order products based on payment and shipping status
+		$archived = round(!empty($order['Invoice']['paid']) || !empty($order['Order']['shipped']));
+
+		$this->updateAll(compact('archived'), array($this->escapeField('id') => $id));
+		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $id));
+		return true;
+	}
+	
+	public function updateProductStock($id) {
 		$orderProducts = $this->OrderProduct->find('all', array(
 			'fields' => 'OrderProduct.product_id',
 			'link' => array($this->alias),

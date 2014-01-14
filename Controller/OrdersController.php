@@ -96,6 +96,27 @@ class OrdersController extends ShopAppController {
 		$this->set('isArchived', $order['Order']['archived']);
 	}
 	
+	//Performs a temporary fix to adjust those orders that hadn't been marked as archived when they were paid
+	function admin_fix_archived() {
+		$orders = $this->Order->find('all', array(
+			'link' => array('Shop.Invoice'),
+			'conditions' => array(
+				'Order.archived' => 0,
+				'NOT' => array('Invoice.paid' => null),
+			)
+		));
+		
+		debug(sprintf('Found %d orders not marked as archived', count($orders)));
+		
+		foreach ($orders as $order) {
+			$id = $order['Order']['id'];
+			
+			$this->Order->create();
+			$this->Order->updateArchived($id);
+			$this->Order->updateProductStock($id);
+		}
+		
+	}
 	function admin_index() {
 		if (!empty($this->request->data['Order']['id'])) {
 			$order = $this->Order->findById($this->request->data['Order']['id']);

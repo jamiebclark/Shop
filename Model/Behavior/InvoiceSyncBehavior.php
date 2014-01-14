@@ -45,7 +45,10 @@ class InvoiceSyncBehavior extends ModelBehavior {
 	}
 	
 	function afterSave(Model $Model, $created, $options = array()) {
-		$this->copyModelToInvoice($Model, $Model->id);
+		//Prevents infinite looping while still keeping Model's afterSave functions
+		if (empty($Model->_syncingWithInvoice)) {
+			$this->copyModelToInvoice($Model, $Model->id);
+		}
 		return parent::afterSave($Model, $created, $options);
 	}
 	
@@ -69,6 +72,12 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @return bool Save is successful
  **/
 	function copyModelToInvoice($Model, $id, $fields = null) {
+		//Prevents infinite looping while still keeping Model's afterSave functions
+		if (!empty($Model->_syncingWithInvoice) || !empty($Model->Invoice->_syncingWithModel)) {
+			return null;
+		}
+		$Model->Invoice->_syncingWithModel = true;
+
 		$settings =& $this->settings[$Model->alias];
 		$invoiceSchema = $Model->Invoice->schema();
 		
@@ -107,7 +116,9 @@ class InvoiceSyncBehavior extends ModelBehavior {
 				$data['Invoice'][$invoiceField] = $value;
 			}
 		}
-		return $Model->Invoice->saveAll($data, array('callbacks' => false, 'validate' => false));
+		$success = $Model->Invoice->saveAll($data, array('callbacks' => false, 'validate' => false));
+		$Model->Invoice->_syncingWithModel = null;
+		return $success;
 	}
 	
 /**
@@ -119,6 +130,14 @@ class InvoiceSyncBehavior extends ModelBehavior {
  **/
 	function copyInvoiceToModel($Model, $invoiceId, $fields = null) {
 		$alias = $Model->alias;
+
+		//Prevents infinite looping
+		if (!empty($Model->_syncingWithInvoice) || !empty($Model->Invoice->_syncingWithModel)) {
+			return null;
+		}
+		$Model->_syncingWithInvoice = true;
+		
+		$success = null;
 		$settings =& $this->settings[$alias];
 		if (empty($fields)) {
 			$fields = $settings['fields'];
@@ -129,18 +148,30 @@ class InvoiceSyncBehavior extends ModelBehavior {
 				'conditions' => array('Invoice.id' => $invoiceId)
 			));
 			if (empty($result[$alias])) {
-				return null;
-			}
-			$data = array($alias => array(), 'Invoice' => array('id' => $invoiceId));
-			foreach ($fields as $modelField => $invoiceField) {
-				if (is_numeric($modelField)) {
-					$modelField = $invoiceField;
+				$success = null;
+			} else {
+				$data = array(
+					$alias => array($Model->primaryKey => $result[$alias][$Model->primaryKey]), 
+					'Invoice' => array('id' => $invoiceId)
+				);
+				foreach ($fields as $modelField => $invoiceField) {
+					if (is_numeric($modelField)) {
+						$modelField = $invoiceField;
+					}
+					$data[$alias][$modelField] = $result['Invoice'][$invoiceField];
 				}
-				$data[$alias][$modelField] = $result['Invoice'][$invoiceField];
+				$success = $Model->saveAll($data, array('callbacks' => false, 'validate' => false));
+				if (method_exists($Model, 'afterCopyInvoiceToModel')) {
+					$Model->afterCopyInvoiceToModel($result[$alias][$Model->primaryKey], $invoiceId);
+				}
 			}
-			return $Model->saveAll($data, array('callbacks' => false, 'validate' => false));
 		}
-		return null;
+		$Model->_syncingWithInvoice = null;
+		return $success;
+	}
+	
+	public function afterCopyInvoiceToModel($Model, $id, $invoiceId) {
+		return true;
 	}
 	
 /**
