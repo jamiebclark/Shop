@@ -30,7 +30,7 @@ class ProductInventoryAdjustmentsController extends ShopAppController {
 			));
 			$this->_setCrumbs($product);
 		} 
-		$products = $this->ProductInventoryAdjustment->Product->selectList(array('order' => array('ProductInventory.title' => 'ASC')));
+		$products = $this->ProductInventoryAdjustment->Product->selectList(array('order' => array('Product.title' => 'ASC')));
 		$this->set(compact('product', 'products'));
 	}
 	

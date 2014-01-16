@@ -87,6 +87,27 @@ class Order extends ShopAppModel {
 		return parent::afterSave($created);
 	}
 	
+	public function beforeDelete($cascade = true) {
+		$this->_deletedOrderProducts = $this->OrderProduct->find('list', array(
+			'fields' => array(
+				'OrderProduct.id',
+				'OrderProduct.product_id',
+			),
+			'conditions' => array('OrderProduct.order_id' => $this->id)
+		));
+		return parent::beforeDelete($cascade);
+	}
+	
+	public function afterDelete() {
+		//Makes sure to update product stocks after being deleted
+		if (!empty($this->_deletedOrderProducts)) {
+			foreach ($this->_deletedOrderProducts as $orderProductId => $productId) {
+				$this->OrderProduct->Product->updateStock($productId);
+			}
+		}
+		return parent::afterDelete();
+	}
+	
 	public function afterCopyInvoiceToModel($id, $invoiceId) {
 		$this->updateArchived($id);
 		$this->updateProductStock($id);
