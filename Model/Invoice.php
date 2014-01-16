@@ -79,7 +79,6 @@ class Invoice extends ShopAppModel {
 		$data =& $this->getData();
 		
 		if (empty($this->_syncingWithModel)) {	//Prevents infinite looping with Invoice Sync Behavior
-			debug('Copying');
 			$this->copyToModels($this->id);
 		}
 		
@@ -103,7 +102,6 @@ class Invoice extends ShopAppModel {
 		$fn = 'copyInvoiceToModel';
 		$contain = $fields = $link = array();
 		$models = array_merge($this->hasOne, $this->hasMany);
-		debug($models);
 		foreach ($models as $model => $config) {
 			$fields[] = "`$model`.*";
 			$link[] = $config['className'];
