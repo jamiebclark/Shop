@@ -1,8 +1,8 @@
 <?php
 $keys = array(
 	'Ordered' => array(0, 0),
-	'Paid' => array(0, 1),
-	'Shipped Not Paid' => array(1, 0),
+	'Paid and Not Shipped' => array(0, 1),
+	'Not Paid and Shipped' => array(1, 0),
 	'Shipped and Paid' => array(1, 1),
 	'Canceled' => false
 );
