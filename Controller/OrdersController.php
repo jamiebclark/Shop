@@ -241,7 +241,11 @@ class OrdersController extends ShopAppController {
 			}
 		}
 		if (isset($named['shipped'])) {
-			$options['conditions']['Order.shipped'] = round($named['shipped']);
+			if ($named['shipped']) {
+				$options['conditions']['NOT']['Order.shipped'] = null;
+			} else {
+				$options['conditions']['Order.shipped'] = null;
+			}
 		}
 	
 		if (isset($this->findFilterVal['email'])) {
