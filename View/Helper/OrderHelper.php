@@ -27,11 +27,11 @@ class OrderHelper extends ModelViewHelper {
 	}
 	
 	public function publicUrl($result, $options = array()) {
-		return $this->modelUrl($result, array('public' => true) + $options);
+		return $this->modelUrl($result, array('public' => true, 'admin' => false) + $options);
 	}
 	
 	public function publicLink($result, $options = array()) {
-		return $this->link($result, array('public' => true) + $options);
+		return $this->link($result, array('public' => true, 'prefix' => false) + $options);
 	}
 	
 	/*
