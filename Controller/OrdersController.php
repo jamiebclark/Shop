@@ -2,10 +2,10 @@
 App::uses('OrderEmail', 'Shop.Network/Email');
 App::uses('InvoiceEmail', 'Shop.Network/Email');
 class OrdersController extends ShopAppController {
-	var $name = 'Orders';
+	public $name = 'Orders';
 	
-	var $components = array(		//'FindFilter', 		'Shop.ShoppingCart'	);	
-	var $helpers = array(
+	public $components = array(		//'FindFilter', 		'Shop.ShoppingCart'	);	
+	public $helpers = array(
 		'Shop.Invoice',
 		'Shop.CatalogItem', 
 		'Shop.PaypalForm',
@@ -20,7 +20,7 @@ class OrdersController extends ShopAppController {
 		),
 	);
 	
-	var $paginate = array(
+	public $paginate = array(
 		'fields' => '*',
 		'link' => array('Shop.Invoice'),
 	);
@@ -36,7 +36,7 @@ class OrdersController extends ShopAppController {
 		);
 	}
 	*/	
-	function view($id = null) {
+	public function view($id = null) {
 		if (empty($id)) {
 			$id = $this->ShoppingCart->getCartId();
 		}
@@ -44,7 +44,7 @@ class OrdersController extends ShopAppController {
 	}
 	
 
-	function edit($id = null) {
+	public function edit($id = null) {
 		$saveAttrs = array(
 			'success' => array(
 				'redirect' => array('action' => 'view', 'ID'),
@@ -67,12 +67,12 @@ class OrdersController extends ShopAppController {
 		$this->redirect(array('action' => 'view', $id));
 	}
 	
-	function invoice($id = null) {
+	public function invoice($id = null) {
 		Configure::write('debug', 0);
 		$this->FormData->findModel($id);
 	}
 	
-	function shipping($id = null) {
+	public function shipping($id = null) {
 		$this->FormData->editData($id, null, array('contain' => 'Invoice'), array(
 			'success' => array(
 				'messages' => 'Successfully updated shipping information for your Order',
@@ -83,7 +83,7 @@ class OrdersController extends ShopAppController {
 		//$this->set('countries', $this->Order->Country->selectList());
 	}
 	
-	function checkout($id = null) {
+	public function checkout($id = null) {
 		$order = $this->FormData->editData($id);
 		//Before displaying checkout screen, checks if order is complete
 		if (empty($order['Order']['addline1']) || empty($order['Order']['invoice_id'])) {
@@ -97,7 +97,7 @@ class OrdersController extends ShopAppController {
 	}
 	
 	//Performs a temporary fix to adjust those orders that hadn't been marked as archived when they were paid
-	function admin_fix_archived() {
+	public function admin_fix_archived() {
 		$orders = $this->Order->find('all', array(
 			'link' => array('Shop.Invoice'),
 			'conditions' => array(
@@ -117,7 +117,12 @@ class OrdersController extends ShopAppController {
 		}
 		
 	}
-	function admin_index() {
+	public function admin_index() {
+		
+		$this->Order->deleteOldEmptyOrders();
+		$deleted = $this->Order->getAffectedRows();
+		$this->Session->setFlash(sprintf('Deleted %d old empty orders', $deleted));
+		
 		if (!empty($this->request->data['Order']['id'])) {
 			$order = $this->Order->findById($this->request->data['Order']['id']);
 			if (!empty($order)) {
@@ -132,11 +137,11 @@ class OrdersController extends ShopAppController {
 		$this->set(compact('orders'));
 	}
 	
-	function admin_filter() {
+	public function admin_filter() {
 		$this->render('/FindFilters/filter');
 	}
 	
-	function admin_view($id = null) {
+	public function admin_view($id = null) {
 		$order = $this->FormData->editData($id);
 		$this->set(array(
 			'archived' => $order['Order']['archived'],
@@ -144,11 +149,11 @@ class OrdersController extends ShopAppController {
 		));
 	}
 	
-	function admin_edit ($id = null) {
+	public function admin_edit ($id = null) {
 		$order = $this->FormData->editData($id);
 	}
 	
-	function admin_add() {
+	public function admin_add() {
 		$default = array(
 			'Order' => array(
 				'auto_shipping' => 1,
@@ -170,11 +175,11 @@ class OrdersController extends ShopAppController {
 		$this->FormData->addData(compact('default'));
 	}
 	
-	function admin_delete($id = null) {
+	public function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	
-	function admin_total() {
+	public function admin_total() {
 		$orders = $this->Order->find('all', array(
 			'fields' => array(
 				'SUBSTRING(Invoice.paid, 1, 10) AS paid_day',

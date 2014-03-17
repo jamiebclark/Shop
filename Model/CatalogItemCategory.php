@@ -1,20 +1,20 @@
 <?php
 App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItemCategory extends ShopAppModel {
-	var $name = 'CatalogItemCategory';
-	var $actsAs = array(
+	public $name = 'CatalogItemCategory';
+	public $actsAs = array(
 		'Tree', 
 		'Shop.SelectList',
 		'Shop.Sluggable',
 	);
-	var $hasAndBelongsToMany = array('Shop.CatalogItem');
-	var $order = array('$ALIAS.lft' => 'DESC');
+	public $hasAndBelongsToMany = array('Shop.CatalogItem');
+	public $order = array('$ALIAS.lft' => 'DESC');
 	
-	function findCatalogItems($id, $deep = true, $scope = false, $admin = false) {
+	public function findCatalogItems($id, $deep = true, $scope = false, $admin = false) {
 		return $this->CatalogItem->find('all', $this->findCatalogItemsOptions($id, $deep, $admin));
 	}
 	
-	function findChildren($id, $deep = true, $admin = false) {
+	public function findChildren($id, $deep = true, $admin = false) {
 		$options = array();
 		if ($deep) {
 			if ($leftRight = $this->findLeftRight($id)) {
@@ -26,7 +26,7 @@ class CatalogItemCategory extends ShopAppModel {
 		return $this->find('all', $options);
 	}
 	
-	function getPath($id, $rootId = null, $fields = null, $recursive = null) {
+	public function getPath($id, $rootId = null, $fields = null, $recursive = null) {
 		$path = parent::getPath($id, $fields, $recursive);
 		if (empty($path)) {
 			return null;
@@ -43,7 +43,7 @@ class CatalogItemCategory extends ShopAppModel {
 		return array_values($path);
 	}
 	
-	function checkScope($id, $rootId) {
+	public function checkScope($id, $rootId) {
 		if (empty($id)) {
 			return $rootId;
 		}
@@ -56,7 +56,7 @@ class CatalogItemCategory extends ShopAppModel {
 		return $l > $rootL && $l < $rootR ? $id : false;
 	}
 	
-	function findCatalogItemsOptions($id, $deep = true, $scope = false, $admin = false) {
+	public function findCatalogItemsOptions($id, $deep = true, $scope = false, $admin = false) {
 		$id = $this->idSlugCheck($id);
 		$options = array(
 			'fields' => '*',
@@ -77,11 +77,11 @@ class CatalogItemCategory extends ShopAppModel {
 		return $options;			
 	}
 	
-	function idSlugCheck($id) {
+	public function idSlugCheck($id) {
 		if (!is_numeric($id)) {
 			$result = $this->find('list', array(
-				'fields' => array($this->alias . '.id', $this->alias . '.id'),
-				'conditions' => array($this->alias . '.slug LIKE' => $id),
+				'fields' => array($this->escapeField('id'), $this->escapeField('id')),
+				'conditions' => array($this->escapeField('slug') . ' LIKE' => $id),
 			));
 			if (empty($result)) {
 				return null;
@@ -91,14 +91,14 @@ class CatalogItemCategory extends ShopAppModel {
 		return $id;
 	}
 	
-	function findLeftRight($id) {
+	public function findLeftRight($id) {
 		if (!($result = $this->read(array('lft', 'rght'), $id))) {
 			return array(null, null);
 		}
 		return array($result[$this->alias]['lft'], $result[$this->alias]['rght']);
 	}
 	
-	function findActiveCategories($parentId = null) {
+	public function findActiveCategories($parentId = null) {
 		//Finds any categories with active, non-hidden products associated
 		return $this->find('all', array(
 			'conditions' => array(
@@ -108,7 +108,7 @@ class CatalogItemCategory extends ShopAppModel {
 		));
 	}
 	
-	function updateTotals() {
+	public function updateTotals() {
 		$alias = $this->alias;
 		$active = array(
 			'CatalogItem.hidden = 0',

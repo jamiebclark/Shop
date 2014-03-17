@@ -2,9 +2,9 @@
 App::uses('OrderEmail', 'Shop.Network/Email');
 App::uses('ShopAppModel', 'Shop.Model');
 class Order extends ShopAppModel {
-	var $name = 'Order';
-	var $displayField = 'title';
-	var $actsAs = array(
+	public $name = 'Order';
+	public $displayField = 'title';
+	public $actsAs = array(
 		'Layout.DateValidate',
 		'Location.Mappable' => array('validate' => true),
 		'Shop.InvoiceSync' => array(
@@ -19,11 +19,11 @@ class Order extends ShopAppModel {
 		//	'send_paid_email' => 'sendPaidEmail',
 		),
 	);	
-	var $order = array('Order.created' => 'DESC');
-	var $recursive = -1;
-	var $virtualFields = array('title' => 'CONCAT("Order #", $ALIAS.id)');
+	public $order = array('Order.created' => 'DESC');
+	public $recursive = -1;
+	public $virtualFields = array('title' => 'CONCAT("Order #", $ALIAS.id)');
 	
-	var $hasMany = array(
+	public $hasMany = array(
 		'OrderProduct' => array(
 			'className' => 'Shop.OrderProduct',
 			'dependent' => true
@@ -37,11 +37,11 @@ class Order extends ShopAppModel {
 			'dependent' => true
 		),
 	);
-	var $belongsTo = array(
+	public $belongsTo = array(
 		'Shop.Invoice', 
 		'ShippingMethod' => array('className' => 'Shop.ShippingMethod'),
 	);
-	var $hasAndBelongsToMany = array(
+	public $hasAndBelongsToMany = array(
 		'Shop.PromoCode', 
 		'HandlingMethod' => array(
 			'className' => 'Shop.HandlingMethod',
@@ -49,7 +49,7 @@ class Order extends ShopAppModel {
 		)
 	);
 
-	var $validate = array(
+	public $validate = array(
 		'first_name' => array(
 			'rule' => 'notEmpty',
 			'message' => 'Please enter a first name',
@@ -63,7 +63,9 @@ class Order extends ShopAppModel {
 	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
 	private $sendShippedEmail = false;	
 	
-	function beforeSave($options = array()) {
+	const DELETE_EMPTY_DEADLINE = '-2 months';
+	
+	public function beforeSave($options = array()) {
 		$data =& $this->getData();
 		if (empty($data['country'])) {
 			$data['country'] = 'US';
@@ -72,7 +74,7 @@ class Order extends ShopAppModel {
 	}
 	
 	
-	function afterSave($created, $options = array()) {
+	public function afterSave($created, $options = array()) {
 		$id = $this->id;
 		$this->updateTotal($id);
 		
@@ -142,7 +144,7 @@ class Order extends ShopAppModel {
 		}
 	}
 	
-	function updateTotal($id = null) {
+	public function updateTotal($id = null) {
 		//Finds sub-total first
 		$subTotal = $this->findSubTotal($id);
 
@@ -189,7 +191,7 @@ class Order extends ShopAppModel {
 		return true;
 	}
 	
-	function findProductOptions($id = null) {
+	public function findProductOptions($id = null) {
 		$products = $this->OrderProduct->Product->find('list', array(
 			'link' => array('Shop.OrderProduct' => 'Shop.' . $this->alias),
 			'conditions' => array($this->escapeField('id') => $id)
@@ -197,7 +199,7 @@ class Order extends ShopAppModel {
 		return $products;
 	}
 	
-	function updateHandling($id = null) {
+	public function updateHandling($id = null) {
 		//Removes de-activated or deleted handling rules
 		$this->OrdersHandlingMethod->removeUnused();
 		
@@ -227,7 +229,7 @@ class Order extends ShopAppModel {
 		return $this->OrdersHandlingMethod->saveAll($data);
 	}
 	
-	function findSubTotal($id) {
+	public function findSubTotal($id) {
 		$options = array(
 			'fields' => array(
 				'Order.id', 
@@ -241,7 +243,7 @@ class Order extends ShopAppModel {
 		return !empty($result) ? $result[0]['sub_total'] : 0;
 	}
 
-	function findOrder($id) {
+	public function findOrder($id) {
 		return $this->find('first', array(
 			'fields' => '*',
 			'contain' => array(
@@ -265,7 +267,7 @@ class Order extends ShopAppModel {
 		return null;
 	}
 	
-	function sendShippedEmail($id) {
+	public function sendShippedEmail($id) {
 		$result = $this->findOrder($id);
 		$Email = new OrderEmail();
 		if (!empty($result[$this->alias]['shipped']) && ($Email->sendShipped($result) !== false)) {
@@ -277,7 +279,7 @@ class Order extends ShopAppModel {
 		return false;
 	}
 	
-	function sendPaidEmail($id) {
+	public function sendPaidEmail($id) {
 		$result = $this->findOrder($id);
 		$Email = new OrderEmail();
 		if (!empty($result['Invoice']['paid']) && ($Email->sendPaid($result) !== false)) {
@@ -289,6 +291,14 @@ class Order extends ShopAppModel {
 		return false;	
 	}
 
+	public function deleteOldEmptyOrders() {
+		return $this->deleteAll(array(
+			$this->escapeField('paid') => null,
+			$this->escapeField('shipped') => null,
+			$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
+		));
+	}
+	
 	/*OLD FIND ORDER
 	function findOrder($id) {
 		$order = $this->find('first', array(
