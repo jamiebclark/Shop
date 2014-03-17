@@ -108,8 +108,9 @@ class InvoicesController extends ShopAppController {
 		$this->redirect($redirect);
 	}
 	
-	function admin_resend_email($id = null) {		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';
-		} else {			$msg = 'There was an error sending email';		}				$this->redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
+	function admin_resend_email($id = null) {
+		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';
+		} else {			$msg = 'There was an error sending email';		}		$this->redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
 	function admin_copy_payment($id = null) {
 		$invoice = $this->Invoice->find('first', array(
 			'fields' => array('*'),

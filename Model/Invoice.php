@@ -78,9 +78,12 @@ class Invoice extends ShopAppModel {
 		$result = $this->read(null, $this->id);
 		$data =& $this->getData();
 		
+		//debug($this->data);
+		/*
 		if (empty($this->_syncingWithModel)) {	//Prevents infinite looping with Invoice Sync Behavior
 			$this->copyToModels($this->id);
 		}
+		*/
 		
 		if ($created || array_search('paid', $this->changedFields)) {
 			$this->updatePaid($this->id);
@@ -113,16 +116,14 @@ class Invoice extends ShopAppModel {
 		}
 		$conditions = array($this->escapeField('id') => $id);
 		$result = $this->find('first', compact('fields', 'link', 'conditions'));
-		if (!empty($result)) {
-			foreach ($result as $model => $vals) {
-				if ($model == $this->alias) {	//Avoids Invoice results
-					continue;
-				}
-				if (!empty($this->{$model}->actsAs['Shop.InvoiceSync']) || method_exists($this->{$model}, $fn)) {
-					$this->{$model}->$fn($id);
-				}
+		
+		if (!empty($result) && !empty($result[$this->alias]['model']) && !empty($models[$result[$this->alias]['model']])) {
+			$model = $result[$this->alias]['model'];
+			if (!empty($this->{$model}->actsAs['Shop.InvoiceSync']) || method_exists($this->{$model}, $fn)) {
+				$this->{$model}->$fn($id);
 			}
 		}		
+		exit();
 	}
 	
 	function sendPaidEmail($id = null) {

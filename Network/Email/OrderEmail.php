@@ -22,7 +22,7 @@ class OrderEmail extends ShopEmail {
  **/
 	public function sendShipped($order) {
 		return $this
-			->subject("Your order has shipped [#{$order['Order']['id']}]")
+			->subject(sprintf('Your order has shipped [#%d]', $order['Order']['id']))
 			->emailFormat('copy')
 			->viewVars(compact('order'))
 			->template('Shop.Order/shipped')

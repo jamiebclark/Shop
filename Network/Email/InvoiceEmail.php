@@ -23,7 +23,7 @@ class InvoiceEmail extends ShopEmail {
 		$this->emailFormat('copy')
 			->viewVars(compact('invoice'))
 			->subject("Online payment successful: {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}")
-			->template('Shop.Invoice/paid')
+			->template('Shop.Invoice/paid', 'Shop.default')
 			->sendResult($invoice);
 	}
 	
@@ -38,9 +38,11 @@ class InvoiceEmail extends ShopEmail {
 		$Email = $this->to($emails);
 		$Email->emailFormat('copy');
 		$Email->viewVars(compact('invoice'));
-		$Email->template('Shop.Invoice/admin_paid');
-		$Email->subject("Online payment successful for {$invoice['Invoice']['model_title']} #{$invoice['Invoice']['model_id']}");
-		$Email->setHelpers();
+		$Email->template('Shop.Invoice/admin_paid', 'Shop.default');
+		$Email->subject(sprintf('Online payment successful for %s #%d', 
+			$invoice['Invoice']['model_title'],
+			$invoice['Invoice']['model_id']
+		));
 		return $Email->send();
 	}
 }

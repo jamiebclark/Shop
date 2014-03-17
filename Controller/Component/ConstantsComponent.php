@@ -12,11 +12,14 @@ class ConstantsComponent extends Component {
 	public $name = 'Constants';
 	public $components = array('Session');
 	
+	public $controller;
+	
 	// Keeps track of when the global variables have been set
 	private $_isSet = false;
-	private $sessionName = 'Shop.settings';
+	const SESSION_NAME = 'Shop.settings';
 	
 	public function initialize(Controller $controller) {
+		$this->controller = $controller;
 		$this->setConstantsInit();
 	}
 	
@@ -28,7 +31,7 @@ class ConstantsComponent extends Component {
 	//Sets the constants only if they aren't currently being edited via request data
 	public function setConstantsInit() {
 		// If a user is making changes to ShopSetting, skips setting the variables until after the saving is complete
-		if (empty($controller->request->data['ShopSetting'])) {
+		if (empty($this->controller->request->data['ShopSetting'])) {
 			$this->setConstantsCheck();
 		}
 	}
@@ -53,7 +56,7 @@ class ConstantsComponent extends Component {
 			}
 		}
 		$this->_isSet = true;
-		return $this->Session->write($this->sessionName, $encrypted);
+		return $this->Session->write(self::SESSION_NAME, $encrypted);
 	}
 	
 	/**
@@ -61,7 +64,7 @@ class ConstantsComponent extends Component {
 	 *
 	 **/
 	private function getConstants($reset = false) {
-		if ($reset || !$this->Session->check($this->sessionName)) {
+		if ($reset || !$this->Session->check(self::SESSION_NAME)) {
 			$constants = $this->getModelConstants();
 		} else {
 			$constants = $this->getSessionConstants();
@@ -92,7 +95,7 @@ class ConstantsComponent extends Component {
 	 **/
 	private function getSessionConstants() {
 		$decrypted = array();
-		if ($encrypted = $this->Session->read($this->sessionName)) {
+		if ($encrypted = $this->Session->read(self::SESSION_NAME)) {
 			foreach ($encrypted as $name => $value) {
 				$decrypted[$name] = base64_decode($value);
 			}
