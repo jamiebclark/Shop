@@ -296,7 +296,7 @@ class Order extends ShopAppModel {
 			$this->escapeField('paid') => null,
 			$this->escapeField('shipped') => null,
 			$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
-		));
+		), true, true);
 	}
 	
 	/*OLD FIND ORDER

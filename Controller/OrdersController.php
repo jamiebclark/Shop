@@ -118,10 +118,12 @@ class OrdersController extends ShopAppController {
 		
 	}
 	public function admin_index() {
+		/*
 		$this->Order->deleteOldEmptyOrders();
 		if ($deletedCount = $this->Order->getAffectedRows()) {
 			$this->Session->setFlash(sprintf('Deleted %d old empty orders', $deletedCount));
 		}
+		*/
 		
 		if (!empty($this->request->data['Order']['id'])) {
 			$order = $this->Order->findById($this->request->data['Order']['id']);
