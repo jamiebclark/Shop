@@ -292,15 +292,11 @@ class Order extends ShopAppModel {
 	}
 
 	public function deleteOldEmptyOrders() {
-		$oldOrders = $this->find('list', array(
-			'conditions' => array(
-				$this->escapeField('paid') => null,
-				$this->escapeField('shipped') => null,
-				$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
-			)
+		return $this->deleteAll(array(
+			$this->escapeField('paid') => null,
+			$this->escapeField('shipped') => null,
+			$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
 		));
-		Configure::write('debug', 2);
-		debug(count($oldOrders));
 	}
 	
 	/*OLD FIND ORDER
