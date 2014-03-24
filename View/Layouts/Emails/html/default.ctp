@@ -1,4 +1,5 @@
 <?php
+
 if (defined('EMAIL_STYLE')) {
 	echo $this->Html->tag('style', EMAIL_STYLE, array('type' => 'text/css'));
 }
