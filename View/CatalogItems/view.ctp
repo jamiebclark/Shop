@@ -16,7 +16,7 @@
 </style>
 <div class="catalogitem-view row">
 <?php echo $this->Form->create('OrderProduct', array('action' => 'add')); ?>
-	<div class="span3 catalogitem-images"><?php
+	<div class="col-sm-3 catalogitem-images"><?php
 	echo $this->CatalogItem->thumb(
 		$catalogItem['CatalogItem'], array(
 			'div' => false, 
@@ -37,7 +37,7 @@
 	}
 	?></div>
 	
-	<div class="span6">
+	<div class="col-sm-6">
 		<h1><?php echo $catalogItem['CatalogItem']['title'];?></h1>
 		<?php echo $this->DisplayText->text($catalogItem['CatalogItem']['description']);?>
 
@@ -57,7 +57,7 @@
 			<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
 		<?php endif; ?>
 	</div>
-	<div class="span3 add-cart">
+	<div class="col-sm-3 add-cart">
 		<?php 
 		if (!$this->CatalogItem->hasStock($catalogItem['CatalogItem'])): ?>
 			<h3>Out of stock</h3>

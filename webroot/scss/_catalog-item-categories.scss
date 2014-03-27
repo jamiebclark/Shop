@@ -1,5 +1,5 @@
 .badge-catalogitem-category {
-	background-color: #CCC;
+	background-color: #ccc;
 	a {
 		color: white;
 		text-decoration: none;
@@ -11,11 +11,11 @@
 }
 .catalogitemcategory-list {
 	.catalogitemcategory {
-		margin-bottom: $baseLineHeight / 2;
+		margin-bottom: $line-height-computed / 2;
 	}
 	li em {
-		font-size: $fontSizeSmall;
-		color: $textColorLighter;
+		font-size: $font-size-small;
+		color: $text-color-lighter;
 		font-style: normal;
 	}
 }

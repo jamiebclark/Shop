@@ -22,12 +22,12 @@ if (isset($result['PaymentMethod'])) {
 }
 
 ?>
-<div class="row-fluid">
-	<div class="span6">
+<div class="row">
+	<div class="col-sm-6">
 		<h3>Payment Information</h3>
 		<?php echo $this->Layout->infoTable($payment); ?>
 	</div>
-	<div class="span6">
+	<div class="col-sm-6">
 		<h3>Customer Information</h3>
 		<?php echo $this->Layout->infoTable($customer); ?>
 	</div>

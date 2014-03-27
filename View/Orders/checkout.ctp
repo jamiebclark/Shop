@@ -8,13 +8,13 @@ if (!$isArchived) {
 $statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
 ?>
 <div class="row">
-	<div class="span8">
+	<div class="col-sm-8">
 		<h2>Finish Checking Out</h2>
 		<div class="row">
-			<div class="span4">
+			<div class="col-sm-4">
 				<?php echo $this->element('orders/shipping_status', $statusOptions); ?>
 			</div>
-			<div class="span4">
+			<div class="col-sm-4">
 				<?php echo $this->element('orders/payment_status', $statusOptions); ?>
 			</div>
 		</div>
@@ -22,7 +22,7 @@ $statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
 		echo $this->Invoice->paymentForm($order['Invoice']);
 		?>
 	</div>
-	<div class="span4"><?php 
+	<div class="col-sm-4"><?php 
 		echo $this->element('orders/cart', array(
 			'condensed' => true,
 			'links' => false,

@@ -23,21 +23,17 @@
 			text-align: right;
 		}
 		&.quantity, &.price, &.delete {
-			width: 80px;
+			width: 120px;
 			text-align: center;
 		}
 	}
 
-	.quantity input {
-		width: 40px;
-	}
-	
 	.order-product {
 		td {
-			line-height: $baseLineHeight;
+			line-height: $line-height-base;
 		}
 		&.child-order-product {
-			background-color: #EEE;
+			background-color: #eee;
 			td {
 				font-size: 90%;
 				line-height: normal;

@@ -1,5 +1,5 @@
-@import "../../../../webroot/scss/variables";
-@import "../../../Layout/webroot/scss/bootstrap/variables";
+//@import "../../../../webroot/scss/variables";
+@import "../../../Layout/webroot/scss/bootstrap_import";
 @import "../../../Layout/webroot/scss/variables";
 
 @import "catalog-item-categories";
@@ -8,7 +8,7 @@
 
 .nav-catalogitemcategories {
 	li a {
-		font-size: $fontSizeLarge;
+		font-size: $font-size-large;
 		line-height: 1 !important;
 	}
 }
@@ -42,16 +42,16 @@ th.cash {
 }
 
 form.canceled {
-	background-color: #CCC;
+	background-color: #ccc;
 	input, select, textarea {
-		background-color: #EEE;
+		background-color: #eee;
 	}
 	&, label, input, select, textarea {
 		color: #999;
 	}
 }
 
-@mixin trackBadge($class, $bg, $color) {
+@mixin track-badge($class, $bg, $color) {
 	&.#{$class} {
 		background-color: $bg;
 		color: $color;
@@ -61,10 +61,10 @@ form.canceled {
 	a {
 		color: white;
 	}
-	@include trackBadge(fedex, #472F91, #F57921);
-	@include trackBadge(ups, #1A110E, #DEA72E);
-	@include trackBadge(usps, #013490, #663F3C);
-	@include trackBadge(dhl, #D80612, #FFCB01);
+	@include track-badge(fedex, #472f91, #f57921);
+	@include track-badge(ups, #1a110e, #dea72e);
+	@include track-badge(usps, #013490, #663f3c);
+	@include track-badge(dhl, #d80612, #ffcb01);
 }
 
 .catalogitem-package-children {
@@ -95,10 +95,10 @@ form.canceled {
 	}
 }
 @include order-style(order-not-shipped-not-paid, white);
-@include order-style(order-not-shipped-paid, #FCF8E3);
-@include order-style(order-shipped-not-paid, #F2DEDE);
-@include order-style(order-shipped-paid, #DFF0D8);
-@include order-style(order-canceled, #CCC);
+@include order-style(order-not-shipped-paid, #fcf8e3);
+@include order-style(order-shipped-not-paid, #f2dede);
+@include order-style(order-shipped-paid, #dff0d8);
+@include order-style(order-canceled, #ccc);
 
 .orders.key.table {
 	td {
@@ -117,7 +117,7 @@ form.canceled {
 		text-align: center;
 	}
 	.right-border {
-		border-right: 1px solid #CCC;
+		border-right: 1px solid #ccc;
 	}
 }
 .shipping-rule-input {

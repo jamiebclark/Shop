@@ -1,8 +1,8 @@
 <div class="row">
-	<div class="span2">
+	<div class="col-sm-2">
 		<?php echo $this->element('catalog_item_categories/list');?>
 	</div>
-	<div class="span10"><?php
+	<div class="col-sm-10"><?php
 		echo $this->Layout->defaultHeader(null, null, array(
 			'title' => 'Online Store Products',
 		));

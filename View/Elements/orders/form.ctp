@@ -18,13 +18,13 @@ if (!empty($order['Order']['id'])) {
 	));
 	?>
 <div class="row">
-	<div class="span5">
+	<div class="col-sm-5">
 		<h3>Shipping</h3>
 		<?php 
 			echo $this->element('orders/input_shipping'); 
 		?>
 	</div>
-	<div class="span7">
+	<div class="col-sm-7">
 		<h3>Customer Info</h3><?php
 		echo $this->FormLayout->addressInput(array(
 			'placeholder' => true,
@@ -36,11 +36,11 @@ if (!empty($order['Order']['id'])) {
 </div>
 
 <div class="row">
-	<div class="span5">
+	<div class="col-sm-5">
 		<h3>Payment</h3>
 		<?php echo $this->element('orders/input_payment', array('amt' => false));?>
 	</div>
-	<div class="span7">
+	<div class="col-sm-7">
 		<h3>Billing</h3>
 		<?php 
 		echo $this->Layout->toggle(null, $this->FormLayout->addressInput(compact('span') + array(

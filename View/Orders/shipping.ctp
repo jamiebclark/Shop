@@ -1,6 +1,6 @@
 <?php  echo $this->Form->create('Order'); ?>
 <div class="row">
-	<div class="span6">
+	<div class="col-sm-6">
 		<h2>Shipping</h2><?php  
 		echo $this->Form->hidden('id');
 		echo $this->Form->hidden('Invoice.id');
@@ -31,7 +31,7 @@
 			)
 		));
 	?></div>
-	<div class="span6"><?php
+	<div class="col-sm-6"><?php
 		echo $this->element('orders/cart', array(
 			'condensed' => true,
 			'form' => false,
@@ -46,7 +46,7 @@
 <?php
 echo $this->FormLayout->buttons(array(
 	'Complete Order' => array(
-		'class' => 'btn-primary btn-large pull-right'
+		'class' => 'btn-primary btn-lg pull-right'
 	),
 	'Edit Cart' => array(
 		'url' => array('action' => 'view', $order['Order']['id']),

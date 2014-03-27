@@ -16,8 +16,8 @@ echo $this->Form->inputs(array(
 	$prefix . 'catalog_item_id' => array('type' => 'hidden', 'value' => $catalogItemId),
 ));
 ?>
-<div class="row-fluid shipping-rule-input">
-	<div class="span6"><?php
+<div class="row shipping-rule-input">
+	<div class="col-sm-6"><?php
 		echo $this->Form->input($prefix . 'min_quantity', array(
 			'label' => 'Product Amount',
 			'placeholder' => 'Min',
@@ -28,7 +28,7 @@ echo $this->Form->inputs(array(
 			) + $numOptions)
 		) + $numOptions);
 	?></div>
-	<div class="span6"><?php
+	<div class="col-sm-6"><?php
 		echo $this->Form->input($prefix . 'amt', array(
 			'label' => 'Adjust Order',
 			'append' => '+',

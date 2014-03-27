@@ -9,14 +9,14 @@ list($tableNavTop, $tableNavBottom) = $this->Table->tableNav(array(
 ), true);
 ?>
 <div class="row">
-	<div class="span2">
+	<div class="col-sm-2">
 		<?php echo $this->element('catalog_item_categories/list');?>
 	</div>
-	<div class="span10"><?php 
+	<div class="col-sm-10"><?php 
 		echo $this->element('Shop.catalog_items/layout_form');
 		echo $tableNavTop;
 		if ($catalogLayout['layout'] == 'thumb'): ?>
-			<div class="row-fluid"><?php 
+			<div class="row"><?php 
 				echo $this->CatalogItem->thumbnails($catalogItems, array(
 					'span' => count($catalogItems) < 4 ? 4 : 3, 
 					'caption' => 'title', 

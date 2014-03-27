@@ -1,6 +1,6 @@
 <?php echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id']); ?>
 <div class="row">
-<div class="span8">
+<div class="col-sm-8">
 <h4><?php echo $catalogItem['CatalogItem']['title']; ?></h4>
 <h5>Short Description</h5>
 <?php
@@ -58,7 +58,7 @@ echo $this->element('product_inventory_adjustments/table');
 
 ?>
 </div>
-<div class="span4">
+<div class="col-sm-4">
 	<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], array('dir' => 'mid'));?>
 	<div class="content-box">
 	<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			

@@ -107,10 +107,24 @@ if (!$emptyCart):
 				echo $this->Form->hidden($prefix . 'product_id');
 				echo $this->Form->hidden($prefix . 'parent_id');
 				echo $this->Form->hidden($prefix . 'package_quantity');
-				$cell = $this->Form->input(
-					$prefix . 'quantity', 
-					array('label' => false, 'div' => false, 'class' => 'qty input-small')
+				$deleteUrl = array('controller' => 'order_products', 'action' => 'delete', $orderProduct['id']);
+				$qtyOptions = array(
+					'label' => false, 
+					'div' => false, 
+					//'class' => 'qty input-small'
 				);
+				if (!empty($delete) || (!$condensed && $links)) {
+					$qtyOptions['appendButton'] = $this->Html->link(
+						$this->Iconic->icon('x'),
+						$deleteUrl,
+						array(
+							'escape' => false, 
+							'class' => 'btn btn-default',
+							'title' => 'Remove this item from your cart',
+						)
+					);
+				}
+				$cell = $this->Form->input($prefix . 'quantity', $qtyOptions);
 			}
 			$this->Table->cell(
 				$cell,
@@ -133,6 +147,7 @@ if (!$emptyCart):
 			);
 		}
 
+		/*
 		//DELETE Link
 		if (!empty($delete) || (!$condensed && $links)) {
 			if (!$hasParent) {
@@ -144,7 +159,8 @@ if (!$emptyCart):
 			}
 			$this->Table->cell($deleteLink, 'Remove', array('class' => 'delete'));
 		}
-
+		*/
+		
 		$this->Table->cell(
 			$hasParent ? '&nbsp;' : $this->DisplayText->cash($orderProduct['sub_total']),
 			'Total', 
@@ -207,7 +223,7 @@ else: ?>
 			echo $this->Html->link(
 				'Add some stuff to it!', 
 				array('controller' => 'catalog_items', 'action' => 'index'),
-				array('class' => 'btn btn-large')
+				array('class' => 'btn btn-lg')
 			);
 		?>
 	</div>
@@ -237,7 +253,7 @@ if ($form && !$emptyCart):	?>
 	<?php
 	echo $this->FormLayout->buttons(array(
 		'Checkout' => array(
-			'class' => 'btn btn-large btn-primary pull-right',
+			'class' => 'btn btn-lg btn-primary pull-right',
 			'name' => 'checkout',
 		),
 		'Continue Shopping' => array(

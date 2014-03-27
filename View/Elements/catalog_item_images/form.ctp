@@ -4,10 +4,10 @@ echo $this->Form->create(null, array('type' => 'file'));
 echo $this->Form->hidden('id');
 ?>
 <div class="row">
-	<div class="span2">
+	<div class="col-sm-2">
 		<?php echo $this->CatalogItemImage->inputThumb(); ?>
 	</div>
-	<div class="span9">
+	<div class="col-sm-9">
 		<?php echo $this->Form->input('catalog_item_id', array('helpBlock' => 'Select the which product this image represents')); ?>
 	</div>
 </div>

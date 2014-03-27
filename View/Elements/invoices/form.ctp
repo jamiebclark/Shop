@@ -4,7 +4,7 @@ echo $this->Form->hidden('id');
 $span = 6;
 ?>
 <div class="row">
-	<div class="span4">
+	<div class="col-sm-4">
 		<h3>Customer Info</h3>
 		<?php
 		echo $this->FormLayout->inputRow(array('first_name', 'last_name'));
@@ -12,7 +12,7 @@ $span = 6;
 		echo $this->FormLayout->inputRow(array('email', 'phone'));
 		?>
 	</div>
-	<div class="span6">
+	<div class="col-sm-6">
 		<h3>Payment Info</h3>
 		<?php
 		echo $this->Form->input('amt', array(

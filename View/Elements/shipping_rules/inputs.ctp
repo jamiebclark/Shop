@@ -12,9 +12,9 @@ if ($max < $min) {
 }
 ?>
 <div class="shipping-rules">
-	<div class="row-fluid title">
-		<div class="span6">If matches:</div>
-		<div class="span6">Then add:</div>
+	<div class="row title">
+		<div class="col-sm-6">If matches:</div>
+		<div class="col-sm-6">Then add:</div>
 	</div>
 	<?php 
 	for ($count = 0; $count <= $max; $count++) {

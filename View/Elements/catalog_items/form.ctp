@@ -5,7 +5,7 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 
 ?>
 <div class="row">
-	<div class="span6">
+	<div class="col-sm-6">
 		<?php
 		echo $this->FormLayout->inputs(array(
 			'id',
@@ -42,7 +42,7 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 		?>
 		</fieldset>
 	</div>
-	<div class="span6">
+	<div class="col-sm-6">
 		<fieldset>
 			<legend>Categories</legend>
 			<?php echo $this->FormLayout->inputList('catalog_item_categories/input', array('model' => 'CatalogItemCategory')); ?>

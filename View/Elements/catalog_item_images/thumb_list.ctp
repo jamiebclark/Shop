@@ -9,7 +9,7 @@ extract(array_merge($default, compact(array_keys($default))));
 
 $spanClass = 'span' . floor(12 / $perRow);
 ?>
-<div class="row-fluid">
+<div class="row">
 	<ul class="thumbnails">
 	<?php
 	foreach ($catalogItemImages as $catalogItemImage):

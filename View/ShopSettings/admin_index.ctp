@@ -1,6 +1,6 @@
 <?php echo $this->Form->create(null, array('class' => 'form-horizontal')); ?>
 <div class="row">
-	<div class="span8"><?php
+	<div class="col-sm-8"><?php
 		echo $this->ShopSetting->inputs(array(
 			'COMPANY_NAME' => array('requred' => true),
 			'COMPANY_ADDRESS' => array('requred' => true),
@@ -71,7 +71,7 @@
 		), array('legend' => 'Email Style'));
 		echo $this->ShopSetting->input('SHOP_VARS_LOADED', array('value' => 1, 'type' => 'hidden'));
 	?></div>
-	<div class="span4">
+	<div class="col-sm-4">
 		<div class="scrollfix">
 			<?php echo $this->FormLayout->submitPrimary('Update'); ?>
 		</div>

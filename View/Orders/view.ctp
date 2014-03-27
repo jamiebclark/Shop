@@ -7,11 +7,11 @@
 		'photos' => true,
 	));
 	?>
-	<div class="row-fluid">
-		<div class="span6"><?php 
+	<div class="row">
+		<div class="col-sm-6"><?php 
 			echo $this->element('orders/shipping_status', array('blank' => false));
 		?></div>
-		<div class="span6"><?php
+		<div class="col-sm-6"><?php
 			echo $this->element('orders/payment_status', array('blank' => false));
 		?></div>
 	</div>

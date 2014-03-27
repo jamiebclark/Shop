@@ -32,14 +32,14 @@ $info = array(
 
 ?>
 <div class="row">
-	<div class="span6">
+	<div class="col-sm-6">
 		<h3>Info</h3>
 		<?php 		
 			echo $this->Layout->infoTable($info); 
 		?>
 	</div>
 
-	<div class="span6">
+	<div class="col-sm-6">
 		<h3>Shipping</h3>
 			<?php echo $this->element('orders/input_shipping'); ?>
 		<h3>Payment</h3>
@@ -50,7 +50,7 @@ $info = array(
 <?php echo $this->Form->end(); ?>
 
 <div class="row">
-	<div class="span10">
+	<div class="col-sm-10">
 		<h2>Order Contents</h2>
 		<?php
 		echo $this->element('orders/cart', array('shipping' => true, 'delete' => true));
