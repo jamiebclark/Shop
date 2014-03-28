@@ -233,12 +233,11 @@ endif;
 if ($form && !$emptyCart):	?>
 	<div class="promo-code clearfix">
 		<?php 
-		echo $this->Form->input('PromoCode.0.code', array(
-			'div' => 'input-append',
+		echo $this->FormLayout->input('PromoCode.0.code', array(
 			'label' => false,
 			'value' => '',
 			'placeholder' => 'Add a Promo Code',
-			'after' => $this->FormLayout->submit('Add', array('div' => false))
+			'appendButton' => $this->FormLayout->submit('Add', array('div' => false))
 		));
 		if (!empty($this->request->data['Order']['PromoCode'])): ?>
 			<div class="promo-code-list">
