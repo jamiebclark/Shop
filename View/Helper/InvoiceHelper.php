@@ -179,7 +179,7 @@ class InvoiceHelper extends ModelViewHelper {
 		
 		$paypalForm = $this->paypalForm(
 			$invoice, 
-			$this->Form->submit ('Pay with Credit Card or PayPal', array('class' => 'btn-large btn-primary'))
+			$this->Form->submit ('Pay with Credit Card or PayPal', array('class' => 'btn btn-lg btn-primary'))
 		);
 		$payments = array();
 		
@@ -204,15 +204,15 @@ class InvoiceHelper extends ModelViewHelper {
 		
 		//Begin Output
 		$out = '';
-		$span = 12 / count($payments);
+		$col = 12 / count($payments);
 		foreach ($payments as $k => $payment) {
 			list($title, $action, $info) = $payment + array(null, null, null);
-			$out .= $this->Html->div("invoice-payment span$span",
+			$out .= $this->Html->div("invoice-payment col-sm-$col",
 				$this->Html->tag('h3', $title) . $this->Html->div('invoice-payment-wrap',
 					$this->Html->div('action', $action) . $this->Html->div('info', $info)
 				)
 			);
 		}
-		return $this->Html->div('invoice-payments row-fluid', $out);;
+		return $this->Html->div('invoice-payments row', $out);;
 	}
 }

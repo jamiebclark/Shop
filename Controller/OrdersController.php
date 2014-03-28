@@ -59,7 +59,7 @@ class OrdersController extends ShopAppController {
 
 		$this->Order->validate = array();
 		if (isset($this->request->data['checkout'])) {
-			$saveAttrs['success']['redirect'] = array('action' => 'checkout', 'ID');
+			$this->FormData->setSuccessRedirect(array('action' => 'checkout', 'ID'));
 		} else if (isset($this->request->data['update'])) {
 		}
 		
@@ -73,12 +73,9 @@ class OrdersController extends ShopAppController {
 	}
 	
 	public function shipping($id = null) {
-		$this->FormData->editData($id, null, array('contain' => 'Invoice'), array(
-			'success' => array(
-				'messages' => 'Successfully updated shipping information for your Order',
-				'redirect' => array('action' => 'checkout', 'ID')
-			)
-		));
+		$this->FormData->setSuccessMessage('Successfully updated shipping information for your Order');
+		$this->FormData->setSuccessRedirect(array('action' => 'checkout', 'ID'));
+		$this->FormData->editData($id, null, array('contain' => 'Invoice'));
 		//$this->set('states', $this->Order->State->selectList());
 		//$this->set('countries', $this->Order->Country->selectList());
 	}

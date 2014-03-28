@@ -11,10 +11,10 @@ $statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
 	<div class="col-sm-8">
 		<h2>Finish Checking Out</h2>
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-6">
 				<?php echo $this->element('orders/shipping_status', $statusOptions); ?>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-6">
 				<?php echo $this->element('orders/payment_status', $statusOptions); ?>
 			</div>
 		</div>
