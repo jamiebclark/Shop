@@ -295,11 +295,11 @@ class OrdersController extends ShopAppController {
 	}
 	
 	function _beforeFindModel($options = array()) {
-		if (empty($this->FormData->id)) {
+		if (empty($this->FindModel->id)) {
 			if (!empty($this->request->data['Order']['id'])) {
-				$this->FormData->id = $this->request->data['Order']['id'];
+				$this->FindModel->id = $this->request->data['Order']['id'];
 			} else {
-				$this->FormData->id = $this->ShoppingCart->getCartId();
+				$this->FindModel->id = $this->ShoppingCart->getCartId();
 			}
 		}
 		return $options;
