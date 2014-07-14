@@ -4,7 +4,11 @@ App::uses('InvoiceEmail', 'Shop.Network/Email');
 class OrdersController extends ShopAppController {
 	public $name = 'Orders';
 	
-	public $components = array(		//'FindFilter', 		'Shop.ShoppingCart'	);	
+	public $components = array(
+		//'FindFilter', 
+		'Shop.ShoppingCart'
+	);
+	
 	public $helpers = array(
 		'Shop.Invoice',
 		'Shop.CatalogItem', 
@@ -24,7 +28,8 @@ class OrdersController extends ShopAppController {
 		'fields' => '*',
 		'link' => array('Shop.Invoice'),
 	);
-		/*
+	
+	/*
 	function beforeFilter() {
 		parent::beforeFilter();
 		$this->FindFilter->filter = array(
@@ -35,7 +40,8 @@ class OrdersController extends ShopAppController {
 			'name' => array('type' => 'text'),
 		);
 	}
-	*/	
+	*/
+	
 	public function view($id = null) {
 		if (empty($id)) {
 			$id = $this->ShoppingCart->getCartId();
@@ -295,11 +301,11 @@ class OrdersController extends ShopAppController {
 	}
 	
 	function _beforeFindModel($options = array()) {
-		if (empty($this->FindModel->id)) {
+		if (empty($this->FormData->id)) {
 			if (!empty($this->request->data['Order']['id'])) {
-				$this->FindModel->id = $this->request->data['Order']['id'];
+				$this->FormData->id = $this->request->data['Order']['id'];
 			} else {
-				$this->FindModel->id = $this->ShoppingCart->getCartId();
+				$this->FormData->id = $this->ShoppingCart->getCartId();
 			}
 		}
 		return $options;
