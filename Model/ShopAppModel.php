@@ -1,6 +1,6 @@
 <?php
 class ShopAppModel extends AppModel {
-	var $actsAs = array(
+	public $actsAs = array(
 		'Containable',
 		'Shop.BlankDelete',
 		'Shop.Linkable',
@@ -8,10 +8,11 @@ class ShopAppModel extends AppModel {
 		'Layout.DateValidate',
 	);
 
-	var $useDbConfig = 'shop';
-	var $recursive = 0;
+	public $useDbConfig = 'shop';
+	public $recursive = 0;
+	public $tablePrefix = false;
 	
-	function __construct($id = false, $table = null, $ds = null) {
+	public function __construct($id = false, $table = null, $ds = null) {
 		parent::__construct($id, $table, $ds);
 		$aliasFields = array('order', 'virtualFields');
 		foreach ($aliasFields as $field) {
@@ -29,7 +30,7 @@ class ShopAppModel extends AppModel {
 		}
 	}
 	
-	function &getData() {
+	public function &getData() {
 		$data = null;
 		if (isset($this->data)) {
 			if (isset($this->data[$this->alias])) {
