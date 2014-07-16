@@ -1,5 +1,7 @@
 <?php
 App::uses('InvoiceEmail', 'Shop.Network/Email');
+App::uses('ShopAppModel', 'Shop.Model');
+
 class Invoice extends ShopAppModel {
 	var $name = 'Invoice';
 	var $actsAs = array(
@@ -24,7 +26,8 @@ class Invoice extends ShopAppModel {
 		),
 		//'NsaMember',
 		//'DonorCardOrder',
-	);	
+	);
+	
 	var $belongsTo = array(
 		//'User' => array('foreignKey' => 'user_id'),
 		//'Shop.PaypalPayment',
