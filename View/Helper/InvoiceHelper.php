@@ -6,12 +6,15 @@ class InvoiceHelper extends ModelViewHelper {
 	
 	var $helpers = array(
 		'Form', 
-		'Html',		'Layout.AddressBook',
-		'Layout.Asset',
+		'Html',
+		'Layout.AddressBook',
+		'CakeAssets.Asset',
 		'Layout.Calendar',
 		'Layout.DisplayText',
 		'Layout.FormLayout',
-		'Layout.Layout', 		'Shop.PaypalForm', 	);
+		'Layout.Layout', 
+		'Shop.PaypalForm', 
+	);
 	
 	var $companyName = COMPANY_NAME;
 	var $mailingAddress = COMPANY_ADDRESS;

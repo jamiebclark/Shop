@@ -1,7 +1,7 @@
 <?php
 class AmazonFormHelper extends AppHelper {
 	var $name = 'AmazonForm';
-	var $helpers = array('Form', 'Html', 'Layout.Asset');
+	var $helpers = array('Form', 'Html', 'CakeAssets.Asset');
 	
 	var $returnUrl = PAYPAL_RETURN_URL;
 	var $cancelReturnUrl = PAYPAL_CANCEL_URL;

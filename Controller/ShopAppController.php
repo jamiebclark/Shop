@@ -14,7 +14,7 @@ class ShopAppController extends AppController {
 	);
 	
 	public $helpers = array(
-		'Layout.Asset',
+		'CakeAssets.Asset',
 		'Layout.Crumbs',
 		'Layout.Calendar', 
 		'Layout.DisplayText',
