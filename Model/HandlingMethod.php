@@ -1,4 +1,6 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
+
 class HandlingMethod extends ShopAppModel {
 	var $name = 'HandlingMethod';
 	var $hasMany = array('Shop.OrdersHandlingMethod');

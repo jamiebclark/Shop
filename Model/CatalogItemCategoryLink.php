@@ -1,4 +1,6 @@
 <?php
+App::uses('ShopAppModel', 'Shop.Model');
+
 class CatalogItemCategoryLink extends ShopAppModel {
 	var $name = 'CatalogItemCategoryLink';
 	var $belongsTo = array('Shop.CatalogItemCategory');
