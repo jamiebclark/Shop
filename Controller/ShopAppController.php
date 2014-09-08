@@ -25,6 +25,14 @@ class ShopAppController extends AppController {
 		//'Layout.DateBuild', 
 		'Layout.Table',
 	);
+
+/**
+ * Works with the Permission Component
+ * TODO: Remove this dependency
+ **/
+	public $permissions = [
+		'prefix' => ['admin' => ['type' => ['staff']]],
+	];
 	
 	public function beforeRender() {
 		parent::beforeRender();
