@@ -69,6 +69,16 @@ class Invoice extends ShopAppModel {
 
 	public $syncedModels = array();
 	
+	public function beforeSave() {
+		$data =& $this->getData();
+		
+		// Makes sure net amount is set
+		if (isset($data['amt']) && isset($data['net']) && empty($data['net'])) {
+			$data['net'] = $data['amt'];
+		}
+		return parent::beforeSave();
+	}
+
 	function beforeFind($queryData) {
 		$queryData['fields'] = array_merge(array('*'), (array) $queryData['fields']);
 		foreach ($this->hasOne as $alias) {

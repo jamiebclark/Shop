@@ -93,6 +93,7 @@ class PaypalPayment extends ShopAppModel {
 						'id' => $invoiceId,
 						'paid' => date('Y-m-d H:i:s', strtotime($date)),
 						'invoice_payment_method_id' => 1,	//Type: PayPal
+						'net' => $result[$this->alias]['mc_gross'] - $result[$this->alias]['mc_fee'],
 					), 
 					array('validate' => false)
 				);

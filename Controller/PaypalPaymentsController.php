@@ -11,26 +11,26 @@ class PaypalPaymentsController extends ShopAppController {
 	private $_logResource;
 	private $_logFailed = false;
 
-	function beforeFilter($options = array()) {
+	public function beforeFilter($options = array()) {
 		if ($this->_logDir[0] != '/') {
 			$this->_logDir = APP . 'Plugin/Shop/' . $this->_logDir;
 		}
 		return parent::beforeFilter($options);
 	}
 	
-	function admin_index() {
+	public function admin_index() {
 		$this->paginate = array('order' => array('PaypalPayment.created' => 'DESC'));
 		$paypalPayments = $this->paginate();
 		$this->set(compact('paypalPayments'));
 	}
 	
-	function admin_test($txnId = null) {
+	public function admin_test($txnId = null) {
 		$post = array('txn_id' => $txnId);
 		$this->_savePost($post, true);
 		$this->redirect(array('action' => 'logs'));
 	}
 	
-	function admin_logs($logFile = null) {
+	public function admin_logs($logFile = null) {
 		if (!($folder = opendir($this->_logDir))) {
 			throw new Exception('Could not open directory: ' . $this->_logDir);
 		}
@@ -54,8 +54,29 @@ class PaypalPaymentsController extends ShopAppController {
 		}
 		$this->set(compact('logFiles', 'logFile', 'logFileContent'));
 	}
+
+	public function admin_fix() {
+		$paypalPayments = $this->PaypalPayment->find('all', array(
+			'fields' => '*',
+			'link' => array('Shop.Invoice')
+		));
+		$count = 0;
+		foreach ($paypalPayments as $paypalPayment) {
+			unset($paypalPayment['PaypalPayment']['modified']);
+			$this->PaypalPayment->create();
+			$this->PaypalPayment->read(null, $paypalPayment['PaypalPayment']['id']);
+			$this->PaypalPayment->save($paypalPayment['PaypalPayment']);
+
+			if (empty($paypalPayment['Invoice']['user_id'])) {
+				$this->PaypalPayment->syncInvoice($paypalPayment['PaypalPayment']['id'], true);
+			}
+
+			$count++;
+		}
+		debug('Re-saved ' . number_format($count) . ' Paypal Payments');
+	}
 	
-	function ipn() {
+	public function ipn() {
 		$this->_log('Received IPN');
 
 		// PHP 4.1
@@ -177,27 +198,6 @@ class PaypalPaymentsController extends ShopAppController {
 		} else {
 			$this->_log('TxnID was blank. Skipping.');
 		}
-	}
-	
-	function admin_fix() {
-		$paypalPayments = $this->PaypalPayment->find('all', array(
-			'fields' => '*',
-			'link' => array('Shop.Invoice')
-		));
-		$count = 0;
-		foreach ($paypalPayments as $paypalPayment) {
-			unset($paypalPayment['PaypalPayment']['modified']);
-			$this->PaypalPayment->create();
-			$this->PaypalPayment->read(null, $paypalPayment['PaypalPayment']['id']);
-			$this->PaypalPayment->save($paypalPayment['PaypalPayment']);
-
-			if (empty($paypalPayment['Invoice']['user_id'])) {
-				$this->PaypalPayment->syncInvoice($paypalPayment['PaypalPayment']['id'], true);
-			}
-
-			$count++;
-		}
-		debug('Re-saved ' . number_format($count) . ' Paypal Payments');
 	}
 	
 	function _logOpen() {

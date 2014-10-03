@@ -21,6 +21,15 @@ $span = 6;
 			'placeholder' => '0.00',
 			'class' => 'input-small',
 			'step' => 'any',
+			'helpBlock' => 'Gross donation',
+		));
+		echo $this->Form->input('net', array(
+			'label' => 'Net Amount',
+			'prepend' => '$',
+			'placeholder' => '0.00',
+			'class' => 'input-small',
+			'step' => 'any',
+			'helpBlock' => 'Leave blank to match the gross amount',
 		));
 		echo $this->Form->input('recur', array(
 			'label' => 'Recurring',
