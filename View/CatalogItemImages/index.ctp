@@ -1,15 +1,13 @@
-<?php
-echo $this->element('products/crumbs');
+<?php echo $this->element('Shop.catalog_item_images/crumbs'); ?>
 
-echo $this->element('product_images/thumb_list', array(
-	'class' => 'fullWidth'
-));
+<?php echo $this->element('catalog_item_images/thumb_list', array('perRow' => 6)); ?>
 
-if (!empty($loggedUserTypes['admin'])) {
+<?php if (!empty($loggedUserTypes['admin'])) :
 	echo $this->Layout->adminMenu(array('view', 'add'), array(
 		'url' => array(
 			'action' => 'index', 
 			'admin' => true
 		)
 	));
-}
+endif;
+?>

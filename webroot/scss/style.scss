@@ -1,8 +1,9 @@
-//@import "../../../../webroot/scss/variables";
-@import "../../../Layout/webroot/scss/bootstrap_import";
-@import "../../../Layout/webroot/scss/variables";
+@import "variables";
+
+@import "bootstrap3.2/bootstrap";
 
 @import "catalog-item-categories";
+@import "catalog-item-images";
 @import "catalog-items";
 @import "order-cart";
 

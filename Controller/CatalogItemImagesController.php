@@ -7,8 +7,8 @@ class CatalogItemImagesController extends ShopAppController {
 	function index($catalogItemId = null) {
 		$catalogItemImages = $this->CatalogItemImage->find('all', array(
 			'fields' => '*',
-			'link' => array('Shop.CatalogItem'),
-			'conditions' => array('CatalogItem.id' => $catalogItemId)
+			'contain' => array('CatalogItem'),
+			'conditions' => array('CatalogItemImage.catalog_item_id' => $catalogItemId)
 		));
 		$catalogItem = $this->CatalogItemImage->CatalogItem->findById($catalogItemId);
 		
@@ -24,22 +24,40 @@ class CatalogItemImagesController extends ShopAppController {
 		$catalogItemImage = $this->FormData->findModel($id);
 		$catalogItemImages = $this->CatalogItemImage->find('all', array(
 			'fields' => '*',
-			'link' => array('Shop.CatalogItem'),
+			'contain' => array('CatalogItem'),
 			'conditions' => array(
-				'CatalogItem.id' => $catalogItemImage['CatalogItemImage']['catalog_item_id'],
+				'CatalogItemImage.catalog_item_id' => $catalogItemImage['CatalogItemImage']['catalog_item_id'],
 			)
 		));
-		$this->set(compact('catalogItemImages'));
+
+		if (count($catalogItemImages) > 0):
+			$ids = Hash::extract($catalogItemImages, '{n}.CatalogItemImage.id');
+			$count = count($ids);
+
+			if (($key = array_search($id, $ids)) !== false) {
+				$prevKey = $key - 1;
+				$nextKey = $key + 1;
+				if ($prevKey < 0) {
+					$prevKey = $count - 1;
+				}
+				if ($nextKey >= $count) {
+					$nextKey = 0;
+				}
+				$nextId = $ids[$nextKey];
+				$prevId = $ids[$prevKey];
+			}
+		endif;
+		$this->set(compact('catalogItemImages', 'nextId', 'prevId'));
 	}
 	
 	function admin_index($catalogItemId = null) {
 		$fields = '*';
-		$link = array('Shop.CatalogItem');
+		$contain = array('CatalogItem');
 		$conditions = array();
 		if (!empty($catalogItemId)) {
-			$conditions['CatalogItem.id'] = $catalogItemId;
+			$conditions['CatalogItemImage.catalog_item_id'] = $catalogItemId;
 		}
-		$this->paginate = compact('fields', 'link', 'conditions');
+		$this->paginate = compact('fields', 'contain', 'conditions');
 		$catalogItemImages = $this->paginate();
 		$this->set(compact('catalogItemImages'));
 		$this->set('catalogItem', $this->CatalogItemImage->CatalogItem->findById($catalogItemId));

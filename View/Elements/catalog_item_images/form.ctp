@@ -3,11 +3,11 @@ $add = !$this->Html->value('ProductImage.id');
 echo $this->Form->create(null, array('type' => 'file'));
 echo $this->Form->hidden('id');
 ?>
-<div class="row">
-	<div class="col-sm-2">
+<div class="media">
+	<div class="media-object pull-left">
 		<?php echo $this->CatalogItemImage->inputThumb(); ?>
 	</div>
-	<div class="col-sm-9">
+	<div class="media-body">
 		<?php echo $this->Form->input('catalog_item_id', array('helpBlock' => 'Select the which product this image represents')); ?>
 	</div>
 </div>

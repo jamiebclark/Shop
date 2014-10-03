@@ -3,9 +3,10 @@ App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItemImage extends ShopAppModel {
 	var $name = 'CatalogItemImage';
 	var $actsAs = array(
-		'Shop.BlankDelete' => array('id', 'add_file'),
+		'Shop.BlankDelete' => array('id', 'add_image'),
 		'Uploadable.ImageUploadable' => array(
 			'plugin' => 'Shop',
+			'upload_var' => 'add_image',
 			//'bypass_is_uploaded' => true,
 			'upload_dir' => 'img/catalog_item_images/',
 			'update' => array('filename'),
