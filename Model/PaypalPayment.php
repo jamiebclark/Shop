@@ -1,7 +1,13 @@
 <?php
+/**
+ * Model that tracks PayPal updates through the IPN callbacks
+ *
+ * @package app.Plugin.Shop.Model
+ **/
+
 class PaypalPayment extends ShopAppModel {
-	var $name = 'PaypalPayment';
-	var $belongsTo = array(
+	public $name = 'PaypalPayment';
+	public $belongsTo = array(
 		'Invoice' => array(
 			'className' => 'Shop.Invoice',
 			'foreignKey' => 'invoice'
@@ -9,7 +15,7 @@ class PaypalPayment extends ShopAppModel {
 	);
 	//OnlineStore, Bowlathon
 	
-	function afterSave($created, $options = array()) {
+	public function afterSave($created, $options = array()) {
 		//Updates Invoice
 		$id = $this->id;
 		$this->updateCompletedInvoice($id);
@@ -17,7 +23,7 @@ class PaypalPayment extends ShopAppModel {
 		return parent::afterSave($created);
 	}
 	
-	function findByTxnId($txnId) {
+	public function findByTxnId($txnId) {
 		return $this->find('first', array(
 			'conditions' => array($this->alias . '.txn_id' => $txnId)
 		));
