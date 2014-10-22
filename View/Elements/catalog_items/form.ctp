@@ -1,7 +1,7 @@
 <?php 
 echo $this->Layout->defaultHeader(); 
 echo $this->Form->create('CatalogItem', array('type' => 'file'));
-$cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small');
+$cashOptions = array('beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>','afterInput' => '</div>', 'step' => 'any');
 
 ?>
 <div class="row">
@@ -9,33 +9,42 @@ $cashOptions = array('prepend' => '$', 'step' => 'any', 'class' => 'input-small'
 		<?php
 		echo $this->FormLayout->inputs(array(
 			'id',
-			'title' => array('class' => 'input-block-level'),
-			'short_description' => array('class' => 'input-block-level'),
-			'description' => array('escape' => false, 'class' => 'input-block-level', 'rows' => 10),
+			'title',
+			'short_description',
+			'description' => array('escape' => false, 'rows' => 10),
 		));
 		?>
 		<div class="form-horizontal"><?php
+			$inputDefaults = $this->Form->inputDefaults();
+			$this->Form->inputDefaults(array(
+				'label' => array('class' => 'control-label col col-sm-3'),
+				'wrapInput' => 'col col-sm-9',
+			), true);
 			echo $this->FormLayout->inputs(array(
 				'price' => array('label' => 'Price', 'type' => 'cash'),
 				'sale' => array('label' => 'Sale Price', 'type' => 'cash'),
 				'min_quantity' => array('label' => 'Minimum Quantity', 'type' => 'number'),
 				'quantity_per_pack' => array('type' => 'number'),
 			));
+			$this->Form->inputDefaults($inputDefaults);
 			?>
 		</div>
 		<?php
 		echo $this->FormLayout->inputs(array(
 			'active' => array(
 				'label' => 'Active',
-				'helpBlock' => 'Whether item is available for sale',
+				'class' => 'checkbox',
+				'after' => '<span class="help-block">Whether item is available for sale</span>',
 			),
 			'hidden' => array(
 				'label' => 'Hidden',
-				'helpBlock' => 'Hide this from catalog page while still being active',
+				'class' => 'checkbox',
+				'after' => '<span class="help-block">Hide this from catalog page while still being active</span>',
 			),
 			'unlimited' => array(
 				'label' => 'Unlimited Inventory',
-				'helpBlock' => 'Item\'s stock never runs out'
+				'class' => 'checkbox',
+				'after' => '<span class="help-block">Item\'s stock never runs out</span>'
 			),
 		));
 		echo $this->FormLayout->inputList('shipping_rules/input', array('model' => 'ShippingRule', 'legend' => 'Shipping Rules'));

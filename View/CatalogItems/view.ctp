@@ -90,7 +90,7 @@
 				$default = $catalogItem['CatalogItem']['min_quantity'];
 			}
 			echo $this->Form->input('OrderProduct.quantity', compact('default') + array(
-				'class' => 'quantity input-small',
+				'class' => 'form-control quantity',
 			));
 			echo $this->Form->submit('Add to Cart', array(
 				'class' => 'btn btn-primary',

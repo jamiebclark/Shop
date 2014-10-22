@@ -5,7 +5,7 @@ echo $this->Form->create('CatalogItemCategory');
 echo $this->Form->inputs(array(
 	'legend' => 'Category',
 	'id',
-	'parent_id' => array('class' => 'select-collapse'),
+	'parent_id' => array('class' => 'form-control select-collapse'),
 	'title',
 	'CatalogItem.CatalogItem' => array(
 		'multiple' => 'checkbox',

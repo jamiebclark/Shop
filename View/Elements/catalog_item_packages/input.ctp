@@ -7,7 +7,8 @@ echo $this->Form->input("$prefix.catalog_item_child_id", array(
 	'after' => $this->Form->input("$prefix.quantity", array(
 		'div' => false,
 		'default' => 1,
-		'append' => 'Qty.',
+		'beforeInput' => '<div class="input-group">',
+		'afterInput' => '<span class="input-group-addon">Qty.</span></div>',
 		'label' => false,
 		'type' => 'number',
 	))

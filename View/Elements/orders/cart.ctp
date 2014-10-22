@@ -111,7 +111,6 @@ if (!$emptyCart):
 				$qtyOptions = array(
 					'label' => false, 
 					'div' => false, 
-					//'class' => 'qty input-small'
 				);
 				if (!empty($delete) || (!$condensed && $links)) {
 					$qtyOptions['appendButton'] = $this->Html->link(

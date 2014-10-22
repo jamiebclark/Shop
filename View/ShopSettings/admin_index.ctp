@@ -6,15 +6,14 @@
 			'COMPANY_ADDRESS' => array('requred' => true),
 			'COMPANY_EMAIL' => array(
 				'type' => 'email',
-				'helpInline' => 'The contact email given to customers viewing the page',
+				'after' => '<span class="help-block">The contact email given to customers viewing the page</span>',
 				'required' => true,
 			),
 			'COMPANY_ADMIN_EMAILS' => array(
-				'helpInline' => 'A comma-separated list of emails to receive store admin emails',
+				'after' => '<span class="help-block">A comma-separated list of emails to receive store admin emails</span>',
 				'type' => 'textarea',
 				'rows' => 1,
 				'data-max-height' => 160,
-				'class' => 'input-block-level',
 			),
 		), array(
 			'legend' => 'Basic Company Info',
@@ -45,23 +44,23 @@
 			'PAYPAL_USER_NAME' => array(
 				'type' => 'email',
 				'required' => true,
-				'helpInline' => 'The email address you set up with PayPal',
+				'after' => '<span class="help-block">The email address you set up with PayPal</span>',
 			),
 			'PAYPAL_RETURN_URL' => array(
 				'type' => 'url',
-				'helpInline' => 'Where the user should be taken after they complete their order',
+				'after' => '<span class="help-block">Where the user should be taken after they complete their order</span>',
 			),
 			'PAYPAL_CANCEL_URL' => array(
 				'type' => 'url',
-				'helpInline' => 'Where the user should be taken if they cancel their order',
+				'after' => '<span class="help-block">Where the user should be taken if they cancel their order</span>',
 			),
 		), array('legend' => 'PayPal Info', 'note' => 'Information linking to your PayPal account'));
 
-		$codeOptions = array('type' => 'textarea', 'class' => 'code input-block-level');
+		$codeOptions = array('type' => 'textarea', 'class' => 'code form-control');
 		echo $this->ShopSetting->inputs(array(
-			'EMAIL_BACKGROUND_COLOR' => array('class' => 'input-small'),
+			'EMAIL_BACKGROUND_COLOR',
 			'EMAIL_STYLE' => $codeOptions + array(
-				'helpInline' => 'Use the #email-header, #email-content, #email-body, and #email-footer ids for styling',
+				'after' => '<span class="help-block">Use the #email-header, #email-content, #email-body, and #email-footer ids for styling</span>',
 			),
 			'EMAIL_HEADER_HTML' => $codeOptions,
 			'EMAIL_FOOTER_HTML' => $codeOptions,

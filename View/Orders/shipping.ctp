@@ -18,14 +18,14 @@
 			array(
 				'email' => array(
 					'type' => 'email',
-					'helpBlock' => 'We can keep you up to date on when your order has shipped',
+					'after' => '<span class="help-block">We can keep you up to date on when your order has shipped</span>',
 					'placeholder' => 'yourname@email.com',
 				),
 			),
 			array(
 				'phone' => array(
 					'type' => 'phone',
-					'helpBlock' => 'We need a phone number to add your order to Fed-Ex',
+					'after' => '<span class="help-block">We need a phone number to add your order to Fed-Ex</span>',
 					'placeholder' => '(xxx) xxx-xxxx',
 				),
 			)

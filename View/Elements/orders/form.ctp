@@ -14,7 +14,8 @@ if (!empty($order['Order']['id'])) {
 	<?php	
 	echo $this->Form->input('canceled', array(
 		'label' => 'Canceled', 
-		'helpBlock' => 'Order has been canceled'
+		'class' => 'checkbox',
+		'after' => '<span class="help-block">Order has been canceled</span>'
 	));
 	?>
 <div class="row">
@@ -63,16 +64,25 @@ echo $this->Form->inputs(array(
 	'fieldset' => false,
 	'auto_shipping' => array(
 		'type' => 'checkbox',
-		'label' => 'Let the system calculate what shipping charges should be'
+		'label' => 'Let the system calculate what shipping charges should be',
+		'class' => 'checkbox',
 	),
 	'auto_price' => array(
 		'type' => 'checkbox',
 		'label' => 'Let the system calculate product prices',
+		'class' => 'checkbox',
 	)
 ));
 $this->Table->reset();
-$inputOptions = array('label' => false, 'class' => 'input-small');
-$cashOptions = $inputOptions + array('prepend' => '$', 'step' => 'any');
+$inputOptions = array(
+	'label' => false, 
+	'class' => 'input-small form-control'
+);
+$cashOptions = $inputOptions + array(
+	'beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>',
+	'afterInput' => '</div>', 
+	'step' => 'any'
+);
 
 $View = $this;
 echo $this->FormLayout->inputList(function($count) use ($View) {
@@ -96,7 +106,8 @@ echo $this->FormLayout->inputList(function($count) use ($View) {
 <?php
 echo $this->Form->input('auto_handling', array(
 	'type' => 'checkbox',
-	'label' => 'Let the system calculate what handling charges should be'
+	'label' => 'Let the system calculate what handling charges should be',
+	'class' => 'checkbox',
 ));
 echo $this->Table->reset();
 $total = 1;
@@ -119,16 +130,23 @@ for ($k = 0; $k <= $total; $k++) {
 		array(
 			$this->Form->input(
 				$prefix . 'title', 
-				array('prepend' => false, 'class' => null) + $inputOptions
-			), 'Title'
+				array('prepend' => false, 'class' => 'form-control') + $inputOptions
+			), 
+			'Title',
+			array('class' => 'col-sm-4')
 		), array(
 			$this->Form->input($prefix . 'amt', $cashOptions), 
-			'Amount'
+			'Amount',
+			array('class' => 'col-sm-2')
 		), array(
-			$this->Form->input($prefix . 'pct', $inputOptions + array('append' => '%')), 
-			'Percent'
+			$this->Form->input($prefix . 'pct', $inputOptions + array(
+				'beforeInput' => '<div class="input-group">',
+				'afterInput' => '<span class="input-group-addon">%</span></div>'
+			)), 
+			'Percent',
+			array('class' => 'col-sm-2')
 		), array(
-			$this->DisplayText->cash($total), 'Charge',
+			$this->FormLayout->fakeInput($this->DisplayText->cash($total), array('label' => false)), 'Charge',
 			array('class' => 'price')
 		),
 	), true);

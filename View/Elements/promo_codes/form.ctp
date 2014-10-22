@@ -11,37 +11,43 @@ echo $this->Form->inputs(array(
 	'legend' => 'Promo Code',
 	'id',
 	'title' => array(
-		'helpBlock' => 'An internal name (i.e. "Spring sale" or "Weekend Clearance")',
+		'after' => '<span class="help-block">An internal name (i.e. "Spring sale" or "Weekend Clearance")</span>',
 	),
 	'code' => array(
 		'label' => 'Promo Code',
-		'helpBlock' => 'The code users will enter.',
+		'after' => '<span class="help-block">The code users will enter.</span>',
 	),
 	'pct' => array(
 		'label' => 'Discount Percent',
-		'append' => '%',
-		'helpBlock' => 'Percentage the total will be reduced',
+		'beforeInput' => '<div class="input-group">',
+		'afterInput' => '<span class="input-group-addon">%</span></div>',
+		'after' => '<span class="help-block">Percentage the total will be reduced</span>',
 		'step' => 'any',
 	),
 	'amt' => array(
 		'label' => 'Discount Amount',
-		'prepend' => '$',
-		'helpBlock' => 'Flat rate the total will be reduced',
+		'beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>',
+		'afterInput' => '</div>',
+		'after' => '<span class="help-block">Flat rate the total will be reduced</span>',
 		'step' => 'any',
 	),
 	'started' => $dateOptions + array(
-		'helpBlock' => 'When this promo will start going into effect (blank for right now)',
+		'after' => '<span class="help-block">When this promo will start going into effect (blank for right now)</span>',
 		'type' => 'text',
-		'class' => 'datetimepicker',
+		'class' => 'form-control datepicker',
 	),
 	'stopped' => $dateOptions + array(
-		'helpBlock' => 'When this promo will stop (blank for always on)',
+		'after' => '<span class="help-block">When this promo will stop (blank for always on)</span>',
 		'type' => 'text',
-		'class' => 'datepicker',
+		'class' => 'form-control datepicker',
 	),
 	'active' => array(
 		'label' => 'Active',
-		'helpBlock' => 'Is this promo code be usable now?',
+		'class' => 'checkbox',
+		'after' => '<span class="help-block">Is this promo code be usable now?</span>',
 	),
 ));
-echo $this->Form->end('Submit');
+echo $this->Form->end(array(
+	'label' => 'Update',
+	'class' => 'btn btn-primary btn-lg',
+));

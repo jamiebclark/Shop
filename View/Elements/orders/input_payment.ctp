@@ -1,6 +1,13 @@
 <?php 
 $class = 'form-horizontal alert ';
 $class .= $this->Html->value('Invoice.paid') ? 'alert-success' : 'alert-warning';
+
+$inputDefaults = $this->Form->inputDefaults();
+$this->Form->inputDefaults(array(
+	'label' => array('class' => 'control-label col col-sm-2'),
+	'wrapInput' => 'col col-sm-10',
+), true);
+
 ?>
 <div class="<?php echo $class;?>">
 	<?php
@@ -14,7 +21,8 @@ $class .= $this->Html->value('Invoice.paid') ? 'alert-success' : 'alert-warning'
 	if (!isset($amt) || $amt !== false) {
 		echo $this->Form->input('Invoice.amt', array(
 			'label' => 'Amount',
-			'prepend' => '$',
+			'beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>',
+			'afterInput' => '</div>',
 			'step' => 'any',
 			'placeholder' => '0.00',
 		));
@@ -24,22 +32,27 @@ $class .= $this->Html->value('Invoice.paid') ? 'alert-success' : 'alert-warning'
 	
 	echo $this->FormLayout->inputDatetime('Invoice.paid', array(
 		'control' => array('today', 'clear'), 
-		'class' => 'datetime', 
+		'class' => 'form-control datetime', 
 		'label' => 'Date Paid',
 		'blank' => true,
 	));
 	echo $this->Form->input('Invoice.invoice_payment_method_id', array('label' => 'Pay Method'));
 
+	$helpBlock = 'Send the customer an email saying their order has been paid. ';
+
 	$paidEmailOptions = array(
 		'type' => 'checkbox',
-		'label' => 'Send Confirmation Email',
-		'helpBlock' => 'Send the customer an email saying their order has been paid',
+		'class' => 'checkbox',
+		'wrapInput' => 'col col-sm-offset-2',
+		'label' => array('text' => 'Send Confirmation Email', 'class' => 'control-label'),
 		'checked' => !$this->Html->value('Invoice.paid') && !$this->Html->value('Invoice.paid_email'),
 	);
 	if ($this->Html->value('Invoice.paid_email')) {
-		$paidEmailOptions['helpBlock'] .= ' <em>Previously sent ';
-		$paidEmailOptions['helpBlock'] .= $this->Calendar->niceShort($this->Html->value('Order.paid_email'));
-		$paidEmailOptions['helpBlock'] .= '</em>';
+		$helpBlock .= ' <em>Previously sent ';
+		$helpBlock .= $this->Calendar->niceShort($this->Html->value('Order.paid_email'));
+		$helpBlock .= '</em>';
 	}
+	$paidEmailOptions['afterInput'] = '<span class="help-block">' . $helpBlock . '</span>';
 	echo $this->Form->input('Invoice.send_paid_email', $paidEmailOptions);
 ?></div>
+<?php $this->Form->inputDefaults($inputDefaults); ?>

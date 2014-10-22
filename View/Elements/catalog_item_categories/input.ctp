@@ -17,5 +17,5 @@ if (!isset($options) && isset($catalogItemCategories)) {
 
 echo $this->Form->input($field, array(
 	'type' => 'select',
-	'class' => 'select-collapse',
+	'class' => 'form-control select-collapse',
 ) + compact('label', 'options', 'default'));

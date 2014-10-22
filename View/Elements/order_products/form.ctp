@@ -1,6 +1,6 @@
 <?php
 $add = !$this->Html->value('OrderProduct.id');
-$cashOptions = array('prepend' => '$', 'step' => 'any', 'placeholder' => '0.00');
+$cashOptions = array('beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>','afterInput' => '</div>', 'step' => 'any', 'placeholder' => '0.00');
 $inputs = array(
 	'fieldset' => false,
 	'id' => array('type' => 'hidden'),

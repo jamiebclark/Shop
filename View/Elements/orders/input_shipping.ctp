@@ -1,6 +1,12 @@
 <?php 
 $class = 'form-horizontal alert ';
 $class .= $this->Html->value('Order.shipped') ? 'alert-success' : 'alert-warning';
+
+$inputDefaults = $this->Form->inputDefaults();
+$this->Form->inputDefaults(array(
+	'label' => array('class' => 'control-label col col-sm-2'),
+	'wrapInput' => 'col col-sm-10',
+), true);
 ?>
 <div class="<?php echo $class;?>">
 	<?php
@@ -17,23 +23,28 @@ $class .= $this->Html->value('Order.shipped') ? 'alert-success' : 'alert-warning
 		'shipping_cost' => array(
 			'label' => 'Cost to ship',
 			'step' => 'any',
-			'prepend' => '$',
+			'beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>',
+			'afterInput' => '</div>',
 			'placeholder' => '0.00',
 		),
 	));
 	
 	$shippedEmailOptions = array(
 		'type' => 'checkbox',
-		'label' => 'Send Confirmation Email',
-		'helpBlock' => 'Send the customer an email saying their order has shipped',
+		'class' => 'checkbox',
+		'wrapInput' => 'col col-sm-offset-2',
+		'label' => array('text' => 'Send Confirmation Email', 'class' => 'control-label'),
 		'checked' => !$this->Html->value('Order.shipped') && !$this->Html->value('Order.shipped_email'),
 	);
+	$helpBlock = 'Send the customer an email saying their order has shipped. ';
 	if ($this->Html->value('Order.shipped_email')) {
-		$shippedEmailOptions['helpBlock'] .= ' <em>Previously sent ';
-		$shippedEmailOptions['helpBlock'] .= $this->Calendar->niceShort($this->Html->value('Order.shipped_email'));
-		$shippedEmailOptions['helpBlock'] .= '</em>';
+		$helpBlock .= ' <em>Previously sent ';
+		$helpBlock .= $this->Calendar->niceShort($this->Html->value('Order.shipped_email'));
+		$helpBlock .= '</em>';
 	}
+	$shippedEmailOptions['afterInput'] = '<span class="help-block">' . $helpBlock . '</span>';
 	echo $this->Form->input('send_shipped_email', $shippedEmailOptions);
 	//debug($this->request->data);
 	?>
 </div>
+<?php $this->Form->inputDefaults($inputDefaults); ?>

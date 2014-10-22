@@ -11,11 +11,11 @@ echo $this->Form->inputs(array(
 	'quantity' => array(
 		'type' => 'number',
 		'label' => 'Amount Added',
-		'helpBlock' => 'If you are removing inventory, use a negative value',
+		'after' => '<span class="help-block">If you are removing inventory, use a negative value</span>',
 	),
 	'title' => array(
 		'label' => 'Description',
-		'helpBlock' => 'Optional description behind why this stock was added',
+		'after' => '<span class="help-block">Optional description behind why this stock was added</span>',
 	),
 
 ));

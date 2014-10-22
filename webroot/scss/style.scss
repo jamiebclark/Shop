@@ -123,6 +123,15 @@ form.canceled {
 }
 .shipping-rule-input {
 	.input-mini {
-		width: 60px;
+		width: 80px;
+	}
+}
+.shipping-rule-amt {
+	> label {
+		display: block;
+		clear: both;
+	}
+	> .form-control {
+		display: inline-block;
 	}
 }

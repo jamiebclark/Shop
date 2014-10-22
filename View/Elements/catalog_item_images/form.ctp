@@ -8,7 +8,7 @@ echo $this->Form->hidden('id');
 		<?php echo $this->CatalogItemImage->inputThumb(); ?>
 	</div>
 	<div class="media-body">
-		<?php echo $this->Form->input('catalog_item_id', array('helpBlock' => 'Select the which product this image represents')); ?>
+		<?php echo $this->Form->input('catalog_item_id', array('after' => '<span class="help-block">Select the which product this image represents</span>')); ?>
 	</div>
 </div>
 <?php echo $this->FormLayout->end($add ? 'Add Image' : 'Update Image');
