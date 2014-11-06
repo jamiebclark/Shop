@@ -1,5 +1,5 @@
 <h2>Product Packages</h2>
-<p class="note">If this product is a grouping of other products in the store, list them below</p>
+<p class="help-block">If this product is a grouping of other products in the store, list them below</p>
 <?php
 echo $this->Form->create();
 echo $this->Form->hidden('CatalogItem.id');

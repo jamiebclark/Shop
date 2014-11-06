@@ -62,12 +62,12 @@ $cashOptions = array('beforeInput' => '<div class="input-group"><span class="inp
 		</fieldset>
 		<fieldset>
 			<legend>Options / Sizes</legend>
-			<p class="note">If there are options that must be selected before the item can be purchased (ie sizes, colors, langauges, etc), then set them here</p>
+			<p class="help-block">If there are options that must be selected before the item can be purchased (ie sizes, colors, langauges, etc), then set them here</p>
 			<?php echo $this->FormLayout->inputList('catalog_item_options/admin_input', array('model' => 'CatalogItemOption')); ?>
 		</fieldset>
 		<fieldset>
 			<legend>Packages</legend>
-			<p class="note">If this is a combination of other products, you can group them all here</p>
+			<p class="help-block">If this is a combination of other products, you can group them all here</p>
 			<?php echo $this->FormLayout->inputList('catalog_item_packages/input', array('model' => 'CatalogItemPackage')); ?>
 		</fieldset>
 	</div>

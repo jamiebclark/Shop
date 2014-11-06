@@ -51,7 +51,7 @@ $span = 6;
 		<?php echo $this->FormLayout->submitPrimary('Update'); ?>
 
 		<fieldset class="form-horizontal"><legend>Admin Settings</legend>
-			<p class="note">How the Invoice is connected to other models in the database</p>
+			<p class="help-block">How the Invoice is connected to other models in the database</p>
 			<?php
 			echo $this->FormLayout->inputs(array(
 				'model' => array(
