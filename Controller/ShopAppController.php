@@ -50,7 +50,7 @@ class ShopAppController extends AppController {
 		if (!empty($msg)) {
 			$type = 'info';
 			if ($success === false) {
-				$type = 'error';
+				$type = 'danger';
 			} else if ($success == true) {
 				$type = 'success';
 			}
