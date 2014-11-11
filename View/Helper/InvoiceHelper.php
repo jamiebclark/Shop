@@ -173,7 +173,7 @@ class InvoiceHelper extends ModelViewHelper {
 		return $this->mailingAddress;
 	}
 	
-	function paymentForm($invoice, $options = array()) {
+	public function paymentForm($invoice, $options = array()) {
 		$options = array_merge(array(
 			'paypal' => true,
 			'check' => true,
@@ -188,34 +188,45 @@ class InvoiceHelper extends ModelViewHelper {
 		
 		if (!empty($paypal)) {
 			$payments[] = array(
-				'Pay with Credit Card / PayPal',
+				'<i class="fa fa-credit-card"></i> Pay with Credit Card / PayPal',
 				$paypalForm,
-				'Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment ',
+				'<p class="help-block">Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment</p>',
 			);
 		}
 		
 		if (!empty($check)) {
 			$payments[] = array(
-				'Pay by Check',
+				'<i class="fa fa-pencil"></i> Pay by Check',
 				$this->Html->div(
 					'mailing-address', 
-					$this->Html->tag('h4', 'Mail to:') . $this->getMailingAddress()
+					$this->Html->tag('h4', '<strong>Mail to:</strong> '. $this->getMailingAddress())
 				),
 				$this->checkPaymentSteps($invoice),
 			);
 		}
 		
 		//Begin Output
-		$out = '';
 		$col = 12 / count($payments);
-		foreach ($payments as $k => $payment) {
+		ob_start();
+		?>
+		<div class="invoice-payments row">
+		<?php foreach ($payments as $k => $payment) :
 			list($title, $action, $info) = $payment + array(null, null, null);
-			$out .= $this->Html->div("invoice-payment col-sm-$col",
-				$this->Html->tag('h3', $title) . $this->Html->div('invoice-payment-wrap',
-					$this->Html->div('action', $action) . $this->Html->div('info', $info)
-				)
-			);
-		}
-		return $this->Html->div('invoice-payments row', $out);;
+			?>
+			<div class="invoice-payment col-sm-<?php echo $col; ?>">
+				<div class="panel panel-default">
+					<div class="panel-heading"><?php echo $title; ?></div>
+					<div class="panel-body">
+						<div class="invoice-payment-wrap">
+							<div class="info"><?php echo $info; ?></div>
+							<div class="action pull-right"><?php echo $action; ?></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php endforeach; ?>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 }

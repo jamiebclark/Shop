@@ -72,6 +72,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @return bool Save is successful
  **/
 	function copyModelToInvoice($Model, $id, $fields = null) {
+
 		//Prevents infinite looping while still keeping Model's afterSave functions
 		if (!empty($Model->_syncingWithInvoice) || !empty($Model->Invoice->_syncingWithModel)) {
 			return null;

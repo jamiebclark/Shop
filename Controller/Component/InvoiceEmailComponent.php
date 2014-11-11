@@ -28,7 +28,7 @@ class InvoiceEmailComponent extends Component {
 		
 		$this->Invoice = ClassRegistry::init('Shop.Invoice');
 		
-		$helpers = array('Contact', 'Layout.DisplayText', 'Shop.Invoice', 'Email');
+		$helpers = array('Contact', 'Layout.DisplayText', 'Shop.Invoice', 'Layout.Email');
 		foreach ($helpers as $helper => $config) {
 			if (is_numeric($helper)) {
 				$helper = $config;
@@ -103,7 +103,13 @@ class InvoiceEmailComponent extends Component {
 			$subject = 'Invoice #' . $invoice['Invoice']['id'] . ' ';
 			$subject .= $invoice['Invoice']['paid'] ? 'PAID' : 'UNPAID';
 
-			$email = new CakeEmail();			$email->from($this->from)				->to($to)				->subject($subject)				->emailFormat('both')				->template('invoice')				->viewVars(compact('invoice'));
+			$email = new CakeEmail();
+			$email->from($this->from)
+				->to($to)
+				->subject($subject)
+				->emailFormat('both')
+				->template('invoice')
+				->viewVars(compact('invoice'));
 			
 			return $test ? true : $email->send();
 		} else {
