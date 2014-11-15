@@ -24,11 +24,15 @@ if (isset($result['PaymentMethod'])) {
 ?>
 <div class="row">
 	<div class="col-sm-6">
-		<h3>Payment Information</h3>
-		<?php echo $this->Layout->infoTable($payment); ?>
+		<div class="panel panel-default">
+			<div class="panel-heading">Payment Information</div>
+			<?php echo $this->Layout->infoTable($payment); ?>
+		</div>
 	</div>
 	<div class="col-sm-6">
-		<h3>Customer Information</h3>
-		<?php echo $this->Layout->infoTable($customer); ?>
+		<div class="panel panel-default">
+			<div class="panel-heading">Customer Information</div>
+			<?php echo $this->Layout->infoTable($customer); ?>
+		</div>
 	</div>
 </div>

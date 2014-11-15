@@ -91,20 +91,28 @@ class Invoice extends ShopAppModel {
 		$result = $this->read(null, $this->id);
 		$data =& $this->getData();
 		
-		//debug($this->data);
 		/*
 		if (empty($this->_syncingWithModel)) {	//Prevents infinite looping with Invoice Sync Behavior
 			$this->copyToModels($this->id);
 		}
 		*/
 		
+		// Fires if Payment information has changed
 		if ($created || array_search('paid', $this->changedFields)) {
 			$this->updatePaid($this->id);
 		}
+
 		return parent::afterSave($created);
 	}
 	
-	function updatePaid($id = null) {
+	public function updatePaid($id = null) {
+		$result = $this->read('paid', $id);
+		$event = new CakeEvent('Model.Invoice.afterPaid', $this, array(
+			'id' => $id,
+			'paid' => $result[$this->alias]['paid'],
+		));
+		
+		$this->getEventManager()->dispatch($event);
 		return true;
 	}
 	
@@ -180,6 +188,10 @@ class Invoice extends ShopAppModel {
 		}
 	}
 	
+/**
+ * Deletes invoice entries with 0 amount that don't sync to any sort of model
+ *
+ **/
 	public function fixTotals() {
 		$Pdo = getModelPDO($this);
 		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');
@@ -196,6 +208,7 @@ class Invoice extends ShopAppModel {
 						$Model->create();
 						$Model->copyModelToInvoice($row['model_id']);
 					} else {
+						debug(sprintf('ID #%d should be deleted', $row['id']));
 						$this->delete($row['id']);
 					}
 				}
