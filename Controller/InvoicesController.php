@@ -42,7 +42,6 @@ class InvoicesController extends ShopAppController {
 	
 	function admin_view($id = null) {
 		$this->Invoice->syncPaypal($id);
-		
 		if (!empty($this->request->params['named']['notify'])) {
 			$msg = $this->Invoice->sendAdminPaidEmail($id) ? 'Email sent' : 'Error sending email';
 			$this->redirectMsg(array($id), $msg);
@@ -51,6 +50,11 @@ class InvoicesController extends ShopAppController {
 	}
 	
 	function admin_edit($id = null) {
+		$unsetValidates = array('email', 'addline1', 'city', 'state', 'zip', 'country', 'first_name', 'last_name');
+		foreach ($unsetValidates as $field) {
+			unset($this->Invoice->validate[$field]);
+		}
+
 		$this->FormData->editData($id);
 		/*
 		if ($this->_saveData(null, null, array('validate' => false)) === null) {
@@ -109,8 +113,15 @@ class InvoicesController extends ShopAppController {
 	}
 	
 	function admin_resend_email($id = null) {
-		$this->FormData->findModel($id);		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {			$msg = 'Email successfully sent';
-		} else {			$msg = 'There was an error sending email';		}		$this->redirectMsg(array('action' => 'view', $id), $msg, $success);	}	
+		$this->FormData->findModel($id);
+		if ($success = $this->Invoice->sendAdminPaidEmail($id)) {
+			$msg = 'Email successfully sent';
+		} else {
+			$msg = 'There was an error sending email';
+		}
+		$this->redirectMsg(array('action' => 'view', $id), $msg, $success);
+	}
+	
 	function admin_copy_payment($id = null) {
 		$invoice = $this->Invoice->find('first', array(
 			'fields' => array('*'),

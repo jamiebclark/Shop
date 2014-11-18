@@ -10,7 +10,7 @@ $span = 6;
 				<h3>Customer Info</h3>
 				<?php
 				echo $this->FormLayout->inputRow(array('first_name', 'last_name'));
-				echo $this->AddressBookForm->inputAddress('Invoice');
+				echo $this->AddressBookForm->inputAddress('Invoice', array('required' => false));
 				echo $this->FormLayout->inputRow(array('email', 'phone'));
 				?>
 			</div>

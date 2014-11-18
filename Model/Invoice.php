@@ -107,6 +107,7 @@ class Invoice extends ShopAppModel {
 	
 	public function updatePaid($id = null) {
 		$result = $this->read('paid', $id);
+	//	debug('Dispatching Invoice Event');
 		$event = new CakeEvent('Model.Invoice.afterPaid', $this, array(
 			'id' => $id,
 			'paid' => $result[$this->alias]['paid'],
