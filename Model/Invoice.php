@@ -95,28 +95,43 @@ class Invoice extends ShopAppModel {
 			$this->copyToModels($id);
 		}
 		*/
-
 		// Fires if Payment information has changed
-		if ($created || array_search('paid', $this->changedFields)) {
-			$this->updatePaid($id);
+		$appModels = array();
+		$lookForModels = array('models');
+		$plugins = CakePlugin::loaded();
+		foreach ($plugins as $plugin) {
+			$lookForModels[] = "$plugin.Model";
 		}
+		foreach ($lookForModels as $modelKey) {
+			$models = App::objects($modelKey);
+			foreach ($models as $className) {
+				$Model = ClassRegistry::init($className, true);
+				if (is_subclass_of($Model, 'Model') && $Model->hasMethod('copyInvoiceToModel')) {
+					if (empty($this->_syncingWithModel)) {
+						$Model->copyInvoiceToModel($id);
+					}
+				}
 
+				/*
+				if ($Model->hasMethod('afterInvoiceSave')) {
+					if (!empty($Model->actsAs['Shop.InvoiceSync'])) {
+						$config = $Model->actsAs['Shop.InvoiceSync'];
+					} else {
+						$config = array();
+					}
+
+
+					//$Model->Behaviors->unload('Shop.InvoiceSync');
+					//$Model->afterInvoiceSave($created, $id);
+					//$Model->Behaviors->load('Shop.InvoiceSync', $config);
+				}
+				*/
+			}
+		}
 		$this->read(null, $id);
-
 		return parent::afterSave($created);
 	}
 	
-	public function updatePaid($id = null) {
-		$result = $this->read('paid', $id);
-	//	debug('Dispatching Invoice Event');
-		$event = new CakeEvent('Model.Invoice.afterPaid', $this, array(
-			'id' => $id,
-			'paid' => $result[$this->alias]['paid'],
-		));
-		
-		$this->getEventManager()->dispatch($event);
-		return true;
-	}
 	
 /**
  * Finds any related models using the InvoiceSyncBehavior and updates them with the new Invoice information
