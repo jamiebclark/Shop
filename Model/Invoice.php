@@ -88,19 +88,20 @@ class Invoice extends ShopAppModel {
 	}
 	
 	function afterSave($created, $options = array()) {
-		$result = $this->read(null, $this->id);
-		$data =& $this->getData();
-		
+		$id = $this->id;
+
 		/*
 		if (empty($this->_syncingWithModel)) {	//Prevents infinite looping with Invoice Sync Behavior
-			$this->copyToModels($this->id);
+			$this->copyToModels($id);
 		}
 		*/
-		
+
 		// Fires if Payment information has changed
 		if ($created || array_search('paid', $this->changedFields)) {
-			$this->updatePaid($this->id);
+			$this->updatePaid($id);
 		}
+
+		$this->read(null, $id);
 
 		return parent::afterSave($created);
 	}
@@ -124,6 +125,7 @@ class Invoice extends ShopAppModel {
  * @return void
  **/
 	private function copyToModels($id) {
+		$result = $this->read(null, $id);
 		$fn = 'copyInvoiceToModel';
 		$contain = $fields = $link = array();
 		$models = array_merge($this->hasOne, $this->hasMany);
@@ -137,15 +139,16 @@ class Invoice extends ShopAppModel {
 			$contain[] = $model;
 		}
 		$conditions = array($this->escapeField('id') => $id);
-		$result = $this->find('first', compact('fields', 'link', 'conditions'));
+		$query = compact('fields', 'link', 'conditions');
+		$result = $this->find('first', $query);
 		
 		if (!empty($result) && !empty($result[$this->alias]['model']) && !empty($models[$result[$this->alias]['model']])) {
 			$model = $result[$this->alias]['model'];
 			if (!empty($this->{$model}->actsAs['Shop.InvoiceSync']) || method_exists($this->{$model}, $fn)) {
 				$this->{$model}->$fn($id);
 			}
-		}		
-		exit();
+		}	
+		exit();	
 	}
 	
 	function sendPaidEmail($id = null) {
