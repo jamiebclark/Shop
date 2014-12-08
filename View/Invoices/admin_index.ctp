@@ -1,5 +1,7 @@
 <?php
 echo $this->Layout->defaultHeader();
+echo $this->FindFilter->heading();
+
 $this->Table->reset();
 foreach ($invoices as $invoice) {
 	$invoice = $invoice['Invoice'];

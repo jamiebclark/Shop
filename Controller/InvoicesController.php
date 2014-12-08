@@ -1,6 +1,11 @@
 <?php
 class InvoicesController extends ShopAppController {
 	var $name = 'Invoices';
+
+	var $components = array(
+		'FindFilter',
+	);
+
 	var $helpers = array(
 		'Layout.AddressBook',
 		'Layout.AddressBookForm',
@@ -13,6 +18,28 @@ class InvoicesController extends ShopAppController {
 	
 	var $paginate = array('limit' => 50);
 	
+	public function _setFindFilters() {
+		$invoiceModelTypes = $this->Invoice->findModelTypes();
+		$invoiceModelTypes = array_combine($invoiceModelTypes, $invoiceModelTypes);
+
+		$filters = array();
+		$filters['model'] = array('options' => $invoiceModelTypes);
+		$filters['model_id'] = array(
+			'label' => 'Model ID',
+			'type' => 'text',
+		);
+		return $filters;
+	}
+
+	public function _findFilterVal($key, $val, $query = array()) {
+		if ($key == 'model') {
+			$query['conditions']['Invoice.model'] = $val;
+		} else if ($key == 'model_id') {
+			$query['conditions']['Invoice.model_id'] = $val;
+		}
+		return $query;
+	}
+
 	function view($id) {
 		$this->Invoice->recursive = 1;
 		$invoice = $this->Invoice->find('first', array(
@@ -35,7 +62,7 @@ class InvoicesController extends ShopAppController {
 				$this->redirectMsg(true, 'Invoice #' . $this->request->data['Invoice']['id'] . ' Not Found', false);
 			}
 		}
-		
+		$this->paginate = $this->FindFilter->findOptions();
 		$invoices = $this->paginate();
 		$this->set(compact('invoices'));
 	}

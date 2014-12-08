@@ -276,4 +276,12 @@ class Invoice extends ShopAppModel {
 			$this->save($data, array('callbacks' => false, 'validate' => false));
 		}
 	}
+
+	public function findModelTypes() {
+		$result = $this->find('all', array(
+			'fields' => array($this->escapeField('model')),
+			'group' => $this->escapeField('model')
+		));
+		return Hash::extract($result, '{n}.Invoice.model');
+	}
 }
