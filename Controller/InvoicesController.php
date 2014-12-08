@@ -46,7 +46,7 @@ class InvoicesController extends ShopAppController {
 			$msg = $this->Invoice->sendAdminPaidEmail($id) ? 'Email sent' : 'Error sending email';
 			$this->redirectMsg(array($id), $msg);
 		}
-		$this->FormData->findModel($id);
+		$this->FormData->findModel($id, null, array('contain' => array('PaypalPayment')));
 	}
 	
 	function admin_edit($id = null) {
