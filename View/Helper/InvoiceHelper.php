@@ -199,7 +199,7 @@ class InvoiceHelper extends ModelViewHelper {
 				'<i class="fa fa-pencil"></i> Pay by Check',
 				$this->Html->div(
 					'mailing-address', 
-					$this->Html->tag('h4', '<strong>Mail to:</strong> '. $this->getMailingAddress())
+					sprintf('<h4>Mail to:</h4><blockquote>%s</blockquote>', $this->getMailingAddress())
 				),
 				$this->checkPaymentSteps($invoice),
 			);
@@ -213,7 +213,7 @@ class InvoiceHelper extends ModelViewHelper {
 		<?php foreach ($payments as $k => $payment) :
 			list($title, $action, $info) = $payment + array(null, null, null);
 			?>
-			<div class="invoice-payment col-sm-<?php echo $col; ?>">
+			<div class="invoice-payment col-md-<?php echo $col; ?>">
 				<div class="panel panel-default">
 					<div class="panel-heading"><?php echo $title; ?></div>
 					<div class="panel-body">
