@@ -24,4 +24,4 @@ foreach ($keys as $label => $key) {
 	$cells[] = array($this->Html->link($label, $url), compact('class', 'width'));
 }
 $this->Table->cells($cells, true);
-echo $this->Table->output(array('class' => 'orders key'));
+echo $this->Table->output(array('class' => 'orders key', 'paginate' => false));

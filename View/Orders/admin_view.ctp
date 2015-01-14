@@ -33,17 +33,21 @@ $info = array(
 ?>
 <div class="row">
 	<div class="col-sm-6">
-		<h3>Info</h3>
-		<?php 		
-			echo $this->Layout->infoTable($info); 
-		?>
+		<div class="panel panel-default">
+			<div class="panel-heading">About</div>
+			<?php echo $this->Layout->infoTable($info); ?>
+		</div>
 	</div>
 
 	<div class="col-sm-6">
-		<h3>Shipping</h3>
+		<div class="panel panel-default">
+			<div class="panel-heading">Shipping</div>
 			<?php echo $this->element('orders/input_shipping'); ?>
-		<h3>Payment</h3>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">Payment</div>
 			<?php echo $this->element('orders/input_payment'); ?>
+		</div>
 		<?php echo $this->Form->submit('Update'); ?>
 	</div>
 </div>
@@ -101,7 +105,7 @@ $info = array(
 				$info[] = $out;
 			}
 		}
-		echo $this->Layout->fieldset('Order Automatic Updating', $this->Layout->menu($info));
+		echo $this->Layout->contentBox('Order Automatic Updating', $this->Layout->menu($info));
 	?>
 	</div>
 </div>

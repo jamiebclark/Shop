@@ -70,6 +70,7 @@ class OrdersController extends ShopAppController {
 		}
 		
 		$this->FormData->addData(null, $saveAttrs, $saveOptions);
+
 		$this->redirect(array('action' => 'view', $id));
 	}
 	

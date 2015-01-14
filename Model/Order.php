@@ -292,10 +292,42 @@ class Order extends ShopAppModel {
 	}
 
 	public function deleteOldEmptyOrders() {
+		$db = $this->Invoice->getDataSource();
+		$orders = $this->find('all', array(
+			'recursive' => -1,
+			'joins' => array(
+				array(
+					'table' => $db->fullTableName($this->Invoice),
+					'alias' => 'Invoice',
+					'conditions' => array($this->escapeField('invoice_id') . ' = Invoice.id'),
+				),
+			),
+			'conditions' => array('Invoice.model <>' => 'Shop.Model')
+		));
+		if (!empty($orders)) {
+			$ids = Hash::extract($orders, 'Order.{n}.id');
+		}
+		$this->updateAll(
+			array($this->escapeField('invoice_id') => null), 
+			array($this->escapeField() => $ids)
+		);
+
+
 		return $this->deleteAll(array(
 			$this->escapeField('paid') => null,
 			$this->escapeField('shipped') => null,
-			$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
+			'OR' => array(
+				'AND' => array(
+					// Abandoned Orders
+					$this->escapeField('total') . ' >' => 0,
+					$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime(self::DELETE_EMPTY_DEADLINE))
+				),
+				'AND' => array(
+					// Empty Orders
+					$this->escapeField('total') => 0,
+					$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime('-2 days'))
+				)
+			)
 		));
 	}
 	
