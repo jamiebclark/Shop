@@ -223,21 +223,15 @@ class CatalogItemsController extends ShopAppController {
 	}
 	
 	function admin_packages($id = null) {
-		if ($this->_saveData() === null) {
-			$this->request->data = $this->CatalogItem->find('first', array(
-				'postContain' => array(
-					'CatalogItemPackageChild' => array(
-						'link' => array(
-							'Shop.CatalogItemChild' => array(
-								'class' => 'Shop.CatalogItem',
-								'conditions' => 'CatalogItemChild.id = CatalogItemPackageChild.catalog_item_child_id'
-							)
-						)
-					)
-				),
-				'conditions' => array('CatalogItem.id' => $id)
-			));
-		}
+		$this->FormData->editData($id, null, array(
+			'contain' => array(
+				'Product',
+				'CatalogItemPackageChild' => array('CatalogItem')
+			)
+		));
+
+
+
 		$this->set('catalogItems', $this->CatalogItem->selectList());
 	}
 	

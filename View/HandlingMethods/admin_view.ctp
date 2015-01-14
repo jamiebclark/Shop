@@ -1,16 +1,11 @@
+<h1><?php echo $handlingMethod['HandlingMethod']['title']; ?></h1>
 <?php
-echo $this->element('product_handlings/admin_heading', array(
-	'crumbs' => array(
-		$productHandling['ProductHandling']['title'],
-	)
+echo $this->Layout->headerMenu(array(
+	array('Edit Handling Charge', array('action' => 'edit', $handlingMethod['HandlingMethod']['id'])),
+	array('Delete Handling Charge', array('action' => 'delete', $handlingMethod['HandlingMethod']['id']), null, 'Delete this charge?')
 ));
 
-echo $this->Html->tag('h1', $productHandling['ProductHandling']['title']);
-echo $this->Layout->headerMenu(array(
-	array('Edit Handling Charge', array('action' => 'edit', $productHandling['ProductHandling']['id'])),
-	array('Delete Handling Charge', array('action' => 'delete', $productHandling['ProductHandling']['id']), null, 'Delete this charge?'),
-));
-echo $this->Layout->infoResultTable($productHandling['ProductHandling'], array(
+echo $this->Layout->infoResultTable($handlingMethod['HandlingMethod'], array(
 	'title',
 	'pct' => array('format' => 'percent'),
 	'amt' => array('format' => 'cash'),

@@ -3,6 +3,7 @@
 <?php
 echo $this->Form->create();
 echo $this->Form->hidden('CatalogItem.id');
+debug($this->request->data);
 
 $min = 5;
 $buffer = 2;
@@ -16,28 +17,33 @@ if ($max < $min) {
 }
 
 $this->Table->reset();
-for ($k = 0; $k <= $max; $k++) {
-	$prefix = 'ProductPackageChild.' . $k . '.';
+for ($k = 0; $k <= $max; $k++):
+	$prefix = "CatalogItemPackageChild.$k";
 	echo $this->Form->inputs(array(
 		'fieldset' => false,
-		$prefix . 'id' => array('type' => 'hidden'),
-		$prefix . 'product_parent_id' => array('type' => 'hidden', 'value' => $this->request->data['Product']['id']),
+		"$prefix.id" => array('type' => 'hidden'),
+		"$prefix.catalog_item_parent_id" => array(
+			'type' => 'hidden', 
+			'value' => $this->request->data['CatalogItem']['id']
+		),
 	));
 	
 	$this->Table->cells(array(
-		array($this->Form->input(
-			$prefix . 'product_child_id',
-			array('options' => $products, 'label' => false)
-		)),
-		array($this->Form->input(
-			$prefix . 'quantity',
-			array('type' => 'text', 'label' => false)
-		), 'Quantity')
+		array(
+			$this->Form->input(
+				"$prefix.catalog_item_child_id",
+				array('options' => $catalogItems, 'label' => false)
+			),
+			'Catalog Item'
+		), array(
+			$this->Form->input(
+				"$prefix.quantity",
+				array('type' => 'text', 'label' => false)
+			), 
+			'Quantity'
+		)
 	), true);
-}
+endfor;
 echo $this->Table->output();
 echo $this->FormLayout->submit('Update');
-echo $this->Form->end();
-echo "</div>\n";
-
-?>
+echo $this->Form->end(); ?>

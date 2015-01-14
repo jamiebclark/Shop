@@ -52,7 +52,11 @@ if ($form) {
 }
 $this->Table->reset();
 if (!$emptyCart):
-	foreach ($order['OrderProduct'] as $k => $orderProduct) {
+	foreach ($order['OrderProduct'] as $k => $orderProduct):
+		if (empty($orderProduct['Product']['CatalogItem'])) {
+			continue;
+		}
+		
 		$rowOptions = array('class' => 'order-product');
 		$catalogItem = $orderProduct['Product']['CatalogItem'];
 		$prefix = 'OrderProduct.' . $k . '.';
@@ -167,7 +171,7 @@ if (!$emptyCart):
 		);
 
 		$this->Table->rowEnd($rowOptions);
-	}
+	endforeach;
 	
 	//Totals Rows
 	$colspan = $this->Table->columnCount - 1;
