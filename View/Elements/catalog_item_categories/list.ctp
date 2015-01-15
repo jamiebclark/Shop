@@ -13,15 +13,10 @@
 			} else {
 				$title = 'Categories';
 			}
-<<<<<<< HEAD
-			echo $this->Html->div('panel-heading', $title);
-		endif;
-=======
 			?>
 			<div class="panel-heading"><?php echo $title; ?></div>
 		<?php endif;
 		
->>>>>>> 8d2b9ace26644135d86e336e52568999b1972ed1
 		if (!empty($catalogItemCategories)):
 			$list = array();
 			foreach ($catalogItemCategories as $catalogItemCategory) {
@@ -34,11 +29,7 @@
 			}
 			echo $this->Layout->nav($list, array('class' => 'nav-catalogitemcategories nav-pills nav-stacked'));
 		else: ?>
-<<<<<<< HEAD
-			<div class="panel-body"><em>No Categories</em></div>
-=======
 			<div class="panel-body"><em>No categories</em></div>
->>>>>>> 8d2b9ace26644135d86e336e52568999b1972ed1
 		<?php endif; ?>
 	</div>
 </div>
