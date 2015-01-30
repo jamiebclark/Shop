@@ -14,7 +14,7 @@ $class = 'info';
 
 if ($cutoffDaysAway < 0) {
 	$title .= 'PASSED';
-	$class = 'error';
+	$class = 'danger';
 	if ($superBowlDaysAway > 0) {
 		$msg .= 'With the Big Game so close (Less than '. $superBowlDaysAway . ' days away!)';
 	} else {
@@ -22,6 +22,7 @@ if ($cutoffDaysAway < 0) {
 	}
 	$msg .= ', we cannot ensure that items ordered will be delivered in time for your group\'s collection.';
 } else if ($cutoffDaysAway <= 7) {
+	$class = 'warning';
 	if ($cutoffToday) {
 		$title .= 'TODAY';
 	} else {
@@ -32,12 +33,12 @@ if ($cutoffDaysAway < 0) {
 	}
 	$msg  = 'In order to have your order arrive in time for the Big Game (<em>'.date('F j, Y',$superBowlStamp).'</em>), ';
 	$msg .= 'please be sure to place your orders <b>NO LATER</b> than ';
-	$msg .= '<strong>'.date('g:iA T',$cutoffStamp).'</strong> ' . ($cutoffToday ? 'today' : date('F j, Y', $cutoffStamp)).'!';
+	$msg .= '<strong>'.date('g:iA T', $cutoffStamp).'</strong> ' . ($cutoffToday ? 'today' : date('F j, Y', $cutoffStamp)).'!';
 }
-
-if (!empty($msg)) {
-	echo $this->Html->div($class);
-	echo $this->Html->tag('h2', $title);
-	echo $msg;
-	echo "</div>\n";
-}
+?>
+<?php if (!empty($msg)): ?>
+	<div class="alert alert-<?php echo $class;?>">
+		<h5><?php echo $title; ?></h5>
+		<?php echo $msg; ?>
+	</div>
+<?php endif ?>
