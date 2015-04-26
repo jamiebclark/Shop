@@ -3,23 +3,23 @@ define('SHOP_ROOT', APP . 'Plugin' . DS . 'Shop' . DS);
 define('SHOP_WWW_ROOT', SHOP_ROOT . 'webroot' . DS);
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class CatalogItemHelper extends ModelViewHelper {
-	var $name = 'CatalogItem';
-	var $modelPlugin = 'Shop';
+	public $name = 'CatalogItem';
+	public $modelPlugin = 'Shop';
 	
-	var $helpers = array(
+	public $helpers = array(
 		'Html', 
 		'Form', 
 		'Photo', 
 	);
 	
-	var $thumbDir = 'catalog_item_images/';
+	public $thumbDir = 'catalog_item_images/';
 	
-	function beforeRender($viewFile, $options = array()) {
-		$this->Asset->css('Shop.style');
+	public function beforeRender($viewFile, $options = array()) {
+		$this->Html->css('Shop.style', null, array('inline' => false));
 		return parent::beforeRender($viewFile, $options);
 	}
 	
-	function media($result, $options = array()) {
+	public function media($result, $options = array()) {
 		$result = $this->_getResult($result);
 		$options = array_merge(array(
 			'titleTag' => 'h3',
@@ -73,7 +73,7 @@ class CatalogItemHelper extends ModelViewHelper {
 	}
 	*/
 	
-	function thumbOptions($result, $options = array()) {
+	public function thumbOptions($result, $options = array()) {
 		$options = array_merge(array(
 			'externalServer' => false,
 			'root' => SHOP_WWW_ROOT . 'img' . DS,
@@ -83,7 +83,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		return parent::thumbOptions($result, $options);
 	}
 	
-	function link ($CatalogItem, $options = array(), $onClick = null) {
+	public function link ($CatalogItem, $options = array(), $onClick = null) {
 		$options = array_merge(array(
 			'class' => '',
 			'escape' => true,
@@ -94,7 +94,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
 	}
 	
-	function modelUrl($result, $options = array()) {
+	public function modelUrl($result, $options = array()) {
 		$result = $this->_getResult($result);
 		return array(
 			'controller' => 'catalog_items', 
@@ -105,7 +105,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		);
 	}
 	
-	function notes($catalogItem) {
+	public function notes($catalogItem) {
 		$notes = array();
 		if ($catalogItem['min_quantity'] > 1) {
 			$notes[] = 'Minimum order of ' . number_format($catalogItem['min_quantity']);
@@ -133,7 +133,7 @@ class CatalogItemHelper extends ModelViewHelper {
  * 
  * @return string CSS class name
  **/
-	function getInventoryClass($qty, $unlimited = false) {
+	public function getInventoryClass($qty, $unlimited = false) {
 		if (is_array($qty)) {
 			return $this->getInventoryClass($qty['stock'], $qty['unlimited']);
 		}
@@ -146,7 +146,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $class;
 	}
 	
-	function inventory($qty = 0, $unlimited = false) {
+	public function inventory($qty = 0, $unlimited = false) {
 		if (is_array($qty)) {
 			$result = $qty;
 			$qty = $result['stock'];
@@ -165,7 +165,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $this->Html->tag('span', $out, compact('class'));
 	}
 	
-	function price($catalogItem) {
+	public function price($catalogItem) {
 		$out = '';
 		if ($catalogItem['sale'] > 0) {
 			$out .= $this->cash($catalogItem['sale'], array('class' => 'cash-sale'));
@@ -177,7 +177,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $this->Html->tag('span', $out, array('class' => 'catalogitem-price'));
 	}
 	
-	function cash($num, $options = array()) {
+	public function cash($num, $options = array()) {
 		$options = array_merge(array('tag' => 'font'), $options);
 		extract($this->addClass($options, 'cash'));
 		$out = '$' . number_format($num, $num == round($num) ? 0 : 2);
@@ -187,11 +187,11 @@ class CatalogItemHelper extends ModelViewHelper {
 		return $out;
 	}
 	
-	function hasStock($catalogItem) {
+	public function hasStock($catalogItem) {
 		return !empty($catalogItem['stock']) || !empty($catalogItem['unlimited']);
 	}
 	
-	function categories($catalogItemCategories) {
+	public function categories($catalogItemCategories) {
 		$out = '';
 		foreach ($catalogItemCategories as $catalogItemCategory) {
 			$list = '';
