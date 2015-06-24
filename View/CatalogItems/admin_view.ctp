@@ -77,7 +77,12 @@
 
 	</div>
 	<div class="col-sm-4">
-		<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], array('dir' => 'mid'));?>
+		<div class="panel panel-default">
+			<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], array(
+				'dir' => 'mid', 
+				'class' => false,
+			));?>
+		</div>
 
 		<div class="panel panel-default">
 		<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
