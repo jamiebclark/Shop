@@ -73,11 +73,12 @@ class InvoiceEmailComponent extends Component {
 		
 		$users = $this->Invoice->User->find('all', array(
 			'fields' => array('User.email', 'User.full_name'),
-			'link' => array('StaffMember' => array('table' => 'admin.admin_members')),
-			'userType' => $userTypes,
+			'userType' => array(
+				'type' => $userTYpes,
+				'active' => true,
+			),
 			'conditions' => array(
 				'User.active' => 1,
-				'StaffMember.active' => 1,
 			)
 		));
 		if (empty($users)) {
