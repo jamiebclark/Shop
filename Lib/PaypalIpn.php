@@ -6,7 +6,7 @@ class PaypalIpn {
 	protected static $socketTimeout = 30;
 	protected static $socketResource;
 
-	protected static $logDir = "webroot/logs/ipn/";
+	protected static $logDir = "logs/ipn/";
 	protected static $logFile;
 	protected static $logResource;
 	protected static $logFailed = false;
@@ -181,7 +181,7 @@ class PaypalIpn {
 	}
 
 	public static function getLogDir() {
-		return self::$logDir;
+		return WWW_ROOT . self::$logDir;
 	}
 
 	public static function getLogFiles() {
@@ -203,10 +203,11 @@ class PaypalIpn {
 
 	protected static function logOpen() {
 		//$dir = '/home/souper/page_logs/ipn/';
-		if (!is_dir(self::$logDir)) {
-			mkdir(self::$logDir, 0775, true);
+		$logDir = self::getLogDir();
+		if (!is_dir($logDir)) {
+			mkdir($logDir, 0775, true);
 		}
-		self::$logFile = self::$logDir . date('Y-m-d').'.log';
+		self::$logFile = $logDir . date('Y-m-d').'.log';
 		self::$logResource = fopen(self::$logFile, 'a');
 		if (!self::$logResource) {
 			self::$logFailed = true;
