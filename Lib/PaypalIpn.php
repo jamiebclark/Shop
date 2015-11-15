@@ -40,6 +40,7 @@ class PaypalIpn {
 		}
 		$success = null;
 		while ($line = self::getSocketLine()):
+			self::log($line);
 			if (strcmp ($line, "VERIFIED") == 0) {
 				$success = true;
 				break;
