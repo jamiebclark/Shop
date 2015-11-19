@@ -122,10 +122,9 @@ class PaypalIpn {
 		$requestVars = ['cmd' => '_notify-validate'];
 		$data = self::getData();
 		if (!empty($data)) {
-			foreach ($data as $key => $value) {
-				$requestVars[$key] = urlencode(stripslashes($value));
-			}
+			$requestVars += $data;
 		}
+
 		$requestVars = http_build_query($requestVars);
 
 		self::log('Request Variables');
@@ -155,8 +154,8 @@ class PaypalIpn {
 			"POST /cgi-bin/webscr HTTP/1.1",
 			"Content-Type: application/x-www-form-urlencoded",
 			"Content-Length: " . strlen($requestVars),
-			"Host: www.paypal.com",
-			"Connection: close"
+			//"Host: www.paypal.com",
+			//"Connection: close"
 		];
 		$header = implode(self::$eol, $headerLines) . self::$eol . self::$eol;
 
