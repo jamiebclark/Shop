@@ -60,7 +60,7 @@ class PaypalIpn {
 		}
 
 		self::closeSocket();
-		self::logClose();
+		//self::logClose();
 		return $success;
 	}
 
