@@ -2,6 +2,8 @@
 class PaypalIpn {
 
 	protected static $socketUrl = 'ssl://www.paypal.com';
+	protected static $testSocketUrl = 'tls://www.sandbox.paypal.com';
+
 	protected static $socketPort = 443;
 	protected static $socketTimeout = 30;
 	protected static $socketResource;
@@ -40,7 +42,6 @@ class PaypalIpn {
 		}
 		$success = null;
 		while ($line = self::getSocketLine()):
-			self::log($line);
 			if (strcmp ($line, "VERIFIED") == 0) {
 				$success = true;
 				break;
@@ -73,7 +74,7 @@ class PaypalIpn {
 		}
 		self::log('Sending Socket Request');
 		try {
-			return fputs(self::$socketResource, self::getHeader());
+			return fputs(self::$socketResource, self::getRequest());
 		} catch (Exception $e) {
 			throw new Exception('Error sending socket request: ' . $e->getMessage());
 		}
@@ -135,20 +136,35 @@ class PaypalIpn {
 	}
 
 /**
+ * Returns the content of the request
+ *
+ * @return string;
+ **/
+	protected static function getRequest() {
+		return self::getRequestHeader() . self::getRequestVariables();
+	}
+
+/**
  * Builds the socket header
  *
  * @return string;
  **/
-	protected static function getHeader() {
+	protected static function getRequestHeader() {
 		$requestVars = self::getRequestVariables();
-		$header = implode(self::$eol, [
+		$headerLines = [
 			"POST /cgi-bin/webscr HTTP/1.1",
 			"Content-Type: application/x-www-form-urlencoded",
 			"Content-Length: " . strlen($requestVars),
 			"Host: www.paypal.com",
 			"Connection: close"
-		]) . self::$eol . self::$eol;
-		return $header . $requestVars;
+		];
+		$header = implode(self::$eol, $headerLines) . self::$eol . self::$eol;
+
+		foreach ($headerLines as $headerLine) {
+			self::log('HEADER: ' . $headerLine);
+		}
+
+		return $header;
 
 		/** Old outdated 1.0 Header
 		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
@@ -164,9 +180,12 @@ class PaypalIpn {
  **/
 	protected static function getSocketLine() {
 		if (feof(self::$socketResource)) {
+			self::log("END OF REQUEST FILE");
 			return false;
 		}
-		return trim(fgets(self::$socketResource, 1024));
+		$line = trim(fgets(self::$socketResource, 1024));
+		self::log("LINE: $line");
+		return $line;
 	}
 
 /**
