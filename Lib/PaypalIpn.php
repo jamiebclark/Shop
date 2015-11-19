@@ -46,10 +46,10 @@ class PaypalIpn {
 				$success = true;
 				break;
 			} else if (strcmp ($line, "INVALID") == 0) {
-				$success = false;
-				break;
 				// log for manual investigation
 				self::log('Invalid Socket Connection. Aborting.');
+				$success = false;
+				break;
 			}
 		endwhile;
 
