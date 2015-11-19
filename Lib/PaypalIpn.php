@@ -107,6 +107,10 @@ class PaypalIpn {
 		}
 	}
 
+	public static function getData() {
+		return $_POST;
+	}
+
 /**
  * Gets request variables being passed along and converts it to a query string
  *
@@ -115,8 +119,9 @@ class PaypalIpn {
 	protected static function getRequestVariables() {
 		// read the post from PayPal system and add 'cmd'
 		$requestVars = ['cmd' => '_notify-validate'];
-		if (!empty($_POST)) {
-			foreach ($_POST as $key => $value) {
+		$data = self::getData();
+		if (!empty($data)) {
+			foreach ($data as $key => $value) {
 				$requestVars[$key] = urlencode(stripslashes($value));
 			}
 		}
@@ -231,14 +236,17 @@ class PaypalIpn {
 	}
 
 	protected static function getPostVal($key) {
-		return self::checkPost($key) ? $_POST[$key] : '';
+		$data = self::getData();
+		return self::checkPost($key) ? $data[$key] : '';
 	}
 
 	protected static function checkPost($key) {
-		return !empty($_POST) && array_key_exists($key, $_POST);
+		$data = self::getData();
+		return !empty($data) && array_key_exists($key, $data);
 	}
 
 	protected static function checkPostVal($key, $val) {
-		return self::checkPost($key) && ($_POST[$key] === $val);
+		$data = self::getData();
+		return self::checkPost($key) && ($data[$key] === $val);
 	}
 }
