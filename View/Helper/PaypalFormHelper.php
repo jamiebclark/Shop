@@ -1,23 +1,37 @@
 <?php
+App::uses('PluginConfig', 'Shop.Lib');
+
+PluginConfig::init('Shop');
+
 class PaypalFormHelper extends AppHelper {
-	var $name = 'PaypalForm';
-	var $helpers = array('Form', 'Html');
+	public $name = 'PaypalForm';
+	public $helpers = ['Form', 'Html'];
 	
-	var $returnUrl = PAYPAL_RETURN_URL;
-	var $cancelReturnUrl = PAYPAL_CANCEL_URL;
-	var $imageUrl = 'http://souperbowl.org/images/logos/sboc/paypal.gif';
+	public $userName;
+	public $companyName;
+	public $returnUrl;
+	public $cancelReturnUrl;
+	public $imageUrl;
 	
-	var $cmd = '_xclick'; 	//Alternated: '_cart'
+	public $cmd = '_xclick'; 	//Alternated: '_cart'
 	
-	var $settings = array();
-	var $settingsCache = array();
+	public $settings = [];
+	public $settingsCache = [];
 	
-	function beforeRender($viewFile) {
+	public function beforeRender($viewFile) {
+
+		// Set variables
+		$this->returnUrl = $this->getConstantValue('PAYPAL_RETURN_URL', 'Shop.Paypal.returnUrl');
+		$this->cancelReturnUrl = $this->getConstantValue('PAYPAL_CANCEL_URL', 'Shop.Paypal.cancelUrl');
+		$this->imageUrl = $this->getConstantValue(null, 'Shop.Paypal.imageUrl');
+		$this->userName = $this->getConstantValue('PAYPAL_USER_NAME', 'Shop.Paypal.userName');
+		$this->companyName = $this->getConstantValue('COMPANY_NAME', 'Shop.Paypal.companyName');
+
 		$this->cancelReturnUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];
 		parent::beforeRender($viewFile);
 	}
 	
-	function addSetting($name,$value,$overwrite=true) {
+	public function addSetting($name, $value, $overwrite = true) {
 		//Adds a PayPal setting
 		if($overwrite || (!isset($this->settings[$name]) && !isset($this->settingsCache[$name]))) {
 			$this->settings[$name] = $value;
@@ -26,25 +40,25 @@ class PaypalFormHelper extends AppHelper {
 		return true;
 	}
 	
-	function addSettings($settings = array(), $overwrite = true) {
+	public function addSettings($settings = [], $overwrite = true) {
 		foreach ($settings as $name => $value) {
 			$this->addSetting($name, $value, $overwrite);
 		}
 		return true;
 	}
 	
-	function inputSetting($name, $value, $options = array()) {
-		$options = array_merge(array(
+	public function inputSetting($name, $value, $options = []) {
+		$options = array_merge([
 			'name' => $name,
 			'type' => 'hidden',
 			'value' => $value,
-		), $options);
+		], $options);
 		$this->_set($name, $value);
 		$this->settingsCache[$name] = $value;
 		return "\t" . $this->Html->tag('input', false, $options) . "\n";
 	}
 	
-	function inputSettings($settings) {
+	public function inputSettings($settings) {
 		$out = '';
 		foreach ($settings as $settingName => $settingValue) {
 			$out .= $this->inputSetting($settingName, $settingValue);
@@ -52,22 +66,22 @@ class PaypalFormHelper extends AppHelper {
 		return $out;
 	}
 		
-	function create($options = array()) {
-		$options = array_merge(array(
+	public function create($options = []) {
+		$options = array_merge([
 			'url' => 'https://www.paypal.com/cgi-bin/webscr',
 			'type' => 'POST',
 			'class' => 'paypal-form',
-		), $options);
+		], $options);
 		return $this->Form->create(false, $options) . "\n";
 	}
 	
-	function end() {
+	public function end() {
 		$this->addSetting('cmd',$this->cmd,false);
 		$this->addSetting('upload', '1', false);
-		$this->addSetting('business', PAYPAL_USER_NAME, false);
+		$this->addSetting('business', $this->userName, false);
 		$this->addSetting('no_shipping','0',false);
 		$this->addSetting('return',$this->returnUrl,false);
-		$this->addSetting('cbt', "Return to " . COMPANY_NAME,false);
+		$this->addSetting('cbt', "Return to " . $this->companyName, false);
 		$this->addSetting('cancel_return',$this->cancelReturnUrl,false);
 		$this->addSetting('image_url',$this->imageUrl,false);
 		$this->addSetting('currency_code','USD',false);
@@ -99,7 +113,7 @@ class PaypalFormHelper extends AppHelper {
 	
 	private function phoneFormat($name, $value) {
 		$value = preg_replace('/[^0-9]/','',$value);
-		$return = array();
+		$return = [];
 		if(!empty($value)) {
 			$return = array(
 				$name . '_a' => substr($value, 0, 3),
@@ -108,5 +122,14 @@ class PaypalFormHelper extends AppHelper {
 			);
 		}
 		return $return;
+	}
+
+	private function getConstantValue($constantName, $configKey = null) {
+		if (defined($constantName)) {
+			return constant($constantName);
+		} else if (Configure::check($configKey)) {
+			return Configure::read($configKey);
+		}
+		return null;
 	}
 }

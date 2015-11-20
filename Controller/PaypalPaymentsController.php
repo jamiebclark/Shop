@@ -1,54 +1,31 @@
 <?php
+App::uses('PaypalIpn', 'Shop.Lib');
 
 class PaypalPaymentsController extends ShopAppController {
 	public $name = 'PaypalPayments';
 	
-	//public $components = array('Shop.InvoiceEmail');
-	
-	//Log Variables
-	private $_logDir = "webroot/logs/ipn/";
-	private $_logFile;
-	private $_logResource;
-	private $_logFailed = false;
-
-	public function beforeFilter($options = array()) {
-		if ($this->_logDir[0] != '/') {
-			$this->_logDir = APP . 'Plugin/Shop/' . $this->_logDir;
-		}
-		return parent::beforeFilter($options);
-	}
+	//public $components = ['Shop.InvoiceEmail'];
 	
 	public function admin_index() {
-		$this->paginate = array('order' => array('PaypalPayment.created' => 'DESC'));
+		$this->paginate = ['order' => ['PaypalPayment.created' => 'DESC']];
 		$paypalPayments = $this->paginate();
 		$this->set(compact('paypalPayments'));
 	}
 	
 	public function admin_test($txnId = null) {
-		$post = array('txn_id' => $txnId);
+		$post = ['txn_id' => $txnId];
 		$this->_savePost($post, true);
-		$this->redirect(array('action' => 'logs'));
+		$this->redirect(['action' => 'logs']);
 	}
 	
 	public function admin_logs($logFile = null) {
-		if (!($folder = opendir($this->_logDir))) {
-			throw new Exception('Could not open directory: ' . $this->_logDir);
-		}
-		$logFiles = array();
-		while(($file = readdir($folder)) !== false) {
-			if ($file[0] == '.' || $file == 'empty')  {
-				continue;
-			}
-			$logFiles[$file] = $file;
-		}
-		closedir($folder);
-		krsort($logFiles);
-		
+		$logFiles = PaypalIpn::getLogFiles();
+		$logDir = PaypalIpn::getLogDir();
 		if (empty($logFile) || empty($logFiles[$logFile])) {
 			$logFile = array_shift($logFiles);
 		}
 		$logFileContent = '';
-		$logFilePath = $this->_logDir . $logFile;
+		$logFilePath = $logDir . $logFile;
 		if (is_file($logFilePath)) {
 			$logFileContent = file_get_contents($logFilePath);
 		}
@@ -56,10 +33,10 @@ class PaypalPaymentsController extends ShopAppController {
 	}
 
 	public function admin_fix() {
-		$paypalPayments = $this->PaypalPayment->find('all', array(
+		$paypalPayments = $this->PaypalPayment->find('all', [
 			'fields' => '*',
-			'link' => array('Shop.Invoice')
-		));
+			'link' => ['Shop.Invoice']
+		]);
 		$count = 0;
 		foreach ($paypalPayments as $paypalPayment) {
 			unset($paypalPayment['PaypalPayment']['modified']);
@@ -77,157 +54,81 @@ class PaypalPaymentsController extends ShopAppController {
 	}
 	
 	public function ipn() {
-		$this->_log('Received IPN');
+		PaypalIpn::log('Received IPN');
+		$post = $_POST;
 
-		// PHP 4.1
-		// read the post from PayPal system and add 'cmd'
-		$req = 'cmd=_notify-validate';
-
-		foreach ($_POST as $key => $value) {
-			$value = urlencode(stripslashes($value));
-			$req .= "&$key=$value";
+		if (!PaypalIpn::isStatusCompleted()) {
+			exit();
 		}
 
-		// post back to PayPal system to validate
-		$header =  "POST /cgi-bin/webscr HTTP/1.1\r\n";
-		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Content-Length: " . strlen($req) . "\r\n";
-		$header .= "Host: www.paypal.com\r\n";
-		$header .= "Connection: close\r\n\r\n";
-		/** Old outdated 1.0 Header
-		$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
-		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		*/
-		//$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
-		
-		$this->_log("REQUEST");
-		$this->_log($req);
-		$this->_log("END REQUEST");
+		PaypalIpn::log('Payment has status "Completed". Saving');
+		// check the payment_status is Completed
+		// check that txn_id has not been previously processed
+		// check that receiver_email is your Primary PayPal email
+		// check that payment_amount/payment_currency are correct
+		// process payment
+		PaypalIpn::log('Connection verified. Saving.');
+		$this->_savePost($post);
 
-		$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
-		if (!$fp) {
-			// HTTP ERROR
-			$this->_log('Could not connect to Paypal Socket. Aborting.');
-		} else {
-			$this->_log('Socket Opened Successfully');
-			fputs ($fp, $header . $req);
-			while (!feof($fp)) {
-				$res = trim(fgets ($fp, 1024));
-				$this->_log('Result Line "' . $res . '" = ' . strcmp ($res, "VERIFIED"));
-				
-				if (strcmp ($res, "VERIFIED") == 0) {
-					$this->_log('Connection verified');
-					if ($_POST['payment_status'] == 'Completed') {
-						$this->_log('Payment has status "Completed". Saving');
-						// check the payment_status is Completed
-						// check that txn_id has not been previously processed
-						// check that receiver_email is your Primary PayPal email
-						// check that payment_amount/payment_currency are correct
-						// process payment
-						$this->_log('Connection verified. Saving.');
-						$this->_savePost($_POST);
-					} else {
-						$this->_log('Payment status is "' . $_POST['payment_status'] . '". Skipping.');
-					}
-				} else if (strcmp ($res, "INVALID") == 0) {
-					// log for manual investigation
-					$this->_log('Invalid Socket Connection. Aborting.');
-				}
-			}
-			$this->_log('Closing Socket');
-			fclose ($fp);
-		}
-		$this->_logClose();
 		$this->layout = 'ajax';
 		exit();
 	}
 	
 	function _savePost($post = null, $test = false) {
-		$this->_log('Saving POST value');
+		PaypalIpn::log('Saving POST value');
 		if ($test) {
-			$this->_log('TESTING ONLY');
+			PaypalIpn::log('TESTING ONLY');
 		}
 		if($post['txn_id'] != '') {
 			//Checks for existing transaction
-			$this->_log('Transaction ID: ' . $post['txn_id']);
+			PaypalIpn::log('Transaction ID: ' . $post['txn_id']);
 			$paypalPayment = $this->PaypalPayment->findByTxnId($post['txn_id']);
 			
 			if (!empty($paypalPayment)) {
-				$this->_log('Updating existing payment ID: ' . $paypalPayment['PaypalPayment']['id']);
+				PaypalIpn::log('Updating existing payment ID: ' . $paypalPayment['PaypalPayment']['id']);
 				$post['id'] = $paypalPayment['PaypalPayment']['id'];
 			}
 				
 			if (!$test && !$this->PaypalPayment->save($post)) {
-				$this->_log('Error saving info');
+				PaypalIpn::log('Error saving info');
 			} else {
 				if ($test) {
 					$this->PaypalPayment->id = $post['id'];
 				}
 				
-				$this->_log('Successfully saved Paypal IPN info');
-				$this->_log('Finding Invoice ID: ' . $this->PaypalPayment->id);
+				PaypalIpn::log('Successfully saved Paypal IPN info');
+				PaypalIpn::log('Finding Invoice ID: ' . $this->PaypalPayment->id);
 				
 				//Makes sure any missing info is copied from PayPal
 				$this->PaypalPayment->syncInvoice($this->PaypalPayment->id);
 				
-				$invoice = $this->PaypalPayment->Invoice->find('first', array(
-					'link' => array('Shop.PaypalPayment'),
-					'conditions' => array('PaypalPayment.id' => $this->PaypalPayment->id)
-				));
+				$invoice = $this->PaypalPayment->Invoice->find('first', [
+					'link' => ['Shop.PaypalPayment'],
+					'conditions' => ['PaypalPayment.id' => $this->PaypalPayment->id]
+				]);
 				if (empty($invoice)) {
-					$this->_log('Could not load Invoice to send notification email');
+					PaypalIpn::log('Could not load Invoice to send notification email');
 				} else {
-					$this->_log('Invoice Found. Sending Email');
-					$this->_log('Invoice ID: ' . $invoice['Invoice']['id']);
+					PaypalIpn::log('Invoice Found. Sending Email');
+					PaypalIpn::log('Invoice ID: ' . $invoice['Invoice']['id']);
 					
 					App::uses('InvoiceEmail', 'Shop.Network/Email');
 					if (defined('COMPANY_ADMIN_EMAILS')) {
 						$InvoiceEmail = new InvoiceEmail();
-						$this->_log('Created InvoiceEmail Object');
+						PaypalIpn::log('Created InvoiceEmail Object');
 						if ($InvoiceEmail->sendAdminPaid($invoice)) {
-							$this->_log('Sent notification email to admins: ' . COMPANY_ADMIN_EMAILS);
+							PaypalIpn::log('Sent notification email to admins: ' . COMPANY_ADMIN_EMAILS);
 						} else {
-							$this->_log('Error sending notification email');
+							PaypalIpn::log('Error sending notification email');
 						}
 					} else {
-						$this->_log('No admin emails set, so nothing is being sent');
+						PaypalIpn::log('No admin emails set, so nothing is being sent');
 					}
-					$this->_log('Finished Email');
+					PaypalIpn::log('Finished Email');
 				}
 			}
 		} else {
-			$this->_log('TxnID was blank. Skipping.');
+			PaypalIpn::log('TxnID was blank. Skipping.');
 		}
 	}
-	
-	function _logOpen() {
-		//$dir = '/home/souper/page_logs/ipn/';
-		$this->_logFile = $this->_logDir . date('Y-m-d').'.log';
-		$this->_logResource = fopen($this->_logFile, 'a');
-		if (!$this->_logResource) {
-			$this->_logFailed = true;
-			return false;
-		}
-		$this->_log('******* Opening Log ********');
-		return true;
-	}
-	
-	function _log($msg) {
-		if (empty($this->_logResource) && !$this->_logFailed) {
-			$this->_logOpen();
-		}
-		if ($this->_logResource) {
-			return fwrite($this->_logResource,date('c').' '.str_replace(array("\r","\t","\n"),' ',$msg)."\n");
-		} else {
-			return false;
-		}
-	}
-	
-	function _logClose() {
-		if (!empty($this->_logResource)) {
-			$this->_log('******* Closing Log ********');
-			fclose($this->_logResource);
-		}
-	}
-
 }
