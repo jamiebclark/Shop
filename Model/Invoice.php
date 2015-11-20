@@ -3,73 +3,73 @@ App::uses('InvoiceEmail', 'Shop.Network/Email');
 App::uses('ShopAppModel', 'Shop.Model');
 
 class Invoice extends ShopAppModel {
-	var $name = 'Invoice';
-	var $actsAs = array(
-		'Location.Mappable' => array('validate' => true), 
+	public $name = 'Invoice';
+	public $actsAs = [
+		'Location.Mappable' => ['validate' => true], 
 		'Shop.ChangedFields',
-		'Shop.EmailTrigger' => array(
+		'Shop.EmailTrigger' => [
 			'send_paid_email' => 'sendPaidEmail',
 			'send_admin_email' => 'sendAdminPaidEmail',
-		)
-	);
-	var $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
-	var $order = array('$ALIAS.created' => 'DESC');
+		]
+	];
+	public $virtualFields = array('title' => 'CONCAT("Invoice #", $ALIAS.id)');
+	public $order = ['$ALIAS.created' => 'DESC'];
 	
-	var $hasOne = array(
+	public $hasOne = [
 		'Shop.Order',
 		//'BowlathonPledge',
 		//'Donation',
 		//'FundraisingProfileDonation',
-		'PaypalPayment' => array(
+		'PaypalPayment' => [
 			'className' => 'Shop.PaypalPayment',
 			'foreignKey' => 'invoice',
-		),
+		],
 		//'NsaMember',
 		//'DonorCardOrder',
-	);
+	];
 	
-	var $belongsTo = array(
-		//'User' => array('foreignKey' => 'user_id'),
+	public $belongsTo = [
+		//'User' => ['foreignKey' => 'user_id'],
 		//'Shop.PaypalPayment',
-		//'State' => array('foreignKey' => 'Invoice.state'),
-		//'Country' => array('foreignKey' => 'Invoice.country'),
+		//'State' => ['foreignKey' => 'Invoice.state'],
+		//'Country' => ['foreignKey' => 'Invoice.country'],
 		'Shop.InvoicePaymentMethod',
-	);
+	];
 	
-	var $validate = array(
-		'first_name' => array(
+	public $validate = [
+		'first_name' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please enter a first name',
-		),
-		'last_name' => array(
+		],
+		'last_name' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please enter a last name',
-		),
-		'amt' => array(
-			'notEmpty' => array(
+		],
+		'amt' => [
+			'notEmpty' => [
 				'rule' => 'notEmpty',
 				'message' => 'Please enter a donation amount',
-			),
-			'numeric' => array(
+			],
+			'numeric' => [
 				'rule' => 'numeric',
 				'message' => 'Please only enter a number for your donation amount',
-			)
-		),
-		'email' => array(
-			'notEmpty' => array(
+			]
+		],
+		'email' => [
+			'notEmpty' => [
 				'rule' => 'notEmpty',
 				'message' => 'Please enter your email address',
-			),
-			'email' => array(
+			],
+			'email' => [
 				'rule' => 'email',
 				'message' => 'Please enter a valid email address',
-			)
-		)
-	);
+			]
+		]
+	];
 
-	public $syncedModels = array();
+	public $syncedModels = [];
 	
-	public function beforeSave($options = array()) {
+	public function beforeSave($options = []) {
 		$data =& $this->getData();
 
 		// Makes sure net amount is set
@@ -79,15 +79,15 @@ class Invoice extends ShopAppModel {
 		return parent::beforeSave($options);
 	}
 
-	function beforeFind($queryData) {
-		$queryData['fields'] = array_merge(array('*'), (array) $queryData['fields']);
+	public function beforeFind($queryData) {
+		$queryData['fields'] = array_merge(['*'], (array) $queryData['fields']);
 		foreach ($this->hasOne as $alias) {
 			$queryData['link'][] = $alias['className'];
 		}
 		return parent::beforeFind($queryData);
 	}
 	
-	function afterSave($created, $options = array()) {
+	public function afterSave($created, $options = []) {
 		$id = $this->id;
 
 		/*
@@ -96,8 +96,8 @@ class Invoice extends ShopAppModel {
 		}
 		*/
 		// Fires if Payment information has changed
-		$appModels = array();
-		$lookForModels = array('models');
+		$appModels = [];
+		$lookForModels = ['models'];
 		$plugins = CakePlugin::loaded();
 		foreach ($plugins as $plugin) {
 			$lookForModels[] = "$plugin.Model";
@@ -117,7 +117,7 @@ class Invoice extends ShopAppModel {
 					if (!empty($Model->actsAs['Shop.InvoiceSync'])) {
 						$config = $Model->actsAs['Shop.InvoiceSync'];
 					} else {
-						$config = array();
+						$config = [];
 					}
 
 
@@ -142,7 +142,7 @@ class Invoice extends ShopAppModel {
 	private function copyToModels($id) {
 		$result = $this->read(null, $id);
 		$fn = 'copyInvoiceToModel';
-		$contain = $fields = $link = array();
+		$contain = $fields = $link = [];
 		$models = array_merge($this->hasOne, $this->hasMany);
 		foreach ($models as $model => $config) {
 			$fields[] = "`$model`.*";
@@ -197,7 +197,7 @@ class Invoice extends ShopAppModel {
 	public function syncPaypal($id, $soft = true) {
 		$result = $this->find('first', array(
 			'fields' => 'PaypalPayment.id',
-			'link' => array('Shop.PaypalPayment'),
+			'link' => ['Shop.PaypalPayment'],
 			'conditions' => array($this->escapeField($this->primaryKey) => $id),
 		));
 		if (!empty($result['PaypalPayment']['id'])) {
@@ -216,7 +216,7 @@ class Invoice extends ShopAppModel {
 		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');
 		$startCount = $Sth->rowCount();
 		
-		$ids = array();
+		$ids = [];
 		while ($row = $Sth->fetch()) {
 			$ids[] = $row['id'];
 			if (!empty($row['model']) && !empty($row['model_id'])) {
@@ -233,10 +233,10 @@ class Invoice extends ShopAppModel {
 				}
 			}
 		}
-		$result = $this->find('all', array('conditions' => array(
+		$result = $this->find('all', ['conditions' => [
 			'Invoice.id' => $ids,
 			'Invoice.amt' => 0,
-		)));
+		]]);
 		$endCount = count($result);
 		if ($startCount != $endCount) {
 			debug("$endCount Found after initially finding $startCount");
@@ -256,8 +256,8 @@ class Invoice extends ShopAppModel {
 			$SthDup->bindParam(':model', $row['model']);
 			$SthDup->bindParam(':modelId', $row['model_id']);
 			$SthDup->execute();
-			$data = array();
-			$ids = array();
+			$data = [];
+			$ids = [];
 			while ($invoice = $SthDup->fetch()) {
 				$ids[] = $invoice['id'];
 				foreach ($invoice as $field => $val) {
@@ -273,7 +273,7 @@ class Invoice extends ShopAppModel {
 				'NOT' => array($this->escapeField('id') => $data['id'])
 			));
 			//Saves Combined Entry
-			$this->save($data, array('callbacks' => false, 'validate' => false));
+			$this->save($data, ['callbacks' => false, 'validate' => false]);
 		}
 	}
 
