@@ -1,10 +1,10 @@
 <?php
 class OrderProductsController extends ShopAppController {
-	var $name = 'OrderProducts';
-	var $components = array('Shop.ShoppingCart',);
-	var $helpers = array('Shop.Order');
+	public $name = 'OrderProducts';
+	public $components = ['Shop.ShoppingCart',];
+	public $helpers = ['Shop.Order'];
 	
-	function _invalidDisplay($errors = null) {
+	public function _invalidDisplay($errors = null) {
 		$out = '';
 		if (empty($errors)) {
 			$errors = $this->OrderProduct->validationErrors;
@@ -28,12 +28,11 @@ class OrderProductsController extends ShopAppController {
 		return "<ul>$out</ul>\n";
 	}
 	
-	function add() {
+	public function add() {
 		$redirect = true;
 		$msg = null;
-		$invalid = array();
+		$invalid = [];
 		
-
 		if (!empty($this->request->data)) {
 			/*
 			//Finds Product ID
@@ -42,7 +41,7 @@ class OrderProductsController extends ShopAppController {
 			} else {			
 				//Checks if product already exists in the cart
 				$this->OrderProduct->quantityExists($this->request->data);
-				$this->OrderProduct->Order->validate = array();
+				$this->OrderProduct->Order->validate = [];
 			}
 			*/
 			$success = null;
@@ -57,34 +56,34 @@ class OrderProductsController extends ShopAppController {
 				$msg .= $this->_invalidDisplay();
 			} else {
 				$success = false;
-				$order = $this->OrderProduct->Order->find('first', array(
-					'link' => array('Shop.OrderProduct'),
-					'conditions' => array('OrderProduct.id' => $this->OrderProduct->id)
-				));
+				$order = $this->OrderProduct->Order->find('first', [
+					'link' => ['Shop.OrderProduct'],
+					'conditions' => ['OrderProduct.id' => $this->OrderProduct->id]
+				]);
 				$this->ShoppingCart->setCart($order['Order']['id']);
 				//return true;
-				$redirect = array(
+				$redirect = [
 					'controller' => 'orders',
 					'action' => 'view',
 					$order['Order']['id']
-				);
+				];
 			}
 		} else {
-			$this->redirectMsg(array('controller' => 'products', 'action' => 'index'));
+			$this->redirectMsg(['controller' => 'products', 'action' => 'index']);
 		}
 		//debug(compact('redirect', 'msg'));
 		$this->redirectMsg($redirect, $msg, $success);
 	}
 	
 	//Removes an item from a cart
-	function delete($id = null) {
+	public function delete($id = null) {
 		//Makes sure the current user has the shopping cart id in their session
 		$cartId = $this->ShoppingCart->getCart();
 		if (!empty($cartId)) {
-			$order = $this->OrderProduct->Order->find('first', array(
-				'link' => array('Shop.OrderProduct'),
-				'conditions' => array('OrderProduct.id' => $id, 'Order.id' => $cartId)
-			));
+			$order = $this->OrderProduct->Order->find('first', [
+				'link' => ['Shop.OrderProduct'],
+				'conditions' => ['OrderProduct.id' => $id, 'Order.id' => $cartId]
+			]);
 			if (!empty($order)) {
 				$this->FormData->deleteData($id);
 			}
@@ -92,23 +91,23 @@ class OrderProductsController extends ShopAppController {
 		$this->redirectMsg(true, 'There was an error deleting the item. Please try again');
 	}
 	
-	function admin_add($orderId = null, $productId = null) {
+	public function admin_add($orderId = null, $productId = null) {
 		$orderId = $this->_paramCheck('order_id', $orderId);
 		$productId = $this->_paramCheck('product_id', $productId);
-		
-		$default = array('OrderProduct' => array('order_id' => $orderId, 'product_id' => $productId));
+		$default = ['OrderProduct' => ['order_id' => $orderId, 'product_id' => $productId]];
+
 		$this->FormData->addData(compact('default'));
 	}
 	
-	function admin_edit($id = null) {
+	public function admin_edit($id = null) {
 		$this->FormData->editData($id);
 	}
 	
-	function admin_delete($id = null) {
+	public function admin_delete($id = null) {
 		$this->FormData->deleteData($id);
 	}
 	
-	function _setFormElements() {
+	public function _setFormElements() {
 		if ($orderId = $this->_paramCheck('order_id')) {
 			$this->set('order', $this->OrderProduct->Order->findById($orderId));
 		}
@@ -120,10 +119,12 @@ class OrderProductsController extends ShopAppController {
 		$this->set('products', $this->OrderProduct->Product->selectList());
 	}
 	
-	function _paramCheck($varName, $default = null) {
-		if (empty($default)) {
+	public function _paramCheck($varName, $default = null) {
+		if (!empty($default)) {
 			$var = $default;
-		} else if (isset($this->request->data['OrderProduct'][$varName])) {
+		} 
+
+		if (isset($this->request->data['OrderProduct'][$varName])) {
 			$var = $this->request->data['OrderProduct'][$varName];
 		} else if (isset($this->request->named[$varName])) {
 			$var = $this->request->named[$varName];
