@@ -16,14 +16,18 @@ list($tableNavTop, $tableNavBottom) = $this->Table->tableNav(array(
 		echo $this->element('Shop.catalog_items/layout_form');
 		echo $tableNavTop;
 		if ($catalogLayout['layout'] == 'thumb'): ?>
-			<div class="row"><?php 
+			<div class="row">
+				<div class="col-sm-12">
+				<?php 
 				echo $this->CatalogItem->thumbnails($catalogItems, array(
 					'span' => count($catalogItems) < 4 ? 4 : 3, 
 					'caption' => 'title', 
 					'captionTitleTag' => 'h4',
 					'paginate' => false
 				)); 
-			?></div>
+				?>
+				</div>
+			</div>
 		<?php else: ?>
 			<div class="catalogitem-list">
 				<?php echo $this->CatalogItem->mediaList($catalogItems); ?>
