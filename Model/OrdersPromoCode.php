@@ -1,28 +1,29 @@
 <?php
 class OrdersPromoCode extends ShopAppModel {
-	var $name = 'OrdersPromoCode';
-	var $belongsTo = array('Shop.PromoCode', 'Shop.Order');	var $actsAs = array('Shop.BlankDelete' => array('AND' => 'code'));
+	public $name = 'OrdersPromoCode';
+	public $belongsTo = ['Shop.PromoCode', 'Shop.Order'];
+	public $actsAs = ['Shop.BlankDelete' => ['AND' => 'code']];
 	
-	function beforeValidate($options = array()) {
+	protected $copyFields = ['title', 'amt', 'pct', 'code'];
+
+	public function beforeValidate($options = []) {
 		$data =& $this->getData();
 		$unset = false;
-		//Adding a new Promo
+
+		// Adding a new Promo
 		if (empty($data['id']) && !empty($data['code'])) {
 			$promoCode = $this->PromoCode->findActiveCode($data['code']);
 			if (!empty($promoCode)) {
 				$data['product_promo_id'] = $promoCode['PromoCode']['id'];
-				$data['title'] = $promoCode['PromoCode']['title'];
-				$data['amt'] = $promoCode['PromoCode']['amt'];
-				$data['pct'] = $promoCode['PromoCode']['pct'];
-				$data['code'] = $promoCode['PromoCode']['code'];
+				$data = $this->getCopyData($promoCode, $data);
 
 				if (!empty($data['order_id'])) {
-					$result = $this->find('first', array(
-						'conditions' => array(
-							$this->alias . '.order_id' => $data['order_id'],
-							$this->alias . '.product_promo_id' => $promoCode['PromoCode']['id'],
-						)
-					));
+					$result = $this->find('first', [
+						'conditions' => [
+							$this->escapeField('order_id') => $data['order_id'],
+							$this->escapeField('product_promo_id') => $promoCode['PromoCode']['id'],
+						]
+					]);
 					if (!empty($result)) {
 						$data['id'] = $result[$this->alias]['id'];
 						$this->save($data);
@@ -37,8 +38,22 @@ class OrdersPromoCode extends ShopAppModel {
 		}
 		
 		if ($unset) {
-			$this->data = array();
+			$this->data = [];
 		}
-		return true;
+		
+		return parent::beforeValidate($options);
+	}
+
+	public function getCopyData($promoCode, $data = []) {
+		if (!is_array($promoCode)) {
+			$promoCode = $this->PromoCode->findActiveCode($promoCode);
+		}
+		if (!empty($promoCode['PromoCode'])) {
+			$promoCode = $promoCode['PromoCode'];
+		}
+		foreach ($this->copyFields as $field) {
+			$data[$field] = !empty($promoCode[$field]) ? $promoCode[$field] : null;
+		}
+		return $data;
 	}
 }

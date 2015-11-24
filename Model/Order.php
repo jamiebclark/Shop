@@ -65,6 +65,19 @@ class Order extends ShopAppModel {
 	
 	const DELETE_EMPTY_DEADLINE = '-2 months';
 	
+	public function beforeFind($query) {
+		$oQuery = $query;
+		if (!empty($query['fields']) && ($key = array_search('id', $query['fields'])) !== false) {
+			unset($query['fields'][$key]);
+		}
+
+		if ($oQuery != $query) {
+			return $query;
+		}
+
+		return parent::beforeFind($query);
+	}
+
 	public function beforeSave($options = []) {
 		$data =& $this->getData();
 		if (empty($data['country'])) {
@@ -118,6 +131,44 @@ class Order extends ShopAppModel {
 		return parent::afterCopyInvoiceToModel($id, $invoiceId);
 	}
 	
+	public function addPromoCode($id, $promoCodeId) {
+		$promoCode = $this->PromoCode->findActiveCode($promoCodeId);
+		if (empty($promoCode)) {
+			throw new Exception('Invalid promo code');
+			return false;
+		}
+		$promoData = [
+			'order_id' => $id,
+			'promo_code_id' => $promoCode['PromoCode']['id'],
+		];
+
+		$result = $this->OrdersPromoCode->find('first', [
+			'conditions' => [
+				'OrdersPromoCode.promo_code_id' => $promoCode['PromoCode']['id'],
+				'OrdersPromoCode.order_id' => $id,
+			]
+		]);
+		if (!empty($result)) {
+			$promoData['id'] = $result['OrdersPromoCode']['id'];
+		}
+		$promoData = $this->OrdersPromoCode->getCopyData($promoCode, $promoData);
+
+		$data = [
+			'Order' => compact('id'),
+			'OrdersPromoCode' => $promoData,
+		];
+
+		$success = $this->OrdersPromoCode->save($promoData, ['validate' => false]);
+
+		if (!$success) {
+			throw new Exception('Could not save promo code');
+		} else {
+			$this->updateTotal($id);
+			return $success;
+		}
+	}
+
+
 	//Checks if an order should be marked as archived
 	public function updateArchived($id) {
 		$order = $this->find('first', array(
@@ -257,15 +308,18 @@ class Order extends ShopAppModel {
 	}
 
 	public function findOrder($id) {
-		return $this->find('first', array(
+		$query = [
 			'fields' => '*',
 			'contain' => [
-				'Invoice', 'ShippingMethod',
+				'Invoice', 
+				'ShippingMethod',
 				'OrdersHandlingMethod', 'OrdersPromoCode',
-				'OrderProduct' => ['Product' => ['CatalogItem']]
+				'OrderProduct' => ['Product' => ['CatalogItem']],
+				'PromoCode',
 			],
-			'conditions' => array($this->escapeField('id') => $id)
-		));
+			'conditions' => [$this->escapeField('id') => $id]
+		];
+		return $this->find('first', $query);
 	}
 	
 	public function setSameBilling($id) {

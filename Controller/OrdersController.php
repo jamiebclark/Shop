@@ -51,6 +51,19 @@ class OrdersController extends ShopAppController {
 	
 
 	public function edit($id = null) {
+		$redirect = ['action' => 'view', $id];
+
+		if (!empty($this->request->data['Order']['add_promo_code'])) {
+			$promoCode = $this->request->data['Order']['add_promo_code'];
+			try {
+				$this->Order->addPromoCode($this->request->data['Order']['id'], $promoCode);
+			} catch (Exception $e) {
+				$this->Flash->error($e->getMessage(), compact('redirect'));
+			}
+			$this->Session->setFlash('Added promo code: ' . $promoCode);
+			$this->redirect($redirect);
+		}
+
 		$saveAttrs = [
 			'success' => [
 				'redirect' => ['action' => 'view', 'ID'],
@@ -68,13 +81,9 @@ class OrdersController extends ShopAppController {
 			$this->FormData->setSuccessRedirect(['action' => 'checkout', 'ID']);
 		} else if (isset($this->request->data['update'])) {
 		}
-
-		//debug($this->request);
-		//exit();
 		
 		$this->FormData->editData($id, $saveAttrs, $saveOptions);
-
-		$this->redirect(['action' => 'view', $id]);
+		$this->redirect($redirect);
 	}
 	
 	public function invoice($id = null) {
@@ -285,6 +294,7 @@ class OrdersController extends ShopAppController {
 			'fields' => '*',
 			'link' => ['Shop.Invoice'],
 			'postContain' => [
+				'PromoCode',
 				'OrderProduct' => [
 					'link' => ['Shop.Product'],
 				]
