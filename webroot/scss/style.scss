@@ -1,11 +1,7 @@
-@import "variables";
-
-@import "bootstrap3.2/bootstrap";
-
-@import "catalog-item-categories";
-@import "catalog-item-images";
-@import "catalog-items";
-@import "order-cart";
+@import "utilities/index";
+@import "base/index";
+@import "states/index";
+@import "modules/index";
 
 .nav-catalogitemcategories {
 	li a {
