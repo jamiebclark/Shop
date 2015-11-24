@@ -2,10 +2,10 @@
 $infoTitle = 'Your Information';
 $cartTitle = 'Cart Contents';
 if (!$isArchived) {
-	$infoTitle = $this->Html->link($infoTitle, array('action' => 'shipping', $order['Order']['id']));
-	$cartTitle = $this->Html->link($cartTitle, array('action' => 'view', $order['Order']['id']));
+	$infoTitle = $this->Html->link($infoTitle, ['action' => 'shipping', $order['Order']['id']]);
+	$cartTitle = $this->Html->link($cartTitle, ['action' => 'view', $order['Order']['id']]);
 }
-$statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
+$statusOptions = ['mode' => 'definitionList', 'tag' => 'div'];
 ?>
 <h2>Finish Checking Out</h2>
 <div class="row">
@@ -21,13 +21,13 @@ $statusOptions = array('mode' => 'definitionList', 'tag' => 'div');
 		<?php echo $this->Invoice->paymentForm($order['Invoice']); ?>
 	</div>
 	<div class="col-sm-4"><?php 
-		echo $this->element('orders/cart', array(
+		echo $this->element('orders/cart', [
 			'condensed' => true,
 			'links' => false,
 			'form' => false,
 			'images' => false,
 			'title' => 'Cart Contents',
 			'titleTag' => 'h3',
-		));
+		]);
 	?></div>
 </div>
