@@ -12,6 +12,8 @@ $default = [
 ];
 extract(array_merge($default, compact(array_keys($default))));
 
+$continueShoppingUrl = ['controller' => 'catalog_items', 'action' => 'index'];
+
 $emptyCart = empty($order['OrderProduct']);
 //Order-dependent settings
 if ($order['Order']['archived']) {
@@ -218,7 +220,7 @@ if ($title) {
 				<?php 
 					echo $this->Html->link(
 						'Add some stuff to it!', 
-						['controller' => 'catalog_items', 'action' => 'index'],
+						$continueShoppingUrl,
 						['class' => 'btn btn-lg']
 					);
 				?>
@@ -250,13 +252,14 @@ if ($title) {
 			<div class="panel-footer clearfix">
 				<?php
 				echo $this->FormLayout->buttons([
-					'Checkout' => [
+					'Checkout <i class="fa fa-arrow-right"></i>' => [
 						'class' => 'btn btn-lg btn-primary pull-right',
 						'name' => 'checkout',
 					],
-					'Continue Shopping' => [
-						'url' => ['controller' => 'catalog_items', 'action' => 'index'],
+					'<i class="fa fa-arrow-left"></i> Continue Shopping' => [
+						'url' => $continueShoppingUrl,
 						'class' => 'btn',
+						'escape' => false,
 					]
 				]); ?>
 			</div>

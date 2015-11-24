@@ -38,11 +38,12 @@
 		</div>
 		<?php
 			echo $this->FormLayout->buttons([
-				'Complete Order' => [
+				'Complete Order <i class="fa fa-check"></i>' => [
 					'class' => 'btn-primary btn-lg pull-right'
 				],
-				'Edit Cart' => [
+				'<i class="fa fa-arrow-left"></i> Edit Cart' => [
 					'url' => ['action' => 'view', $order['Order']['id']],
+					'escape' => false,
 					'class' => 'prev',
 				],
 			]);
