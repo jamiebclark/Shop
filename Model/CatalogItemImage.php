@@ -1,43 +1,45 @@
 <?php
 App::uses('ShopAppModel', 'Shop.Model');
 class CatalogItemImage extends ShopAppModel {
-	var $name = 'CatalogItemImage';
-	var $actsAs = array(
-		'Shop.BlankDelete' => array('id', 'add_image'),
-		'Uploadable.ImageUploadable' => array(
+	public $name = 'CatalogItemImage';
+	public $actsAs = [
+		'Shop.BlankDelete' => ['id', 'add_image'],
+		'Uploadable.ImageUploadable' => [
 			'plugin' => 'Shop',
 			'upload_var' => 'add_image',
 			//'bypass_is_uploaded' => true,
 			'upload_dir' => 'img/catalog_item_images/',
-			'update' => array('filename'),
-			'dirs' => array(
-				'thumb' => array('setSoft' => array(160, 160)),
-				'mid' => array('setSoft' => array(320, 320)),
-				'' => array('max' => array(600, 400))
-			)
-		),
-		//'Shop.BlankDelete' => array('title'),
+			'update' => ['filename'],
+			'dirs' => [
+				'thumb' => ['setSoft' => [160, 160]],
+				'mid' => ['setSoft' => [320, 320]],
+				'' => ['max' => [600, 400]]
+			]
+		],
+		//'Shop.BlankDelete' => ['title'],
 		'Layout.Removable',
-		'Shop.FieldOrder' => array(
+		'Shop.FieldOrder' => [
 			'orderField' => 'order',
-			'subKeyFields' => array('catalog_item_id'),
-		)
-	);
-	var $order = array('CatalogItemImage.catalog_item_id', 'CatalogItemImage.order');
-	var $belongsTo = array('Shop.CatalogItem');
+			'subKeyFields' => ['catalog_item_id'],
+		]
+	];
+	public $order = ['CatalogItemImage.catalog_item_id', 'CatalogItemImage.order'];
+	public $belongsTo = ['Shop.CatalogItem'];
 	
-	var $validate = array(
-		'catalog_item_id' => array(
+	public $validate = [
+		'catalog_item_id' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please select a product',
-		)
-	);
+		]
+	];
 	
-	function afterSave($created, $options = array()) {
-		$result = $this->read(null, $this->id);
+	public function afterSave($created, $options = []) {
+		$id = $this->id;
+		$result = $this->read(null, $id);
 		if (!empty($result[$this->alias]['thumb'])) {
 			$this->setThumbnail($this->id);
 		}
+		$result = $this->read(null, $id);
 		return parent::afterSave($created);
 	}
 
@@ -45,13 +47,13 @@ class CatalogItemImage extends ShopAppModel {
  *	Sets the current image as the CatalogItem's default thumnail image
  *
  **/
-	function setThumbnail($id) {
+	public function setThumbnail($id) {
 		$result = $this->read(null, $id);
 		$result = $result[$this->alias];
-		$this->CatalogItem->save(array(
+		$this->CatalogItem->save([
 			'id' => $result['catalog_item_id'],
 			'filename' => $result['filename'],
-		), array('callbacks' => false, 'validate' => false));
+		], ['callbacks' => false, 'validate' => false]);
 		return $this->updateAll(array(
 			$this->escapeField('thumb') => 0,
 		), array(
