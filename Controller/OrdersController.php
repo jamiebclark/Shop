@@ -4,41 +4,41 @@ App::uses('InvoiceEmail', 'Shop.Network/Email');
 class OrdersController extends ShopAppController {
 	public $name = 'Orders';
 	
-	public $components = array(
+	public $components = [
 		//'FindFilter', 
 		'Shop.ShoppingCart'
-	);
+	];
 	
-	public $helpers = array(
+	public $helpers = [
 		'Shop.Invoice',
 		'Shop.CatalogItem', 
 		'Shop.PaypalForm',
 		'Shop.AmazonForm',
 		'Layout.AddressBook',
 		'Layout.AddressBookForm',
-		'Layout.Crumbs' => array(
-			'controllerCrumbs' => array(array(
+		'Layout.Crumbs' => [
+			'controllerCrumbs' => [[
 				'Store',
-				array('controller' => 'catalog_items','action' => 'index'),
-			))
-		),
-	);
+				['controller' => 'catalog_items','action' => 'index'],
+			]]
+		],
+	];
 	
-	public $paginate = array(
+	public $paginate = [
 		'fields' => '*',
-		'link' => array('Shop.Invoice'),
-	);
+		'link' => ['Shop.Invoice'],
+	];
 	
 	/*
 	function beforeFilter() {
 		parent::beforeFilter();
-		$this->FindFilter->filter = array(
-			'shipped' => array('options' => array('' => ' -- Either -- ', 1 => 'Shipped', 0 => 'Not Shipped')),
-			'paid' => array('options' => array('' => ' -- Either -- ', 1 => 'Paid', 0 => 'Not Paid')),
-			'canceled' => array('type' => 'checkbox', 'default' => 0),
-			'email' => array('type' => 'text', 'label' => 'Email Address'),
-			'name' => array('type' => 'text'),
-		);
+		$this->FindFilter->filter = [
+			'shipped' => ['options' => ['' => ' -- Either -- ', 1 => 'Shipped', 0 => 'Not Shipped']],
+			'paid' => ['options' => ['' => ' -- Either -- ', 1 => 'Paid', 0 => 'Not Paid']],
+			'canceled' => ['type' => 'checkbox', 'default' => 0],
+			'email' => ['type' => 'text', 'label' => 'Email Address'],
+			'name' => ['type' => 'text'],
+		];
 	}
 	*/
 	
@@ -51,27 +51,39 @@ class OrdersController extends ShopAppController {
 	
 
 	public function edit($id = null) {
-		$saveAttrs = array(
-			'success' => array(
-				'redirect' => array('action' => 'view', 'ID'),
-				'message' => 'Updated cart',
-			),
-			'fail' => array(
-				'message' => 'There was an error updating your cart',
-				'redirect' => array('action' => 'view', 'ID'),
-			)
-		);
-		$saveOptions = array();
+		$redirect = ['action' => 'view', $id];
 
-		$this->Order->validate = array();
+		if (!empty($this->request->data['Order']['add_promo_code'])) {
+			$promoCode = $this->request->data['Order']['add_promo_code'];
+			try {
+				$this->Order->addPromoCode($this->request->data['Order']['id'], $promoCode);
+			} catch (Exception $e) {
+				$this->Flash->error($e->getMessage(), compact('redirect'));
+			}
+			$this->Session->setFlash('Added promo code: ' . $promoCode);
+			$this->redirect($redirect);
+		}
+
+		$saveAttrs = [
+			'success' => [
+				'redirect' => ['action' => 'view', 'ID'],
+				'message' => 'Updated cart',
+			],
+			'fail' => [
+				'message' => 'There was an error updating your cart',
+				'redirect' => ['action' => 'view', 'ID'],
+			]
+		];
+		$saveOptions = [];
+
+		$this->Order->validate = [];
 		if (isset($this->request->data['checkout'])) {
-			$this->FormData->setSuccessRedirect(array('action' => 'checkout', 'ID'));
+			$this->FormData->setSuccessRedirect(['action' => 'checkout', 'ID']);
 		} else if (isset($this->request->data['update'])) {
 		}
 		
-		$this->FormData->addData(null, $saveAttrs, $saveOptions);
-
-		$this->redirect(array('action' => 'view', $id));
+		$this->FormData->editData($id, $saveAttrs, $saveOptions);
+		$this->redirect($redirect);
 	}
 	
 	public function invoice($id = null) {
@@ -81,8 +93,8 @@ class OrdersController extends ShopAppController {
 	
 	public function shipping($id = null) {
 		$this->FormData->setSuccessMessage('Successfully updated shipping information for your Order');
-		$this->FormData->setSuccessRedirect(array('action' => 'checkout', 'ID'));
-		$this->FormData->editData($id, null, array('contain' => 'Invoice'));
+		$this->FormData->setSuccessRedirect(['action' => 'checkout', 'ID']);
+		$this->FormData->editData($id, null, ['contain' => 'Invoice']);
 		//$this->set('states', $this->Order->State->selectList());
 		//$this->set('countries', $this->Order->Country->selectList());
 	}
@@ -92,23 +104,23 @@ class OrdersController extends ShopAppController {
 		//Before displaying checkout screen, checks if order is complete
 		if (empty($order['Order']['addline1']) || empty($order['Order']['invoice_id'])) {
 			//Shipping information has not been entered yet
-			$this->redirect(array('action' => 'shipping', $id));
+			$this->redirect(['action' => 'shipping', $id]);
 		} else if (!empty($order['Invoice']['paid'])) {
 			//Order has been paid already
-			$this->redirect(array('action' => 'view', $id));
+			$this->redirect(['action' => 'view', $id]);
 		}
 		$this->set('isArchived', $order['Order']['archived']);
 	}
 	
 	//Performs a temporary fix to adjust those orders that hadn't been marked as archived when they were paid
 	public function admin_fix_archived() {
-		$orders = $this->Order->find('all', array(
-			'link' => array('Shop.Invoice'),
-			'conditions' => array(
+		$orders = $this->Order->find('all', [
+			'link' => ['Shop.Invoice'],
+			'conditions' => [
 				'Order.archived' => 0,
-				'NOT' => array('Invoice.paid' => null),
-			)
-		));
+				'NOT' => ['Invoice.paid' => null],
+			]
+		]);
 		
 		debug(sprintf('Found %d orders not marked as archived', count($orders)));
 		
@@ -130,7 +142,7 @@ class OrdersController extends ShopAppController {
 		if (!empty($this->request->data['Order']['id'])) {
 			$order = $this->Order->findById($this->request->data['Order']['id']);
 			if (!empty($order)) {
-				$this->redirect(array('action' => 'view', $this->request->data['Order']['id']));
+				$this->redirect(['action' => 'view', $this->request->data['Order']['id']]);
 			} else {
 				$this->redirectMsg(true, 'Could not find Order #' . $this->request->data['Order']['id']);
 			}
@@ -147,10 +159,10 @@ class OrdersController extends ShopAppController {
 	
 	public function admin_view($id = null) {
 		$order = $this->FormData->editData($id);
-		$this->set(array(
+		$this->set([
 			'archived' => $order['Order']['archived'],
 			'canceled' => $order['Order']['canceled'],
-		));
+		]);
 	}
 	
 	public function admin_edit ($id = null) {
@@ -158,18 +170,18 @@ class OrdersController extends ShopAppController {
 	}
 	
 	public function admin_add() {
-		$default = array(
-			'Order' => array(
+		$default = [
+			'Order' => [
 				'auto_shipping' => 1,
 				'auto_price' => 1,
 				'auto_handling' => 1,
 				'sub_total' => 0,
 				'shipping' => 0,
-			)
-		);
-		$handlingMethods = $this->Order->HandlingMethod->find('all', array(
-			'conditions' => array('HandlingMethod.active' => 1)
-		));
+			]
+		];
+		$handlingMethods = $this->Order->HandlingMethod->find('all', [
+			'conditions' => ['HandlingMethod.active' => 1]
+		]);
 		foreach ($handlingMethods as $handlingMethod) {
 			$handlingMethod = $handlingMethod['HandlingMethod'];
 			$handlingMethod['handling_method_id'] = $handlingMethod['id'];
@@ -190,18 +202,18 @@ class OrdersController extends ShopAppController {
 				'SUM(Order.total) AS total',
 				'IF(MONTH(Invoice.paid) BETWEEN 1 AND 2, YEAR(Invoice.paid), YEAR(Invoice.paid) + 1) AS year',
 			),
-			'link' => array('Shop.Invoice'),
-			'conditions' => array(),
+			'link' => ['Shop.Invoice'],
+			'conditions' => [],
 			'group' => 'paid_day',
 			'order' => 'Invoice.paid DESC',
 		));
-		$totals = array();
-		$stats = array(
+		$totals = [];
+		$stats = [
 			'min' => 0,
 			'max' => 0,
 			'min_day' => null,
 			'max_day' => null,
-		);
+		];
 		foreach ($orders as $order) {
 			$year = $order[0]['year'];
 			$total = $order[0]['total'];
@@ -224,10 +236,10 @@ class OrdersController extends ShopAppController {
 				$stats['min'] = $total;
 			}
 			if (empty($totals[$year])) {
-				$totals[$year] = array(
-					'day' => array(),
+				$totals[$year] = [
+					'day' => [],
 					'total' => 0,
-				);
+				];
 			}
 			$totals[$year]['day'][$day] = $total;
 			$totals[$year]['total'] += $total;
@@ -235,14 +247,14 @@ class OrdersController extends ShopAppController {
 		$this->set(compact('totals', 'stats'));
 	}
 	
-	function _findFilter($options = array()) {
-		$search = array('shipped', 'paid', 'canceled');
+	function _findFilter($options = []) {
+		$search = ['shipped', 'paid', 'canceled'];
 		$named = $this->request->named;
 		if (isset($named['canceled'])) {
 			$options['conditions']['Order.canceled'] = round($named['canceled']);
 		}
 		if (isset($named['paid'])) {
-			$options['link']['Shop.Invoice'] = array();
+			$options['link']['Shop.Invoice'] = [];
 			if ($named['paid']) {
 				$options['conditions']['NOT']['Invoice.paid'] = null;
 			} else {
@@ -270,23 +282,24 @@ class OrdersController extends ShopAppController {
 		return $options;
 	}
 	
-	function _setFindModelAttrs($defaults = array()) {
-		return array_merge($defaults, array(
+	function _setFindModelAttrs($defaults = []) {
+		return array_merge($defaults, [
 			'method' => 'findOrder',
 			'passIdToMethod' => true,
-		));
+		]);
 	}
 	
-	function _setFindModelOptions($options = array()) {
-		return array_merge(array(
+	function _setFindModelOptions($options = []) {
+		return array_merge([
 			'fields' => '*',
-			'link' => array('Shop.Invoice'),
-			'postContain' => array(
-				'OrderProduct' => array(
-					'link' => array('Shop.Product'),
-				)
-			),
-		), $options);
+			'link' => ['Shop.Invoice'],
+			'postContain' => [
+				'PromoCode',
+				'OrderProduct' => [
+					'link' => ['Shop.Product'],
+				]
+			],
+		], $options);
 	}
 	
 	function _setFormElements() {
@@ -301,7 +314,7 @@ class OrdersController extends ShopAppController {
 		}
 	}
 	
-	function _beforeFindModel($options = array()) {
+	function _beforeFindModel($options = []) {
 		if (empty($this->FormData->id)) {
 			if (!empty($this->request->data['Order']['id'])) {
 				$this->FormData->id = $this->request->data['Order']['id'];

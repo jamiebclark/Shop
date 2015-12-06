@@ -6,27 +6,56 @@
 App::uses('ShopAppModel', 'Shop.Model');
 class ProductInventoryAdjustment extends ShopAppModel {
 	public $name = 'ProductInventoryAdjustment';
-	public $actsAs = array('Shop.ChangedFields');
-	public $order = array('ProductInventoryAdjustment.available' => 'DESC');
+	public $actsAs = ['Shop.ChangedFields'];
+	public $order = ['ProductInventoryAdjustment.available' => 'DESC'];
 	
-	public $belongsTo = array('Shop.Product');
+	public $belongsTo = ['Shop.Product'];
 	
-	public $validate = array(
-		'product_id' => array(
+	public $validate = [
+		'product_id' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please select a product first',
-		),
-		'quantity' => array(
+		],
+		'quantity' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please select an amount to add',
-		),
-		'available' => array(
+		],
+		'available' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please let us know when the inventory will be available',
-		)
-	);
+		]
+	];
 	
-	function afterSave($created, $options = array()) {
+	public function beforeValidate($options = []) {
+		if (!empty($this->data[$this->alias])) {
+			$data =& $this->data[$this->alias];
+		} else {
+			$data =& $this->data;
+		}
+
+		$qty = 0;
+		$productId = $data['product_id'];
+		if (!empty($data['quantity'])) {
+			$qty = $data['quantity'];
+		}
+		if (!empty($data['change_quantity'])) {
+			$this->Product->id = $productId;
+			$currentStock = $this->Product->field('stock');
+			$qty = $data['change_quantity'] - $currentStock;
+		} else {
+			if (!empty($data['add_quantity'])) {
+				$qty += $data['add_quantity'];
+			}
+			if (!empty($data['remove_quantity'])) {
+				$qty -= abs($data['remove_quantity']);
+			}
+		}
+		$data['quantity'] = $qty;
+
+		return parent::beforeValidate($options);
+	} 
+
+	public function afterSave($created, $options = []) {
 		if ($created || in_array('quantity', $this->changedFields)) {
 			$result = $this->findById($this->id);
 			$quantity = $result[$this->alias]['quantity'];
@@ -39,23 +68,23 @@ class ProductInventoryAdjustment extends ShopAppModel {
 	}
 
 	
-	function beforeDelete($cascade = true) {
+	public function beforeDelete($cascade = true) {
 		$result = $this->read(null, $this->id);
 		$result = $result[$this->alias];
-		//Removes the stock from the Product's totals
+		// Removes the stock from the Product's totals
 		$this->Product->adjustStock($result['product_id'], -1 * $result['quantity']);
 		return true;
 	}
 
-	function findProductTotal($productId) {
+	public function findProductTotal($productId) {
 		$result = $this->find('first', array(
 			'fields' => 'SUM(quantity) AS total',
 			'recursive' => -1,
 			'conditions' => array(
-				$this->alias . '.available <=' => date('Y-m-d H:i:s'),
-				$this->alias . '.product_id' => $productId,
+				$this->escapeField('available') . ' <=' => date('Y-m-d H:i:s'),
+				$this->escapeField('product_id') => $productId,
 			),
-			'group' => $this->alias . '.product_id',
+			'group' => $this->escapeField('product_id'),
 		));
 		$total = 0;
 		if (!empty($result)) {
@@ -65,24 +94,24 @@ class ProductInventoryAdjustment extends ShopAppModel {
 	}
 	
 	/*
-	var $belongsTo = array(
+	var $belongsTo = [
 		'Product',
-		'ProductOptionChoice1' => array(
+		'ProductOptionChoice1' => [
 			'className' => 'ProductOptionChoice',
 			'foreignKey' => 'product_option_choice_1'
-		),
-		'ProductOptionChoice2' => array(
+		],
+		'ProductOptionChoice2' => [
 			'className' => 'ProductOptionChoice',
 			'foreignKey' => 'product_option_choice_2'
-		),
-		'ProductOptionChoice3' => array(
+		],
+		'ProductOptionChoice3' => [
 			'className' => 'ProductOptionChoice',
 			'foreignKey' => 'product_option_choice_3'
-		),
-		'ProductOptionChoice4' => array(
+		],
+		'ProductOptionChoice4' => [
 			'className' => 'ProductOptionChoice',
 			'foreignKey' => 'product_option_choice_4'
-		),
-	);
+		],
+	];
 	*/
 }

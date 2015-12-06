@@ -1,12 +1,18 @@
-.catalogitem-image-view {
-	margin-bottom: $line-height-computed;
-}
-.catalogitem-image-view-display {
-	text-align: center;
-	img {
-		width: auto;
+.catalogitem-images {
+	&-display {
+		width: 100%;
 	}
 }
+.catalogitem-image-view {
+	margin-bottom: $line-height-computed;
+	&-display {
+		text-align: center;
+		img {
+			width: auto;
+		}
+	}
+}
+
 .thumbnails {
 	.thumbnail {
 		&.thumbnail-current {

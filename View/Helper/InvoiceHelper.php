@@ -1,10 +1,10 @@
 <?php
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 class InvoiceHelper extends ModelViewHelper {
-	var $name = 'Invoice';
-	var $modelPlugin = 'Shop';
+	public $name = 'Invoice';
+	public $modelPlugin = 'Shop';
 	
-	var $helpers = array(
+	public $helpers = [
 		'Form', 
 		'Html',
 		'Layout.AddressBook',
@@ -14,22 +14,27 @@ class InvoiceHelper extends ModelViewHelper {
 		'Layout.FormLayout',
 		'Layout.Layout', 
 		'Shop.PaypalForm', 
-	);
+	];
 	
 	var $companyName = COMPANY_NAME;
 	var $mailingAddress = COMPANY_ADDRESS;
 	
+	public function beforeRender($viewFile) {
+		$this->PaypalForm->beforeRender($viewFile);
+		return parent::beforeRender($viewFile);
+	}
+
 	function address($invoice) {
 		$invoice = $this->_getResult($invoice);
-		return $this->AddressBook->address($invoice, array(
-			'beforeField' => array(array('first_name', 'last_name')),
-		));
+		return $this->AddressBook->address($invoice, [
+			'beforeField' => [['first_name', 'last_name']],
+		]);
 	}
 
 	public function paid($result) {
 		$invoice = $this->_getResult($result);
 		if ($invoice['paid']) {
-			$paid = 'Paid ' . $this->Calendar->niceShort($invoice['paid'], array('time' => false));
+			$paid = 'Paid ' . $this->Calendar->niceShort($invoice['paid'], ['time' => false]);
 			if (!empty($result['InvoicePaymentMethod'])) {
 				$paid .= " (<em>{$result['InvoicePaymentMethod']['title']}</em>)";
 			}
@@ -48,7 +53,7 @@ class InvoiceHelper extends ModelViewHelper {
 		return $out;	
 	}
 	
-	public function title($invoice, $options = array()) {
+	public function title($invoice, $options = []) {
 		$invoice = $this->_getResult($invoice);
 		if (empty($options['text'])) {
 			$options['text'] = 'Invoice #' . $invoice['id'];
@@ -61,7 +66,7 @@ class InvoiceHelper extends ModelViewHelper {
 		return "{$invoice['model_title']} #{$invoice['model_id']}";
 	}
 	
-	function relatedLink($invoice, $options = array()) {
+	function relatedLink($invoice, $options = []) {
 		$invoice = $this->_getResult($invoice);
 		if (empty($invoice['model'])) {
 			return '';
@@ -80,8 +85,8 @@ class InvoiceHelper extends ModelViewHelper {
 		return $this->Html->link($this->relatedTitle($invoice), $url, $options);
 	}
 
-	function paypalForm($invoice, $content = null, $options = array()) {
-		$cols = array(
+	function paypalForm($invoice, $content = null, $options = []) {
+		$cols = [
 			'first_name',
 			'last_name',
 			'address1' => 'addline1',
@@ -95,13 +100,13 @@ class InvoiceHelper extends ModelViewHelper {
 			'email',
 			'amount' => 'amt',
 			'invoice' => 'id',
-		);
+		];
 		$here = Router::url(null, true);
-		$settings = array(
+		$settings = [
 		//	'cmd' => '_cart',
 			'return' => $here,
 			'cancel_return' => $here,
-		);
+		];
 		
 		if (!empty($invoice['model_title'])) {
 			$settings['item_name'] = $this->relatedTitle($invoice);
@@ -125,7 +130,7 @@ class InvoiceHelper extends ModelViewHelper {
 			$settings['srt'] = $invoice['recur'];	//Repeat this many times
 		}
 		
-		$optionSettings = Param::keyCheck($options, 'settings', true, array());
+		$optionSettings = Param::keyCheck($options, 'settings', true, []);
 		$settings = array_merge($settings, $optionSettings);
 
 		foreach ($cols as $paypalCol => $dbCol) {
@@ -154,44 +159,44 @@ class InvoiceHelper extends ModelViewHelper {
 			'Payment should be the amount of <strong>$' . number_format($invoice['amt'],2) . '</strong>',
 			'Be sure to write <strong>' . $memo . '</strong> in the "Memo" section',
 			'If possible, attach a ' . $this->Html->link(
-				'printed copy of your invoice', array(
+				'printed copy of your invoice', [
 					'controller' => 'invoices',
 					'action' => 'view',
 					'plugin' => 'shop',
 					$invoice['id'],
-				) + Prefix::reset(), 
-				array('target' => '_blank')
+				] + Prefix::reset(), 
+				['target' => '_blank']
 			),
 		);
 		
-		return $this->Html->tag('ol', '<li>' . implode('</li><li>', $steps) . '</li>', array(
+		return $this->Html->tag('ol', '<li>' . implode('</li><li>', $steps) . '</li>', [
 			'class' => 'invoice-check-payment-steps',
-		));
+		]);
 	}
 	
 	function getMailingAddress() {
 		return $this->mailingAddress;
 	}
 	
-	public function paymentForm($invoice, $options = array()) {
-		$options = array_merge(array(
+	public function paymentForm($invoice, $options = []) {
+		$options = array_merge([
 			'paypal' => true,
 			'check' => true,
-		), $options);
+		], $options);
 		extract($options);
 		
 		$paypalForm = $this->paypalForm(
 			$invoice, 
-			$this->Form->submit ('Pay with Credit Card or PayPal', array('class' => 'btn btn-lg btn-primary'))
+			$this->Form->submit ('Pay with Credit Card or PayPal', ['class' => 'btn btn-lg btn-primary'])
 		);
-		$payments = array();
+		$payments = [];
 		
 		if (!empty($paypal)) {
-			$payments[] = array(
+			$payments[] = [
 				'<i class="fa fa-credit-card"></i> Pay with Credit Card / PayPal',
 				$paypalForm,
 				'<p class="help-block">Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment</p>',
-			);
+			];
 		}
 		
 		if (!empty($check)) {
@@ -211,7 +216,7 @@ class InvoiceHelper extends ModelViewHelper {
 		?>
 		<div class="invoice-payments row">
 		<?php foreach ($payments as $k => $payment) :
-			list($title, $action, $info) = $payment + array(null, null, null);
+			list($title, $action, $info) = $payment + [null, null, null];
 			?>
 			<div class="invoice-payment col-md-<?php echo $col; ?>">
 				<div class="panel panel-default">

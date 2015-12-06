@@ -1,15 +1,10 @@
 <?php 
-$class = 'form-horizontal alert ';
-$class .= $this->Html->value('Invoice.paid') ? 'alert-success' : 'alert-warning';
-
-$inputDefaults = $this->Form->inputDefaults();
-$this->Form->inputDefaults(array(
-	'label' => array('class' => 'control-label col col-sm-2'),
-	'wrapInput' => 'col col-sm-10',
-), true);
-
+$class = 'panel ';
+$class .= $this->Html->value('Invoice.paid') ? 'panel-success' : 'panel-warning';
 ?>
 <div class="<?php echo $class;?>">
+	<div class="panel-heading">Payment</div>
+	<div class="panel-body">
 	<?php
 	echo $this->Form->hidden('Invoice.id');
 	if ($this->Html->value('Invoice.id')) {
@@ -43,7 +38,6 @@ $this->Form->inputDefaults(array(
 	$paidEmailOptions = array(
 		'type' => 'checkbox',
 		'class' => 'checkbox',
-		'wrapInput' => 'col col-sm-offset-2',
 		'label' => array('text' => 'Send Confirmation Email', 'class' => 'control-label'),
 		'checked' => !$this->Html->value('Invoice.paid') && !$this->Html->value('Invoice.paid_email'),
 	);
@@ -54,5 +48,6 @@ $this->Form->inputDefaults(array(
 	}
 	$paidEmailOptions['afterInput'] = '<span class="help-block">' . $helpBlock . '</span>';
 	echo $this->Form->input('Invoice.send_paid_email', $paidEmailOptions);
-?></div>
-<?php $this->Form->inputDefaults($inputDefaults); ?>
+	?>
+	</div>
+</div>

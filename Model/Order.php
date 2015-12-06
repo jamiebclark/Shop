@@ -4,68 +4,81 @@ App::uses('ShopAppModel', 'Shop.Model');
 class Order extends ShopAppModel {
 	public $name = 'Order';
 	public $displayField = 'title';
-	public $actsAs = array(
+	public $actsAs = [
 		'Layout.DateValidate',
-		'Location.Mappable' => array('validate' => true),
-		'Shop.InvoiceSync' => array(
+		'Location.Mappable' => ['validate' => true],
+		'Shop.InvoiceSync' => [
 			'title' => 'Store Order',
-			'fields' => array(
+			'fields' => [
 			//	'paid',
 				'total' => 'amt',
-			),
-		),
-		'Shop.EmailTrigger' => array(
+			],
+		],
+		'Shop.EmailTrigger' => [
 			'send_shipped_email' => 'sendShippedEmail',
 		//	'send_paid_email' => 'sendPaidEmail',
-		),
-	);	
-	public $order = array('Order.created' => 'DESC');
+		],
+	];	
+	public $order = ['Order.created' => 'DESC'];
 	public $recursive = -1;
 	public $virtualFields = array('title' => 'CONCAT("Order #", $ALIAS.id)');
 	
-	public $hasMany = array(
-		'OrderProduct' => array(
+	public $hasMany = [
+		'OrderProduct' => [
 			'className' => 'Shop.OrderProduct',
 			'dependent' => true
-		),
-		'OrdersHandlingMethod' => array(
+		],
+		'OrdersHandlingMethod' => [
 			'className' => 'Shop.OrdersHandlingMethod',
 			'dependent' => true
-		),
-		'OrdersPromoCode' => array(
+		],
+		'OrdersPromoCode' => [
 			'className' => 'Shop.OrdersPromoCode',
 			'dependent' => true
-		),
-	);
-	public $belongsTo = array(
+		],
+	];
+	public $belongsTo = [
 		'Shop.Invoice', 
-		'ShippingMethod' => array('className' => 'Shop.ShippingMethod'),
-	);
-	public $hasAndBelongsToMany = array(
+		'ShippingMethod' => ['className' => 'Shop.ShippingMethod'],
+	];
+	public $hasAndBelongsToMany = [
 		'Shop.PromoCode', 
-		'HandlingMethod' => array(
+		'HandlingMethod' => [
 			'className' => 'Shop.HandlingMethod',
 			'with' => 'Shop.OrdersHandlingMethod',
-		)
-	);
+		]
+	];
 
-	public $validate = array(
-		'first_name' => array(
+	public $validate = [
+		'first_name' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please enter a first name',
-		),
-		'last_name' => array(
+		],
+		'last_name' => [
 			'rule' => 'notEmpty',
 			'message' => 'Please enter a last name',
-		)
-	);
+		]
+	];
 	
 	//Tracks from beforeSave to afterSave whether a confirmation email should be sent
 	private $sendShippedEmail = false;	
 	
 	const DELETE_EMPTY_DEADLINE = '-2 months';
 	
-	public function beforeSave($options = array()) {
+	public function beforeFind($query) {
+		$oQuery = $query;
+		if (!empty($query['fields']) && ($key = array_search('id', $query['fields'])) !== false) {
+			unset($query['fields'][$key]);
+		}
+
+		if ($oQuery != $query) {
+			return $query;
+		}
+
+		return parent::beforeFind($query);
+	}
+
+	public function beforeSave($options = []) {
 		$data =& $this->getData();
 		if (empty($data['country'])) {
 			$data['country'] = 'US';
@@ -74,7 +87,7 @@ class Order extends ShopAppModel {
 	}
 	
 	
-	public function afterSave($created, $options = array()) {
+	public function afterSave($created, $options = []) {
 		$id = $this->id;
 		$this->updateTotal($id);
 		
@@ -86,17 +99,19 @@ class Order extends ShopAppModel {
 		$this->updateArchived($id);
 		$this->updateProductStock($id);
 		
+		$this->read(null, $id);
+
 		return parent::afterSave($created);
 	}
 	
 	public function beforeDelete($cascade = true) {
-		$this->_deletedOrderProducts = $this->OrderProduct->find('list', array(
-			'fields' => array(
+		$this->_deletedOrderProducts = $this->OrderProduct->find('list', [
+			'fields' => [
 				'OrderProduct.id',
 				'OrderProduct.product_id',
-			),
-			'conditions' => array('OrderProduct.order_id' => $this->id)
-		));
+			],
+			'conditions' => ['OrderProduct.order_id' => $this->id]
+		]);
 		return parent::beforeDelete($cascade);
 	}
 	
@@ -116,11 +131,49 @@ class Order extends ShopAppModel {
 		return parent::afterCopyInvoiceToModel($id, $invoiceId);
 	}
 	
+	public function addPromoCode($id, $promoCodeId) {
+		$promoCode = $this->PromoCode->findActiveCode($promoCodeId);
+		if (empty($promoCode)) {
+			throw new Exception('Invalid promo code');
+			return false;
+		}
+		$promoData = [
+			'order_id' => $id,
+			'promo_code_id' => $promoCode['PromoCode']['id'],
+		];
+
+		$result = $this->OrdersPromoCode->find('first', [
+			'conditions' => [
+				'OrdersPromoCode.promo_code_id' => $promoCode['PromoCode']['id'],
+				'OrdersPromoCode.order_id' => $id,
+			]
+		]);
+		if (!empty($result)) {
+			$promoData['id'] = $result['OrdersPromoCode']['id'];
+		}
+		$promoData = $this->OrdersPromoCode->getCopyData($promoCode, $promoData);
+
+		$data = [
+			'Order' => compact('id'),
+			'OrdersPromoCode' => $promoData,
+		];
+
+		$success = $this->OrdersPromoCode->save($promoData, ['validate' => false]);
+
+		if (!$success) {
+			throw new Exception('Could not save promo code');
+		} else {
+			$this->updateTotal($id);
+			return $success;
+		}
+	}
+
+
 	//Checks if an order should be marked as archived
 	public function updateArchived($id) {
 		$order = $this->find('first', array(
 			'fields' => '*',
-			'link' => array('Shop.Invoice'),
+			'link' => ['Shop.Invoice'],
 			'conditions' => array($this->escapeField('id') => $id)
 		));
 		
@@ -128,14 +181,14 @@ class Order extends ShopAppModel {
 		$archived = round(!empty($order['Invoice']['paid']) || !empty($order['Order']['shipped']));
 
 		$this->updateAll(compact('archived'), array($this->escapeField('id') => $id));
-		$this->OrderProduct->updateAll(compact('archived'), array('OrderProduct.order_id' => $id));
+		$this->OrderProduct->updateAll(compact('archived'), ['OrderProduct.order_id' => $id]);
 		return true;
 	}
 	
 	public function updateProductStock($id) {
 		$orderProducts = $this->OrderProduct->find('all', array(
 			'fields' => 'OrderProduct.product_id',
-			'link' => array($this->alias),
+			'link' => [$this->alias],
 			'conditions' => array($this->escapeField('id') => $id),
 			'group' => 'OrderProduct.product_id',
 		));
@@ -154,46 +207,57 @@ class Order extends ShopAppModel {
 			$this->updateHandling($id);
 		}
 		
-		$totals = array();
+		$data = [];
 		//Product Totals
-		$options = array(
+		$query = array(
 			'fields' => array(
 				'SUM(OrderProduct.sub_total) AS sub_total',
 				'SUM(OrderProduct.shipping) AS shipping',
 			),
-			'link' => array('Shop.OrderProduct'),
+			'link' => ['Shop.OrderProduct'],
 			'group' => $this->escapeField('id'),
 		);
-		$options['conditions']['Order.id'] = $id;
-		$result = $this->find('first', $options);
-		$totals += $result[0];
+		$query['conditions']['Order.id'] = $id;
+		$result = $this->find('first', $query);
+		$data += $result[0];
 		
-		$options = array(
+		$query = array(
 			'fields' => array(
 				'SUM(OrdersHandlingMethod.amt + OrdersHandlingMethod.pct * ' . $subTotal . ') AS handling',
 				'-1 * SUM(OrdersPromoCode.amt + OrdersPromoCode.pct * ' . $subTotal . ') AS promo_discount',
 			),
-			'link' => array('Shop.OrdersHandlingMethod', 'Shop.OrdersPromoCode'),
+			'link' => ['Shop.OrdersHandlingMethod', 'Shop.OrdersPromoCode'],
 			'group' => $this->escapeField('id'),
 		);
-		$options['conditions']['Order.id'] = $id;
-		$result = $this->find('first', $options);
+		$query['conditions']['Order.id'] = $id;
+		$result = $this->find('first', $query);
 		//debug($result);
-		$totals += $result[0];
+		$data += $result[0];
 		
-		$totals['sub_total'] = $subTotal;
 
-		$total = array_sum($totals);
-		$totals['total'] = $total;
-		$this->updateAll($totals, array($this->escapeField('id') => $id));
-		//Updates Invoice
-		$this->copyModelToInvoice($this->id);
+		$data['sub_total'] = $subTotal;
+
+		$total = array_sum($data);
+		$data['total'] = $total;
+		$data[$this->primaryKey] = $id;
+		foreach ($data as $k => $v) {
+			if (empty($v)) {
+				$data[$k] = 0;
+			}
+		}
+
+		
+		$this->create();
+		$this->save($data, ['callbacks' => false]);
+
+		// Updates Invoice
+		$this->copyModelToInvoice($id);
 		return true;
 	}
 	
 	public function findProductOptions($id = null) {
 		$products = $this->OrderProduct->Product->find('list', array(
-			'link' => array('Shop.OrderProduct' => 'Shop.' . $this->alias),
+			'link' => ['Shop.OrderProduct' => 'Shop.' . $this->alias],
 			'conditions' => array($this->escapeField('id') => $id)
 		));
 		return $products;
@@ -203,24 +267,24 @@ class Order extends ShopAppModel {
 		//Removes de-activated or deleted handling rules
 		$this->OrdersHandlingMethod->removeUnused();
 		
-		$handlingIds = $this->OrdersHandlingMethod->find('list', array(
-			'fields' => array('HandlingMethod.id', 'OrdersHandlingMethod.id'),
-			'link' => array('Shop.HandlingMethod'),
-			'conditions' => array('OrdersHandlingMethod.order_id' => $id)
-		));
+		$handlingIds = $this->OrdersHandlingMethod->find('list', [
+			'fields' => ['HandlingMethod.id', 'OrdersHandlingMethod.id'],
+			'link' => ['Shop.HandlingMethod'],
+			'conditions' => ['OrdersHandlingMethod.order_id' => $id]
+		]);
 
-		$handlingMethods = $this->HandlingMethod->find('all', array(
-			'conditions' => array('HandlingMethod.active' => 1)
-		));
-		$data = array();
+		$handlingMethods = $this->HandlingMethod->find('all', [
+			'conditions' => ['HandlingMethod.active' => 1]
+		]);
+		$data = [];
 		foreach ($handlingMethods as $handlingMethod) {
-			$insert = array(
+			$insert = [
 				'handling_method_id' => $handlingMethod['HandlingMethod']['id'],
 				'order_id' => $id,
 				'title' => $handlingMethod['HandlingMethod']['title'],
 				'amt' => $handlingMethod['HandlingMethod']['amt'],
 				'pct' => $handlingMethod['HandlingMethod']['pct'],
-			);
+			];
 			if (!empty($handlingIds[$handlingMethod['HandlingMethod']['id']])) {
 				$insert['id'] = $handlingIds[$handlingMethod['HandlingMethod']['id']];
 			}
@@ -235,8 +299,8 @@ class Order extends ShopAppModel {
 				'Order.id', 
 				'SUM(OrderProduct.sub_total) AS sub_total',
 			),
-			'conditions' => array('Order.id' => $id),
-			'link' => array('Shop.Order'),
+			'conditions' => ['Order.id' => $id],
+			'link' => ['Shop.Order'],
 			'group' => 'Order.id'
 		);
 		$result = $this->OrderProduct->find(!empty($id) ? 'first' : 'all', $options);
@@ -244,22 +308,25 @@ class Order extends ShopAppModel {
 	}
 
 	public function findOrder($id) {
-		return $this->find('first', array(
+		$query = [
 			'fields' => '*',
-			'contain' => array(
-				'Invoice', 'ShippingMethod',
+			'contain' => [
+				'Invoice', 
+				'ShippingMethod',
 				'OrdersHandlingMethod', 'OrdersPromoCode',
-				'OrderProduct' => array('Product' => array('CatalogItem'))
-			),
-			'conditions' => array($this->escapeField('id') => $id)
-		));
+				'OrderProduct' => ['Product' => ['CatalogItem']],
+				'PromoCode',
+			],
+			'conditions' => [$this->escapeField('id') => $id]
+		];
+		return $this->find('first', $query);
 	}
 	
 	public function setSameBilling($id) {
-		$fields = array(
+		$fields = [
 			'first_name', 'last_name', 'addline1', 'addline2', 'city', 'state', 'zip', 'country',
 			'email', 'phone',
-		);
+		];
 		$result = $this->read(null, $id);
 		if (!empty($result[$this->alias]['same_billing'])) {
 			return $this->copyModelToInvoice($id, $fields);
@@ -302,7 +369,7 @@ class Order extends ShopAppModel {
 					'conditions' => array($this->escapeField('invoice_id') . ' = Invoice.id'),
 				),
 			),
-			'conditions' => array('Invoice.model <>' => 'Shop.Model')
+			'conditions' => ['Invoice.model <>' => 'Shop.Model']
 		));
 		if (!empty($orders)) {
 			$ids = Hash::extract($orders, 'Order.{n}.id');
@@ -333,25 +400,25 @@ class Order extends ShopAppModel {
 	
 	/*OLD FIND ORDER
 	function findOrder($id) {
-		$order = $this->find('first', array(
+		$order = $this->find('first', [
 			'fields' => '*',
-			'link' => array('Shop.Invoice', 'Shop.ShippingMethod'),
-			'postContain' => array('OrdersHandlingMethod', 'OrdersPromoCode'),				
-			'conditions' => array('Order.id' => $id)
-		));
+			'link' => ['Shop.Invoice', 'Shop.ShippingMethod'],
+			'postContain' => ['OrdersHandlingMethod', 'OrdersPromoCode'],				
+			'conditions' => ['Order.id' => $id]
+		]);
 		if (empty($order)) {
 			return false;
 		}
-		$orderProducts = $this->OrderProduct->find('all', array(
-			'contain' => array(
-				'Product' => array('CatalogItem'
+		$orderProducts = $this->OrderProduct->find('all', [
+			'contain' => [
+				'Product' => ['CatalogItem'
 				'ParentProduct',
 				'ProductOptionChoice1', 'ProductOptionChoice2', 'ProductOptionChoice3', 'ProductOptionChoice4',
-			),
-			'conditions' => array(
+			],
+			'conditions' => [
 				'OrderProduct.order_id' => $id,
-			)
-		));
+			]
+		]];
 		foreach ($orderProducts as $k => $orderProduct) {
 			$order['OrderProduct'][$k] = $orderProduct['OrderProduct'];
 			unset($orderProduct['OrderProduct']);

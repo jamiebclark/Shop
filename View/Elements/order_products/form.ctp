@@ -1,13 +1,13 @@
 <?php
 $add = !$this->Html->value('OrderProduct.id');
-$cashOptions = array('beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>','afterInput' => '</div>', 'step' => 'any', 'placeholder' => '0.00');
+$cashOptions = ['beforeInput' => '<div class="input-group"><span class="input-group-addon">$</span>','afterInput' => '</div>', 'step' => 'any', 'placeholder' => '0.00'];
 $inputs = array(
 	'fieldset' => false,
-	'id' => array('type' => 'hidden'),
-	'order_id' => array('type' => 'hidden'),
+	'id' => ['type' => 'hidden'],
+	'order_id' => ['type' => 'hidden'],
 	'product_id',
-	'parent_catalog_item_id' => array('type' => 'hidden'),
-	'quantity' => array('default' => 1),
+	'parent_catalog_item_id' => ['type' => 'hidden'],
+	'quantity' => ['default' => 1],
 	'price' => $cashOptions,
 	'sale' => $cashOptions + array('label' => 'Sale Price (if any)'),
 	'shipping' => $cashOptions,
@@ -24,7 +24,7 @@ if (!empty($catalogItem)) {
 	}
 }
 echo $this->Layout->defaultHeader();
-echo $this->Form->create('OrderProduct', array('class' => 'form-horizontal'));
+echo $this->Form->create('OrderProduct');
 echo $this->Form->inputs($inputs);
 echo $this->Form->submit($add ? 'Add To Order' : 'Update');
 echo $this->Form->end();

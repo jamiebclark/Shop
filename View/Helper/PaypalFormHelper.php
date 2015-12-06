@@ -18,16 +18,10 @@ class PaypalFormHelper extends AppHelper {
 	public $settings = [];
 	public $settingsCache = [];
 	
+	private $_areConstantsSet = false;
+
 	public function beforeRender($viewFile) {
-
-		// Set variables
-		$this->returnUrl = $this->getConstantValue('PAYPAL_RETURN_URL', 'Shop.Paypal.returnUrl');
-		$this->cancelReturnUrl = $this->getConstantValue('PAYPAL_CANCEL_URL', 'Shop.Paypal.cancelUrl');
-		$this->imageUrl = $this->getConstantValue(null, 'Shop.Paypal.imageUrl');
-		$this->userName = $this->getConstantValue('PAYPAL_USER_NAME', 'Shop.Paypal.userName');
-		$this->companyName = $this->getConstantValue('COMPANY_NAME', 'Shop.Paypal.companyName');
-
-		$this->cancelReturnUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];
+		$this->setConstants();
 		parent::beforeRender($viewFile);
 	}
 	
@@ -67,11 +61,16 @@ class PaypalFormHelper extends AppHelper {
 	}
 		
 	public function create($options = []) {
+		if (!$this->_areConstantsSet) {
+			$this->setConstants();
+		}
+
 		$options = array_merge([
 			'url' => 'https://www.paypal.com/cgi-bin/webscr',
 			'type' => 'POST',
 			'class' => 'paypal-form',
 		], $options);
+
 		return $this->Form->create(false, $options) . "\n";
 	}
 	
@@ -131,5 +130,17 @@ class PaypalFormHelper extends AppHelper {
 			return Configure::read($configKey);
 		}
 		return null;
+	}
+
+	private function setConstants() {
+		// Set variables
+		$this->returnUrl = $this->getConstantValue('PAYPAL_RETURN_URL', 'Shop.Paypal.returnUrl');
+		$this->cancelReturnUrl = $this->getConstantValue('PAYPAL_CANCEL_URL', 'Shop.Paypal.cancelUrl');
+		$this->imageUrl = $this->getConstantValue(null, 'Shop.Paypal.imageUrl');
+		$this->userName = $this->getConstantValue('PAYPAL_USER_NAME', 'Shop.Paypal.userName');
+		$this->companyName = $this->getConstantValue('COMPANY_NAME', 'Shop.Paypal.companyName');
+
+		$this->cancelReturnUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];
+		$this->_areConstantsSet = true;
 	}
 }

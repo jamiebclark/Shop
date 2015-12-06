@@ -1,10 +1,10 @@
 <?php
 class PromoCode extends ShopAppModel {
-	var $name = 'PromoCode';
-	var $hasMany = array('Shop.OrdersPromoCode');
-	var $hasAndBelongsToMany = array('Shop.Order');
+	public $name = 'PromoCode';
+	public $hasMany = ['Shop.OrdersPromoCode'];
+	public $hasAndBelongsToMany = ['Shop.Order'];
 	
-	function beforeValidate($options = array()) {
+	public function beforeValidate($options = []) {
 		$data =& $this->getData();
 		$data['code'] = $this->formatCode($data['code']);
 		
@@ -17,18 +17,21 @@ class PromoCode extends ShopAppModel {
 	}
 	
 	private function formatCode($code) {
-		return strtoupper(str_replace(' ', '', $code));
+		return trim(strtoupper(str_replace(' ', '', $code)));
 	}
 	
 	public function findActiveCode($code) {
-		return $this->find('first', array(
+		return $this->find('first', [
 			'recursive' => -1,
-			'conditions' => array(
-				$this->alias . '.code LIKE' => $code,
-				$this->alias . '.active' => 1,
-				$this->alias . '.started IS NULL OR ' . $this->alias . '.started <= NOW()',
-				$this->alias . '.stopped IS NULL OR ' . $this->alias . '.stopped >= NOW()',
-			)
-		));
+			'conditions' => [
+				'OR' => [
+					$this->escapeField('code') . ' LIKE' => $this->formatCode($code),
+					$this->escapeField() => $code,
+				],
+				$this->escapeField('active') => 1,
+				$this->escapeField('started') . ' IS NULL OR ' . $this->escapeField('started') . ' <= NOW()',
+				$this->escapeField('stopped') . ' IS NULL OR ' . $this->escapeField('stopped') . ' >= NOW()',
+			]
+		]);
 	}
 }

@@ -5,7 +5,7 @@
  **/
 App::uses('InflectorPlus', 'Layout.Lib');
 class InvoiceSyncBehavior extends ModelBehavior {
-	var $settings = array();
+	public $settings = array();
 	
 /**
  * Initiate behavior for the model using specific settings.
@@ -20,7 +20,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param array $settings Settings to override for model.
  * @return void
  **/
-	function setup(Model $Model, $settings = array()) {
+	public function setup(Model $Model, $settings = array()) {
 		$default = array(
 			'title' => InflectorPlus::humanize($Model->alias),
 			'fields' => array(),
@@ -44,7 +44,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		$Invoice->syncedModels[$Model->alias] = $Model->alias;
 	}
 	
-	function afterSave(Model $Model, $created, $options = array()) {
+	public function afterSave(Model $Model, $created, $options = array()) {
 		//Prevents infinite looping while still keeping Model's afterSave functions
 		if (empty($Model->_syncingWithInvoice)) {
 			$this->copyModelToInvoice($Model, $Model->id);
@@ -52,7 +52,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		return parent::afterSave($Model, $created, $options);
 	}
 	
-	function beforeDelete(Model $Model, $cascade = true) {
+	public function beforeDelete(Model $Model, $cascade = true) {
 		$result = $Model->find('first', array(
 			'contain' => array('Invoice'),
 			'conditions' => array($Model->escapeField($Model->primaryKey) => $Model->id)
@@ -71,7 +71,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param int $id Model ID
  * @return bool Save is successful
  **/
-	function copyModelToInvoice($Model, $id, $fields = null) {
+	public function copyModelToInvoice($Model, $id, $fields = null) {
 
 		//Prevents infinite looping while still keeping Model's afterSave functions
 		if (!empty($Model->_syncingWithInvoice) || !empty($Model->Invoice->_syncingWithModel)) {
@@ -130,7 +130,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param int $id Invoice id
  * @return bool/null Save is successful, null if no fields are present
  **/
-	function copyInvoiceToModel($Model, $invoiceId, $fields = null) {
+	public function copyInvoiceToModel($Model, $invoiceId, $fields = null) {
 		$alias = $Model->alias;
 
 		//Prevents infinite looping
