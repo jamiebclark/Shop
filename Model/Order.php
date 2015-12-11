@@ -358,27 +358,56 @@ class Order extends ShopAppModel {
 		return false;	
 	}
 
+/**
+ * Deletes old and empty orders
+ *
+ **/
 	public function deleteOldEmptyOrders() {
-		$db = $this->Invoice->getDataSource();
-		$orders = $this->find('all', array(
+		$db = $this->getDataSource();
+
+		// Finds orders with mis-matched invoices
+		$orders = $this->find('all', [
 			'recursive' => -1,
-			'joins' => array(
-				array(
+			'joins' => [
+				[
 					'table' => $db->fullTableName($this->Invoice),
 					'alias' => 'Invoice',
-					'conditions' => array($this->escapeField('invoice_id') . ' = Invoice.id'),
-				),
-			),
-			'conditions' => ['Invoice.model <>' => 'Shop.Model']
-		));
-		if (!empty($orders)) {
-			$ids = Hash::extract($orders, 'Order.{n}.id');
-		}
-		$this->updateAll(
-			array($this->escapeField('invoice_id') => null), 
-			array($this->escapeField() => $ids)
-		);
+					'type' => 'LEFT',
+					'conditions' => [$this->escapeField('invoice_id') . ' = Invoice.id'],
+				],
+			],
+			'conditions' => [
+				'NOT' => ['Invoice.model' => 'Shop.Model'],
+			],
+		]);
 
+		if (!empty($orders)) {
+			$ids = Hash::extract($orders, '{n}.Order.id');
+			$this->updateAll(
+				array($this->escapeField('invoice_id') => null), 
+				array($this->escapeField() => $ids)
+			);
+			$this->deleteAll([$this->escapeField() => $ids], null, true);
+		}
+
+		// Finds empty orders
+		$orders = $this->find('all', [
+			'recursive' => -1,
+			'joins' => [
+				[
+					'table' => $db->fullTablename($this->OrderProduct),
+					'alias' => 'OrderProduct',
+					'type' => 'LEFT',
+					'conditions' => 'OrderProduct.order_id = ' . $this->escapeField(),
+				]
+			],
+			'conditions' => ['OrderProduct.id' => null],
+		]);
+
+		if (!empty($orders)) {
+			$ids = Hash::extract($orders, '{n}.Order.id');
+			$this->deleteAll([$this->escapeField() => $ids], null, true);
+		}
 
 		return $this->deleteAll(array(
 			$this->escapeField('paid') => null,
@@ -395,7 +424,7 @@ class Order extends ShopAppModel {
 					$this->escapeField('created') . ' <' => date('Y-m-d H:i:s', strtotime('-2 days'))
 				)
 			)
-		));
+		), null, true);
 	}
 	
 	/*OLD FIND ORDER
