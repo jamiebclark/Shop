@@ -375,8 +375,16 @@ class Order extends ShopAppModel {
 					'type' => 'LEFT',
 					'conditions' => [$this->escapeField('invoice_id') . ' = Invoice.id'],
 				],
+				[
+					'table' => $db->fullTablename($this->OrderProduct),
+					'alias' => 'OrderProduct',
+					'type' => 'LEFT',
+					'conditions' => 'OrderProduct.order_id = ' . $this->escapeField(),
+				]
+
 			],
 			'conditions' => [
+				'OrderProduct.id' => NULL,
 				'NOT' => ['Invoice.model' => 'Shop.Order'],
 			],
 		]);
