@@ -366,7 +366,6 @@ class Order extends ShopAppModel {
 		$db = $this->getDataSource();
 
 		// Finds orders with mis-matched invoices
-		/*
 		$orders = $this->find('all', [
 			'recursive' => -1,
 			'joins' => [
@@ -378,7 +377,7 @@ class Order extends ShopAppModel {
 				],
 			],
 			'conditions' => [
-				'NOT' => ['Invoice.model' => 'Shop.Model'],
+				'NOT' => ['Invoice.model' => 'Shop.Order'],
 			],
 		]);
 
@@ -409,7 +408,6 @@ class Order extends ShopAppModel {
 			$ids = Hash::extract($orders, '{n}.Order.id');
 			$this->deleteAll([$this->escapeField() => $ids], null, true);
 		}
-		*/
 
 		return $this->deleteAll(array(
 			$this->escapeField('paid') => null,
