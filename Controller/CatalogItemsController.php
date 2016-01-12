@@ -1,7 +1,17 @@
 <?php
 class CatalogItemsController extends ShopAppController {
 	public $name = 'CatalogItems';
-	public $components = ['Shop.ShoppingCart', 'Layout.Table'];
+	public $components = [
+		'Shop.ShoppingCart', 
+		'Layout.Table',
+		'FormData.RemoveBlankData' => [
+			'Shop.CatalogItemOption' => ['title'],
+			'Shop.CatalogItemPackage' => [
+				'or' => ['package_id', 'qty'],
+			]
+		],
+	];
+	
 	public $helpers = [
 		'Shop.CatalogItem', 
 		'Layout.Crumbs' => [
@@ -568,18 +578,6 @@ class CatalogItemsController extends ShopAppController {
 	*/
 	public function _setFormElements() {
 		$this->set('catalogItemCategories', $this->CatalogItem->CatalogItemCategory->selectList());
-		$packageChildren = ['' => ' -- Package Content -- '] + $this->CatalogItem->find('list', [
-			'link' => [
-				'Shop.CatalogItemPackageParent' => [
-				'class' => 'Shop.CatalogItemPackage',
-				'conditions' => [
-					'CatalogItemPackageParent.catalog_item_parent_id = CatalogItem.id',
-				]
-			]],
-			'conditions' => ['CatalogItemPackageParent.id' => null],
-			'order' => ['CatalogItem.active DESC', 'CatalogItem.title'],
-		]);
-		$this->set(compact('packageChildren'));
 	}
 
 	public function _findOptions($options = [], $categoryId = null, $admin = false) {

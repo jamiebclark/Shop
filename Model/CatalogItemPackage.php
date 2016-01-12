@@ -1,31 +1,46 @@
 <?php
 class CatalogItemPackage extends ShopAppModel {
-	var $name = 'CatalogItemPackage';
-	var $actsAs = array(
-		'Shop.BlankDelete' => array('or' => array(
+	public $name = 'CatalogItemPackage';
+	public $actsAs = [
+		'Shop.BlankDelete' => ['or' => [
 			'catalog_item_child_id', 'quantity'
-		))
-	);
+		]]
+	];
 	
-	var $belongsTo = array(
-		'CatalogItemParent' => array(
+	public $belongsTo = [
+		'CatalogItemParent' => [
 			'className' => 'Shop.CatalogItem',
 			'foreignKey' => 'catalog_item_parent_id',
-		),
-		'CatalogItemChild' => array(
+		],
+		'CatalogItemChild' => [
 			'className' => 'Shop.CatalogItem',
 			'foreignKey' => 'catalog_item_child_id',
-		)
-	);
+		]
+	];
+
+	public $validate = [
+		'catalog_item_parent_id' => [
+			'rule' => 'notEmpty',
+			'message' => 'Please select a catalog item parent',
+		],
+		'catalog_item_child_id' => [
+			'rule' => 'notEmpty',
+			'message' => 'Please select a catalog item child',
+		],
+		'quantity' => [
+			'rule' => 'notEmpty',
+			'message' => 'Please select a quantity',
+		]
+	];
 	
-	function afterSave($created, $options = array()) {
+	public function afterSave($created, $options = []) {
 		$result = $this->read(null, $this->id);
 		
-		$this->CatalogItemParent->save(array(
+		$this->CatalogItemParent->save([
 			'id' => $result[$this->alias]['catalog_item_parent_id'],
 			'is_package' => 1,
 			'unlimited' => 1,
-		));
+		]);
 		
 		return parent::afterSave($created);
 	}

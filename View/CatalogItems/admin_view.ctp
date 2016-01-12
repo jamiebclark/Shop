@@ -1,4 +1,8 @@
-<?php echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
+<?php 
+$this->Html->script('Layout.element_input_list', ['inline' => false]);
+
+
+echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 	'title' => $catalogItem['CatalogItem']['title']
 ]); ?>
 <div class="row">
@@ -85,14 +89,57 @@
 		</div>
 
 		<div class="panel panel-default">
-		<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
-			<div class="panel-heading"><?php echo $catalogItemOption['title']; ?></div>
-			<ul class="list-group">
-			<?php foreach ($catalogItemOption['ProductOptionChoice'] as $productOptionChoice): ?>
-				<li class="list-group-item"><?php echo $productOptionChoice['title']; ?></li>
-			<?php endforeach; ?>
-			</ul>
-		<?php endforeach; ?>
+			<div class="panel-heading">
+				Production Options
+				<?php echo $this->Html->link('<i class="fa fa-plus"></i>', [
+						'controller' => 'catalog_item_options',
+						'action' => 'add',
+						$catalogItem['CatalogItem']['id'],
+					], [
+						'escape' => false, 
+						'class' => 'btn btn-default pull-right ajax-modal',
+						'data-modal-title' => 'Add option',
+					]
+				); ?>
+			</div>
+			<div class="panel-body">
+				<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<?php echo $catalogItemOption['title']; ?>
+							<div class="pull-right btn-group">
+								<?php echo $this->Html->link(
+									'<i class="fa fa-edit"></i>', [
+										'controller' => 'catalog_item_options',
+										'action' => 'edit',
+										$catalogItemOption['id']
+									], [
+										'class' => 'btn btn-default ajax-modal',
+										'data-modal-title' => 'Edit Option',
+										'escape' => false,
+									]
+								); ?>
+								<?php echo $this->Html->link(
+									'<i class="fa fa-times"></i>', [
+										'controller' => 'catalog_item_options',
+										'action' => 'delete',
+										$catalogItemOption['id']
+									], [
+										'class' => 'btn btn-danger',
+										'escape' => false,
+									], 
+									'Delete this option and all of it\'s associated choices?'
+								); ?>
+							</div>
+						</div>
+						<ul class="list-group">
+						<?php foreach ($catalogItemOption['ProductOptionChoice'] as $productOptionChoice): ?>
+							<li class="list-group-item"><?php echo $productOptionChoice['title']; ?></li>
+						<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endforeach; ?>
+			</div>
 		</div>
 
 		<div class="panel panel-default">
@@ -102,50 +149,55 @@
 			</div>
 		</div>
 
-		<?php
-		$this->Table->reset();
-		if (!empty($catalogItem['CatalogItemPackageChild'])):
-			foreach ($catalogItem['CatalogItemPackageChild'] as $catalogItemPackageChild):
-				$url = ['action' => 'view', $catalogItemPackageChild['CatalogItemChild']['id']];
-				$this->Table->cells(array(
-					array(
-						$this->CatalogItem->thumb(
-							$catalogItemPackageChild['CatalogItemChild'], 
-							['dir' => 'thumb', 'url' => $url]
-						)
-					), array(
-						$this->Html->link(
-							$catalogItemPackageChild['CatalogItemChild']['title'], 
-							$url
-						), 'CatalogItem'
-					), array(
-						$this->Html->link(
-							number_format($catalogItemPackageChild['quantity']), 
-							$url
-						), 'Quantity')
-				), true);
-			endforeach;
-		endif;
-		?>	
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<?php echo $this->Html->link('Packages',
-					['action' => 'packages', $catalogItem['CatalogItem']['id']]
+				<?php echo $this->Html->link('<i class="fa fa-plus"></i>',
+					['controller' => 'catalog_item_packages', 'action' => 'add', $catalogItem['CatalogItem']['id']],
+					['escape' => false, 'class' => 'pull-right btn btn-default ajax-modal', 'data-modal-title' => 'Add Package']
 				); ?>
+				Packages
 			</div>
-			<?php echo $this->Table->output(); ?>
+			<?php if (!empty($catalogItem['CatalogItemPackageChild'])): ?>
+				<ul class="list-group">
+				<?php foreach ($catalogItem['CatalogItemPackageChild'] as $catalogItemPackageChild):
+					$url = ['action' => 'view', $catalogItemPackageChild['CatalogItemChild']['id']];
+					?>
+					<li class="list-group-item">
+						<div class="pull-right">
+							<?php echo $this->ModelView->actionMenu(['edit', 'delete'], [
+									'url' => [
+										'controller' => 'catalog_item_packages', 
+										'action' => 'view', 
+										$catalogItemPackageChild['id']
+									]
+								]); ?>
+						</div>
+						<?php echo $this->Html->link(
+								$catalogItemPackageChild['CatalogItemChild']['title'], 
+								$url
+							);
+						?>
+						<span class="label label-default">
+							<?php echo number_format($catalogItemPackageChild['quantity']); ?>
+						</span>
+					</li>
+				<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>				
 		</div>
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<?php echo $this->Layout->actionMenu(['index'], [
-					'url' => [
+				<?php echo $this->Html->link('<i class="fa fa-plus"></i>', [
 						'controller' => 'catalog_item_images',
-						'action' => 'index',
+						'action' => 'add',
 						$catalogItem['CatalogItem']['id']
-					],
-					'class' => 'pull-right'
-				]); ?>
+					], [
+						'class' => 'pull-right btn btn-default ajax-modal', 
+						'escape' => false,
+						'data-modal-title' => 'Add Image',
+					]
+				); ?>
 				Photos
 			</div>
 			<?php

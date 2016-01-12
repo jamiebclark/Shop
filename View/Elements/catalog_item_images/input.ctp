@@ -19,7 +19,7 @@ if (isset($count)) {
 	<?php
 		echo $this->Form->inputs([
 			'fieldset' => false,
-			$prefix . 'id' => ['type' => 'hidden'],
+			$prefix . 'id' => ['type' => 'hidden', 'class' => 'element-input-list-key'],
 			$prefix . 'add_file' => ['type' => 'file'],
 			$prefix . 'filename' => ['type' => 'hidden'],
 			$prefix . 'thumb' => ['type' => 'checkbox', 'label' => 'Make Thumbnail', 'class' => 'checkbox'],

@@ -1,33 +1,40 @@
 <?php
 class CatalogItemOption extends ShopAppModel {
-	var $name = 'CatalogItemOption';
+	public $name = 'CatalogItemOption';
 
-	var $actsAs = array(
-		'Shop.BlankDelete' => array('title'),
-		'Shop.FieldOrder' => array(
+	public $actsAs = [
+		'Shop.BlankDelete' => ['title'],
+		'Shop.FieldOrder' => [
 			'orderField' => 'index',
-			'subKeyFields' => array('catalog_item_id')
-		),
+			'subKeyFields' => ['catalog_item_id']
+		],
 		'Layout.Removable',
-	);
+	];
 	
-	var $hasMany = array(
-		'ProductOptionChoice' => array(
+	public $hasMany = [
+		'ProductOptionChoice' => [
 			'className' => 'Shop.ProductOptionChoice',
 			'dependent' => true,
-		)
-	);
-	var $belongsTo = array('Shop.CatalogItem');
+		]
+	];
+	public $belongsTo = ['Shop.CatalogItem'];
+	
+	public $validate = [
+		'title' => [
+			'rule' => 'notEmpty',
+			'message' => 'Please give this option a title',
+		]
+	];
 	
 	/*
-	function beforeSave($options = array()) {
+	function beforeSave($options = []) {
 		$data =& $this->getData();
 		//If no index is set, add it to the bottom
 		if (empty($data['index'])) {
-			$index = $this->find('count', array(
+			$index = $this->find('count', [
 				'recursive' => -1,
-				'conditions' => array('catalog_item_id' => $data['catalog_item_id'])
-			));
+				'conditions' => ['catalog_item_id' => $data['catalog_item_id']]
+			]);
 			if (empty($data['id'])) {
 				$index++;
 			}
@@ -45,13 +52,13 @@ class CatalogItemOption extends ShopAppModel {
  * @return array Array of possible choices with index as keys
  */
 	public function findCatalogItemIndexes($catalogItemId, $keyField = 'index') {
-		$indexes = array();
-		$choices = $this->ProductOptionChoice->find('all', array(
+		$indexes = [];
+		$choices = $this->ProductOptionChoice->find('all', [
 			'fields' => '*',
-			'link' => array('Shop.' . $this->alias),
-			'conditions' => array($this->alias . '.catalog_item_id' => $catalogItemId),
+			'link' => ['Shop.' . $this->alias],
+			'conditions' => [$this->alias . '.catalog_item_id' => $catalogItemId],
 			'order' => $this->alias . '.index',
-		));
+		]);
 		foreach ($choices as $choice) {
 			$indexes[$choice[$this->alias][$keyField]][$choice['ProductOptionChoice']['id']] = $choice['ProductOptionChoice']['title'];
 		}
@@ -69,48 +76,48 @@ class CatalogItemOption extends ShopAppModel {
 	}
 	
 	function findCatalogItemOptions($catalogItemId) {
-		$catalogItemOptions = $this->find('all', array(
+		$catalogItemOptions = $this->find('all', [
 			'recursive' => -1,
-			'conditions' => array(
+			'conditions' => [
 				'CatalogItemOption.catalog_item_id' => $catalogItemId,
-			)
-		));
+			]
+		]);
 		
-		$unlimited = $this->CatalogItem->find('count', array(
-			'conditions' => array(
+		$unlimited = $this->CatalogItem->find('count', [
+			'conditions' => [
 				'CatalogItem.id' => $catalogItemId,
 				'CatalogItem.unlimited' => 1
-			)
-		));
-		$catalogItemOptions = array();
-		$ids = array();
+			]
+		]);
+		$catalogItemOptions = [];
+		$ids = [];
 		foreach ($catalogItemOptions as $key => $catalogItemOption) {
 			$ids[$key] = $catalogItemOption['CatalogItemOption']['id'];
 			$index = $catalogItemOption['CatalogItemOption']['index'];
 			if (!isset($products)) {
 				//Finds inventory for the first level of choices
 				$products = array(
-					$ids[$key] => $this->CatalogItem->Product->find('list', array(
-					'fields' => array(
+					$ids[$key] => $this->CatalogItem->Product->find('list', [
+					'fields' => [
 						'Product.product_option_choice_id_' . $index,
 						'Product.stock',
-					),
-					'link' => array('Shop.CatalogItem'),
-					'conditions' => array('CatalogItem.catalog_item_id' => $catalogItemId)
-				)));
+					],
+					'link' => ['Shop.CatalogItem'],
+					'conditions' => ['CatalogItem.catalog_item_id' => $catalogItemId]
+				]));
 			}
 		}
 		$keyLink = array_flip($ids);
 		
-		$choices = $this->ProductOptionChoice->find('list', array(
-			'fields' => array(
+		$choices = $this->ProductOptionChoice->find('list', [
+			'fields' => [
 				'ProductOptionChoice.id', 'ProductOptionChoice.title', 'ProductOptionChoice.catalog_item_option_id',
-			),
-			'conditions' => array('ProductOptionChoice.catalog_item_option_id' => $ids)
-		));
+			],
+			'conditions' => ['ProductOptionChoice.catalog_item_option_id' => $ids]
+		]);
 		foreach ($choices as $optionId => $choice) {
 			if (!$unlimited && isset($products[$optionId])) {
-				$advancedChoice = array();
+				$advancedChoice = [];
 				foreach ($choice as $value => $name) {
 					$stock = !empty($products[$optionId][$value]) ? $products[$optionId][$value] : 0;
 					$disabled = $stock <= 0;

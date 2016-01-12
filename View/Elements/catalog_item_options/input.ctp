@@ -15,6 +15,7 @@ foreach ($catalogItemOptions as $row):
 		'type' => 'select',
 		'options' => $options,
 		'label' => $title,
+		'class' => 'element-input-list-key',
 	));
 	$index++;
 endforeach;
