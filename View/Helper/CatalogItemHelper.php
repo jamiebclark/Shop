@@ -6,20 +6,20 @@ class CatalogItemHelper extends ModelViewHelper {
 	public $name = 'CatalogItem';
 	public $modelPlugin = 'Shop';
 	
-	public $helpers = array(
+	public $helpers = [
 		'Html', 
 		'Form', 
 		'Photo', 
-	);
+	];
 	
 	public $thumbDir = 'catalog_item_images/';
 	
-	public function beforeRender($viewFile, $options = array()) {
-		$this->Html->css('Shop.style', null, array('inline' => false));
+	public function beforeRender($viewFile, $options = []) {
+		$this->Html->css('Shop.style', null, ['inline' => false]);
 		return parent::beforeRender($viewFile, $options);
 	}
 	
-	public function media($result, $options = array()) {
+	public function media($result, $options = []) {
 		$result = $this->_getResult($result);
 		$options = array_merge(array(
 			'titleTag' => 'h3',
@@ -30,12 +30,12 @@ class CatalogItemHelper extends ModelViewHelper {
 			$options = $this->addClass($options, 'inactive');
 		}
 		if (!empty($result['short_description'])) {
-			$options['after'] = $this->DisplayText->text($result['short_description'], array('tag' => 'p'));
+			$options['after'] = $this->DisplayText->text($result['short_description'], ['tag' => 'p']);
 		}
 		return parent::media($result, $options);
 	}
 	/*
-	function media($catalogItem, $options = array()) {
+	function media($catalogItem, $options = []) {
 		$options = array_merge(array(
 			'url' => $this->modelUrl($catalogItem),
 			'dir' => 'thumb',
@@ -46,13 +46,13 @@ class CatalogItemHelper extends ModelViewHelper {
 		if (!empty($options['url'])) {
 			$title = $this->Html->link($title, $options['url']);
 		}
-		$body = $this->Html->tag('h2', $title, array('class' => 'media-title'));
+		$body = $this->Html->tag('h2', $title, ['class' => 'media-title']);
 		return $this->Html->div('catalogitem media', $thumb . $this->Html->div('media-body', $body));
 	}
 	*/
 	
 	/*
-	function thumb($catalogItem, $options = array()) {
+	function thumb($catalogItem, $options = []) {
 		$src = $this->thumbDir;
 		if (!empty($options['dir'])) {
 			$options = $this->addClass($options, $options['dir']);
@@ -63,7 +63,7 @@ class CatalogItemHelper extends ModelViewHelper {
 			$options['url'] = $this->modelUrl($catalogItem);
 		}
 		$src .= $catalogItem['filename'];
-		$file = str_replace(array('/','\\'), DS, SHOP_WWW_ROOT . 'img' . DS . $src);
+		$file = str_replace(['/','\\'], DS, SHOP_WWW_ROOT . 'img' . DS . $src);
 		$filename = 'Shop.' . $src;
 		if (is_file($file)) {
 			return isset($options['filename']) ? $filename : $this->Html->image($filename, $options);
@@ -73,28 +73,28 @@ class CatalogItemHelper extends ModelViewHelper {
 	}
 	*/
 	
-	public function thumbOptions($result, $options = array()) {
-		$options = array_merge(array(
+	public function thumbOptions($result, $options = []) {
+		$options = array_merge([
 			'externalServer' => false,
 			'root' => SHOP_WWW_ROOT . 'img' . DS,
 			'plugin' => 'Shop',
 			'defaultFile' => false,
-		), $options);
+		], $options);
 		return parent::thumbOptions($result, $options);
 	}
 	
-	public function link ($CatalogItem, $options = array(), $onClick = null) {
-		$options = array_merge(array(
+	public function link ($CatalogItem, $options = [], $onClick = null) {
+		$options = array_merge([
 			'class' => '',
 			'escape' => true,
-		), $options);
+		], $options);
 		$options['class'] .= ' catalogitem';
 		$url = Param::keyCheck($options, 'url', false, $this->modelUrl($CatalogItem));
 		
 		return $this->Html->link($CatalogItem['title'], $url, $onClick);
 	}
 	
-	public function modelUrl($result, $options = array()) {
+	public function modelUrl($result, $options = []) {
 		$result = $this->_getResult($result);
 		return array(
 			'controller' => 'catalog_items', 
@@ -106,7 +106,7 @@ class CatalogItemHelper extends ModelViewHelper {
 	}
 	
 	public function notes($catalogItem) {
-		$notes = array();
+		$notes = [];
 		if ($catalogItem['min_quantity'] > 1) {
 			$notes[] = 'Minimum order of ' . number_format($catalogItem['min_quantity']);
 		}
@@ -159,7 +159,7 @@ class CatalogItemHelper extends ModelViewHelper {
 		}
 		$class = $this->getInventoryClass($qty, $unlimited);
 		if ($class == 'error') {
-			$class = 'important';
+			$class = 'danger';
 		}
 		$class = 'label label-' . $class;
 		return $this->Html->tag('span', $out, compact('class'));
@@ -168,17 +168,17 @@ class CatalogItemHelper extends ModelViewHelper {
 	public function price($catalogItem) {
 		$out = '';
 		if ($catalogItem['sale'] > 0) {
-			$out .= $this->cash($catalogItem['sale'], array('class' => 'cash-sale'));
+			$out .= $this->cash($catalogItem['sale'], ['class' => 'cash-sale']);
 			$out .= ' ';
-			$out .= $this->cash($catalogItem['price'], array('class' => 'cash-old'));
+			$out .= $this->cash($catalogItem['price'], ['class' => 'cash-old']);
 		} else {
 			$out .= $this->cash($catalogItem['price']);
 		}
-		return $this->Html->tag('span', $out, array('class' => 'catalogitem-price'));
+		return $this->Html->tag('span', $out, ['class' => 'catalogitem-price']);
 	}
 	
-	public function cash($num, $options = array()) {
-		$options = array_merge(array('tag' => 'font'), $options);
+	public function cash($num, $options = []) {
+		$options = array_merge(['tag' => 'font'], $options);
 		extract($this->addClass($options, 'cash'));
 		$out = '$' . number_format($num, $num == round($num) ? 0 : 2);
 		if (!empty($tag)) {
@@ -196,14 +196,14 @@ class CatalogItemHelper extends ModelViewHelper {
 		foreach ($catalogItemCategories as $catalogItemCategory) {
 			$list = '';
 			foreach ($catalogItemCategory as $id => $title) {
-				$url = array('controller' => 'catalog_items', 'action' => 'index', 'category' => $id);
+				$url = ['controller' => 'catalog_items', 'action' => 'index', 'category' => $id];
 				if (!empty($list)) {
 					$list .= ' / ';
 				}
 				$list .= $this->Html->link($title, $url);
 			}
 			$out .= $this->Html->div('catalogitemcategory',
-				$this->Html->tag('span', $list, array('class' => 'badge badge-catalogitem-category'))
+				$this->Html->tag('span', $list, ['class' => 'badge badge-catalogitem-category'])
 			);
 		}
 		return $this->Html->div('catalogitemcategory-list', $out);
