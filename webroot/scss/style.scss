@@ -14,15 +14,21 @@
 }
 
 .qty, .cash {
-	font-size: 20px;
+	font-size: $cash-font-size;
 }
-.cash-sale {
-	color: #660000;
+.cash {
+	&-sale {
+		color: #660000;
+	}
+	&-old {
+		color: #666;
+		text-decoration: line-through;
+	}
+	&-addon {
+		font-size: .75em;
+	}
 }
-.cash-old {
-	color: #666;
-	text-decoration: line-through;
-}
+
 th.cash, td.cash {
 	width: 120px;
 	text-align: right;

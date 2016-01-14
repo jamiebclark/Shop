@@ -126,7 +126,7 @@ if ($title) {
 					}
 					$this->Table->cell(
 						$cell,
-						$this->Form->submit('Update', ['name' => 'update', 'div' => false]),
+						$this->Form->button('Update', ['type' => 'submit', 'name' => 'update', 'div' => false]),
 						['class' => 'quantity']
 					);
 				} else {

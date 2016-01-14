@@ -178,9 +178,9 @@ class CatalogItemHelper extends ModelViewHelper {
 	}
 	
 	public function cash($num, $options = []) {
-		$options = array_merge(['tag' => 'font'], $options);
+		$options = array_merge(['tag' => 'span'], $options);
 		extract($this->addClass($options, 'cash'));
-		$out = '$' . number_format($num, $num == round($num) ? 0 : 2);
+		$out = '<span class="cash-addon">$</span>' . number_format($num, $num == round($num) ? 0 : 2);
 		if (!empty($tag)) {
 			$out = $this->Html->tag($tag, $out, compact('class', 'style'));
 		}

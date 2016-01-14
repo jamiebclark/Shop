@@ -1,19 +1,14 @@
-<style type="text/css">
-.catalogitem-image-thumb-list img {
-	display: block;
-	float: left;
-	width: 33%;
-}
-.catalogitem-images .main {
-	width: 100%;
-}
-.add-cart .catalogitem-price {
-	line-height: 80px;
-}
-.add-cart .catalogitem-price .cash {
-	font-size: 40px;
-}
-</style>
+<?php
+$this->Html->css('Shop.catalog_item_view', null, ['inline' => false]);
+?>
+
+<?php if (empty($catalogItem['CatalogItem']['active'])): ?>
+	<div class="alert alert-warning">
+		<h2 class="alert-title">Inactive Product</h2>
+		<p class="lead">Sorry, this product isn't currently active in the store. It's not currently available for purchase.</p>
+	</div>
+<?php endif; ?>
+
 <div class="catalogitem-view">
 <?php echo $this->Form->create('OrderProduct', ['action' => 'add']); ?>
 	<div class="row">
@@ -87,9 +82,11 @@
 				<div class="col-sm-4 add-cart">
 					<div class="panel panel-default">
 						<div class="panel-body">
-							<?php 
-							if (!$this->CatalogItem->hasStock($catalogItem['CatalogItem'])): ?>
-								<h3>Out of stock</h3>
+							<?php if (empty($catalogItem['CatalogItem']['active'])): ?>
+								<h3 class="heading-topper">Unavailable</h3>
+								<p>This product isn't currently available in the store</p>
+							<?php elseif (!$this->CatalogItem->hasStock($catalogItem['CatalogItem'])): ?>
+								<h3 class="heading-topper">Out of stock</h3>
 								<p>Sorry, this item is temporarily out of stock. Please check back soon for inventory updates</p><?php 
 							else: ?>
 								<?php

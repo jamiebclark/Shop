@@ -1,0 +1,16 @@
+.catalogitem-image-thumb-list img {
+	display: block;
+	float: left;
+	width: 33%;
+}
+.catalogitem-images .main {
+	width: 100%;
+}
+.add-cart .catalogitem-price {
+	display: block;
+	line-height: 80px;
+	text-align: center;
+}
+.add-cart .catalogitem-price .cash {
+	font-size: 40px;
+}
