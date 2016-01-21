@@ -220,7 +220,9 @@ class InvoiceHelper extends ModelViewHelper {
 			?>
 			<div class="invoice-payment col-md-<?php echo $col; ?>">
 				<div class="panel panel-default">
-					<div class="panel-heading"><?php echo $title; ?></div>
+					<div class="panel-heading">
+						<span class="panel-title"><?php echo $title; ?></span>
+					</div>
 					<div class="panel-body">
 						<div class="invoice-payment-wrap">
 							<div class="info"><?php echo $info; ?></div>

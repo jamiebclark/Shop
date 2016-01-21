@@ -18,7 +18,9 @@
 	}
 	?>
 	<div class="panel panel-default">
-		<div class="panel-heading"><?php echo $title; ?></div>
+		<div class="panel-heading">
+			<span class="panel-title"><?php echo $title; ?></span>
+		</div>
 		<?php echo $output; ?>
 	</div>
 <?php endif;

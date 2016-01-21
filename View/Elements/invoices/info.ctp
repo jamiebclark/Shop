@@ -25,13 +25,13 @@ if (isset($result['PaymentMethod'])) {
 <div class="row">
 	<div class="col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading">Payment Information</div>
+			<div class="panel-heading"><span class="panel-title">Payment Information</span></div>
 			<?php echo $this->Layout->infoTable($payment); ?>
 		</div>
 	</div>
 	<div class="col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading">Customer Information</div>
+			<div class="panel-heading"><span class="panel-title">Customer Information</span></div>
 			<?php echo $this->Layout->infoTable($customer); ?>
 		</div>
 	</div>

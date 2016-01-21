@@ -34,7 +34,7 @@ $info = array(
 <div class="row">
 	<div class="col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading">About</div>
+			<div class="panel-heading"><span class="panel-title">About</span></div>
 			<?php echo $this->Layout->infoTable($info); ?>
 		</div>
 	</div>
@@ -101,7 +101,7 @@ $info = array(
 		}
 		?>
 		<div class="panel panel-default">
-			<div class="panel-heading">Order Auto-Updating</div>
+			<div class="panel-heading"><span class="panel-title">Order Auto-Updating</span></div>
 			<ul class="list-group">
 				<?php foreach ($info as $row): ?>
 					<li class="list-group-item"><?php echo $row; ?></li>

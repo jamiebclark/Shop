@@ -3,7 +3,7 @@ $class = 'panel ';
 $class .= $this->Html->value('Order.shipped') ? 'panel-success' : 'panel-warning';
 ?>
 <div class="<?php echo $class;?>">
-	<div class="panel-heading">Shipping</div>
+	<div class="panel-heading"><span class="panel-title">Shipping</span></div>
 	<div class="panel-body">
 		<?php
 		echo $this->FormLayout->inputDatetime('shipped', array(

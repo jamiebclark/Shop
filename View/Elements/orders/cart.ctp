@@ -44,7 +44,9 @@ if ($title) {
 ?>
 <div class="<?php echo $wrapClass;?>">
 	<div class="panel panel-default">
-		<div class="panel-heading"><?php echo $title; ?></div><?php
+		<div class="panel-heading">
+			<span class="panel-title"><?php echo $title; ?></span>
+		</div><?php
 		if ($form) {
 			echo $this->Form->create('Order', ['action' => 'edit']);
 			echo $this->Form->hidden('id', ['value' => $order['Order']['id']]);

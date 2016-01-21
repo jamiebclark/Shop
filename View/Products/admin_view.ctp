@@ -28,7 +28,7 @@ if (!empty($products)) {
 }
 ?>
 <div class="panel panel-default">
-	<div class="panel-heading">About</div>
+	<div class="panel-heading"><span class="panel-title">About</span></div>
 	<?php echo $this->Layout->infoTable($info); ?>
 </div>
 
@@ -49,6 +49,6 @@ foreach ($productInventoryAdjustments as $productInventoryAdjustment) {
 }
 ?>
 <div class="panel panel-default">
-	<div class="panel-heading">Inventory History</div>
+	<div class="panel-heading"><span class="panel-title">Inventory History</span></div>
 	<?php echo $this->Table->output(['paginate' => true]); ?>
 </div>

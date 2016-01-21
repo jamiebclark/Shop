@@ -60,7 +60,7 @@ $this->Html->css('Shop.catalog_item_view', null, ['inline' => false]);
 					<?php if (!empty($catalogItem['CatalogItemPackageChild'])): ?>
 					<div class="package">
 						<div class="panel panel-default">
-							<div class="panel-heading">Packaged Item</div>
+							<div class="panel-heading"><span class="panel-title">Packaged Item</span></div>
 							<div class="panel-body">This product contains the following items:</div>
 							<?php
 							echo $this->element('catalog_item_packages/child_table', [
@@ -72,7 +72,7 @@ $this->Html->css('Shop.catalog_item_view', null, ['inline' => false]);
 					<?php endif; ?>
 					<?php if (!empty($catalogItemCategories)): ?>
 						<div class="panel panel-default">
-							<div class="panel-heading">Categories</div>
+							<div class="panel-heading"><span class="panel-title">Categories</span></div>
 							<div class="panel-body">
 								<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
 							</div>

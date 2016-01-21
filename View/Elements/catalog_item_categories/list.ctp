@@ -14,7 +14,9 @@
 				$title = 'Categories';
 			}
 			?>
-			<div class="panel-heading"><?php echo $title; ?></div>
+			<div class="panel-heading">
+				<span class="panel-title"><?php echo $title; ?></span>
+			</div>
 		<?php endif;
 		
 		if (!empty($catalogItemCategories)):

@@ -3,7 +3,7 @@
 <div class="row">
 	<div class="col-sm-6">
 		<div class="panel panel-default">
-			<div class="panel-heading">Shipping</div>
+			<div class="panel-heading"><span class="panel-title">Shipping</span></div>
 			<div class="panel-body">
 				<?php  
 				echo $this->Form->hidden('id');

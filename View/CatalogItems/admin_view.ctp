@@ -8,19 +8,19 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 <div class="row">
 	<div class="col-sm-8">
 		<div class="panel panel-default">
-			<div class="panel-heading">Short Description</div>
+			<div class="panel-heading"><span class="panel-title">Short Description</span></div>
 			<div class="panel-body">
 				<?php echo $this->DisplayText->text($catalogItem['CatalogItem']['short_description'], ['class' => 'well']); ?>
 			</div>
 
-			<div class="panel-heading">Description</div>
+			<div class="panel-heading"><span class="panel-title">Description</span></div>
 			<div class="panel-body">
 				<?php echo $this->DisplayText->text($catalogItem['CatalogItem']['description'], ['class' => 'well']); ?>
 			</div>
 		</div>
 
 		<div class="panel panel-default">
-			<div class="panel-heading">About</div><?php
+			<div class="panel-heading"><span class="panel-title">About</span></div><?php
 			echo $this->Layout->infoResultTable($catalogItem['CatalogItem'], [
 					'price' => ['format' => 'cash'],
 					'sale' => ['format' => 'cash', 'notEmpty', 'class' => 'sale'],
@@ -63,7 +63,7 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 					'url' => ['action' => 'shipping_rules', $catalogItem['CatalogItem']['id']],
 					'class' => 'pull-right'
 				]); ?>
-				Shipping Rules
+				<span class="panel-title">Shipping Rules</span>
 			</div>
 			<?php echo $this->Table->output(); ?>
 		</div>
@@ -74,7 +74,7 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 					'url' => ['controller' => 'product_inventory_adjustments', 'action' => 'add'],
 					'class' => 'pull-right'
 				]);?>
-				Inventory History
+				<span class="panel-title">Inventory History</span>
 			</div>
 			<?php echo $this->element('product_inventory_adjustments/table'); ?>
 		</div>
@@ -143,7 +143,7 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 		</div>
 
 		<div class="panel panel-default">
-			<div class="panel-heading">Categories</div>
+			<div class="panel-heading"><span class="panel-title">Categories</span></div>
 			<div class="panel-body">
 				<?php echo $this->CatalogItem->categories($catalogItemCategories); ?>
 			</div>
@@ -155,7 +155,7 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 					['controller' => 'catalog_item_packages', 'action' => 'add', $catalogItem['CatalogItem']['id']],
 					['escape' => false, 'class' => 'pull-right btn btn-default ajax-modal', 'data-modal-title' => 'Add Package']
 				); ?>
-				Packages
+				<span class="panel-title">Packages</span>
 			</div>
 			<?php if (!empty($catalogItem['CatalogItemPackageChild'])): ?>
 				<ul class="list-group">
@@ -198,8 +198,8 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 						'data-modal-title' => 'Add Image',
 					]
 				); ?>
-				Photos
-			</div>
+				<span class="panel-title">Photos
+			</span></div>
 			<?php
 				echo $this->CatalogItemImage->mediaList($catalogItem['CatalogItemImage'], [
 					'dir' => 'thumb',
