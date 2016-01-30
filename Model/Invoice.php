@@ -213,26 +213,38 @@ class Invoice extends ShopAppModel {
  **/
 	public function fixTotals() {
 		$Pdo = getModelPDO($this);
-		$Sth = $Pdo->query('SELECT id, model, model_id, paid FROM `invoices` WHERE amt = 0');
+		$Sth = $Pdo->query('SELECT id, model, model_id, paid, amt FROM `invoices` WHERE amt = 0');
 		$startCount = $Sth->rowCount();
 		
 		$ids = [];
 		while ($row = $Sth->fetch()) {
+			$deleteId = null;
 			$ids[] = $row['id'];
 			if (!empty($row['model']) && !empty($row['model_id'])) {
 				$Model = ClassRegistry::init($row['model'], true);
 				if (!empty($Model)) {
 					//If Invoice has been paid or the Model exists, sync the totals, otherwise delete it
-					if (!empty($row['paid']) || $Model->read(null, $row['model_id'])) {
+					$result = $Model->read(null, $row['model_id']);
+					$isFound = !empty($result);
+					$isPaid = $row['amt'] > 0 && !empty($row['paid']);
+
+					if ($isPaid || $isFound) {
 						$Model->create();
 						$Model->copyModelToInvoice($row['model_id']);
 					} else {
-						debug(sprintf('ID #%d should be deleted', $row['id']));
-						$this->delete($row['id']);
+						$deleteId = $row['id'];
 					}
 				}
+			} else {
+				$deleteId = $row['id'];
+			}
+
+			if (!empty($deleteId)) {
+				debug(sprintf('ID #%d should be deleted', $deleteId));
+				$this->delete($row['id']);
 			}
 		}
+
 		$result = $this->find('all', ['conditions' => [
 			'Invoice.id' => $ids,
 			'Invoice.amt' => 0,

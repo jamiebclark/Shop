@@ -101,6 +101,8 @@ class Order extends ShopAppModel {
 		
 		$this->read(null, $id);
 
+		debug(Debugger::trace());
+
 		return parent::afterSave($created);
 	}
 	

@@ -5,8 +5,10 @@
  **/
 App::uses('InflectorPlus', 'Layout.Lib');
 class InvoiceSyncBehavior extends ModelBehavior {
-	public $settings = array();
+	public $settings = [];
 	
+	// Stores invoice deleting info between beforeDelete and afterDelete
+	private $_deleteInvoiceId;
 /**
  * Initiate behavior for the model using specific settings.
  *
@@ -20,10 +22,10 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @param array $settings Settings to override for model.
  * @return void
  **/
-	public function setup(Model $Model, $settings = array()) {
+	public function setup(Model $Model, $settings = []) {
 		$default = array(
 			'title' => InflectorPlus::humanize($Model->alias),
-			'fields' => array(),
+			'fields' => [],
 		);
 		if (empty($Model->belongsTo['Invoice'])) {
 			throw new Exception("Cannot use InvoiceSync Behavior without having {$Model->alias} belongTo Invoice");
@@ -39,12 +41,12 @@ class InvoiceSyncBehavior extends ModelBehavior {
 		$Invoice = ClassRegistry::init('Shop.Invoice');
 		$Invoice->bindModel(array('hasOne' => array($Model->alias => array('className' => $this->getModelName($Model)))), false);
 		if (empty($Invoice->syncedModels)) {
-			$Invoice->syncedModels = array();
+			$Invoice->syncedModels = [];
 		}
 		$Invoice->syncedModels[$Model->alias] = $Model->alias;
 	}
 	
-	public function afterSave(Model $Model, $created, $options = array()) {
+	public function afterSave(Model $Model, $created, $options = []) {
 		//Prevents infinite looping while still keeping Model's afterSave functions
 		if (empty($Model->_syncingWithInvoice)) {
 			$this->copyModelToInvoice($Model, $Model->id);
@@ -54,14 +56,23 @@ class InvoiceSyncBehavior extends ModelBehavior {
 	
 	public function beforeDelete(Model $Model, $cascade = true) {
 		$result = $Model->find('first', array(
-			'contain' => array('Invoice'),
+			'contain' => ['Invoice'],
 			'conditions' => array($Model->escapeField($Model->primaryKey) => $Model->id)
 		));
-		//If invoice hasn't been paid, it deletes the invoice too
-		if (!empty($result['Invoice']['id']) && empty($result['Invoice']['paid'])) {
-			$Model->Invoice->deleteAll(array('Invoice.id' => $result['Invoice']['id']), false, false);
+		
+		// If invoice hasn't been paid or if it's empty, delete the invoice too
+		if (!empty($result['Invoice']['id']) && (empty($result['Invoice']['paid']) || empty($result['Invoice']['amt']))) {
+			$this->_deleteInvoiceId = $result['Invoice']['id'];
 		}
 		return parent::beforeDelete($Model, $cascade);
+	}
+
+	public function afterDelete(Model $Model) {
+		if (!empty($this->_deleteInvoiceId)) {
+			$Model->Invoice->deleteAll(['Invoice.id' => $this->_deleteInvoiceId], true, false);
+			$this->_deleteInvoiceId = null;
+		}
+		return parent::afterDelete($Model);
 	}
 	
 /**
@@ -72,11 +83,11 @@ class InvoiceSyncBehavior extends ModelBehavior {
  * @return bool Save is successful
  **/
 	public function copyModelToInvoice($Model, $id, $fields = null) {
-
 		//Prevents infinite looping while still keeping Model's afterSave functions
 		if (!empty($Model->_syncingWithInvoice) || !empty($Model->Invoice->_syncingWithModel)) {
 			return null;
 		}
+	
 		$Model->Invoice->_syncingWithModel = true;
 
 		$settings =& $this->settings[$Model->alias];
@@ -88,7 +99,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 
 		$result = $Model->find('first', array(
 			'fields' => '*', 
-			'link' => array('Shop.Invoice'),
+			'link' => ['Shop.Invoice'],
 			'conditions' => array($Model->escapeField() => $id)
 		));
 
@@ -110,7 +121,7 @@ class InvoiceSyncBehavior extends ModelBehavior {
 					$value = $result[$Model->alias][$modelField];
 				} else if (!empty($invoiceSchema[$invoiceField]['null'])) {
 					$value = null;
-				} else if (in_array($invoiceSchema[$invoiceField]['type'], array('integer', 'float'))) {
+				} else if (in_array($invoiceSchema[$invoiceField]['type'], ['integer', 'float'])) {
 					$value = 0;
 				} else {
 					$value = '';
@@ -118,7 +129,8 @@ class InvoiceSyncBehavior extends ModelBehavior {
 				$data['Invoice'][$invoiceField] = $value;
 			}
 		}
-		$success = $Model->Invoice->saveAll($data, array('callbacks' => false, 'validate' => false));
+		$Model->Invoice->create();
+		$success = $Model->Invoice->saveAll($data, ['callbacks' => false, 'validate' => false]);
 		$Model->Invoice->_syncingWithModel = null;
 		return $success;
 	}
@@ -145,24 +157,24 @@ class InvoiceSyncBehavior extends ModelBehavior {
 			$fields = $settings['fields'];
 		}
 		if (!empty($fields)) {
-			$result = $Model->Invoice->find('first', array(
-				'contain' => array($alias),
-				'conditions' => array('Invoice.id' => $invoiceId)
-			));
+			$result = $Model->Invoice->find('first', [
+				'contain' => [$alias],
+				'conditions' => ['Invoice.id' => $invoiceId]
+			]);
 			if (empty($result[$alias])) {
 				$success = null;
 			} else {
-				$data = array(
-					$alias => array($Model->primaryKey => $result[$alias][$Model->primaryKey]), 
-					'Invoice' => array('id' => $invoiceId)
-				);
+				$data = [
+					$alias => [$Model->primaryKey => $result[$alias][$Model->primaryKey]], 
+					'Invoice' => ['id' => $invoiceId]
+				];
 				foreach ($fields as $modelField => $invoiceField) {
 					if (is_numeric($modelField)) {
 						$modelField = $invoiceField;
 					}
 					$data[$alias][$modelField] = $result['Invoice'][$invoiceField];
 				}
-				$success = $Model->saveAll($data, array('callbacks' => false, 'validate' => false));
+				$success = $Model->saveAll($data, ['callbacks' => false, 'validate' => false]);
 				if (method_exists($Model, 'afterCopyInvoiceToModel')) {
 					$Model->afterCopyInvoiceToModel($result[$alias][$Model->primaryKey], $invoiceId);
 				}
