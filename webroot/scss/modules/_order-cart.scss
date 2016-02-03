@@ -2,6 +2,11 @@
 .order-cart {
 	overflow: hidden;
 	
+	> .panel > form {
+		max-width: none;
+		margin-bottom: 0;
+	}
+	
 	td, th {
 		border: 0;
 	}
