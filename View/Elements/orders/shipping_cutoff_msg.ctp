@@ -15,7 +15,7 @@ if (defined('STORE_SHIPPING_CUTOFF')):
 
 	if ($cutoffDaysAway < 0) {
 		$title .= 'PASSED';
-		$class = 'danger';
+		$class = 'warning';
 		if ($superBowlDaysAway > 0) {
 			$msg .= 'With the Big Game so close (Less than '. $superBowlDaysAway . ' days away!)';
 		} else {
@@ -23,7 +23,7 @@ if (defined('STORE_SHIPPING_CUTOFF')):
 		}
 		$msg .= ', we cannot ensure that items ordered will be delivered in time for your group\'s collection.';
 	} else if ($cutoffDaysAway <= 7) {
-		$class = 'warning';
+		$class = 'info';
 		if ($cutoffToday) {
 			$title .= 'TODAY';
 		} else {

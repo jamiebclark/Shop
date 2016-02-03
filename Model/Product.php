@@ -142,8 +142,8 @@ class Product extends ShopAppModel {
 		$checkQuantity = $result[$this->alias]['stock'] - $quantity;
 		if (!empty($result['CatalogItem']['unlimited'])) {
 			return true;
-		} else if (!empty($checkQuantity)) {
-			return $checkQuantity >= 0;
+		} else if ($checkQuantity >= 0) {
+			return true;
 		} else {
 			return false;
 		}
