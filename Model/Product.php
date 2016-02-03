@@ -143,7 +143,7 @@ class Product extends ShopAppModel {
 		if (!empty($result['CatalogItem']['unlimited'])) {
 			return true;
 		} else if (!empty($checkQuantity)) {
-			return $checkQuantity > 0;
+			return $checkQuantity >= 0;
 		} else {
 			return false;
 		}
