@@ -100,9 +100,6 @@ class Order extends ShopAppModel {
 		$this->updateProductStock($id);
 		
 		$this->read(null, $id);
-
-		debug(Debugger::trace());
-
 		return parent::afterSave($created);
 	}
 	
