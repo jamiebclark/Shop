@@ -41,16 +41,12 @@ class PostContainBehavior extends ModelBehavior {
 		$multiResult = !isset($result[$Model->alias]['id']);
 		
 		//$Model = new $Model->alias();
-		foreach ($modelNames as $key => $modelAlias) {
-			if (is_array($modelAlias)) {
-				$options = $modelAlias;
-				$modelAlias = $key;
-				$modelName = Param::keyCheck($options, 'modelName', true, $modelAlias);
-				//list($modelName, $options) = $modelName;
-			} else {
-				$modelName = $modelAlias;
+		foreach ($modelNames as $modelAlias => $options) {
+			if (is_numeric($modelAlias)) {
+				$modelAlias = $options;
 				$options = [];
 			}
+			$modelName = Param::keyCheck($options, 'modelName', true, $modelAlias);
 
 			$LinkedModel = $Model->{$modelAlias};
 
@@ -66,7 +62,7 @@ class PostContainBehavior extends ModelBehavior {
 
 			$query = array_merge_recursive($options, [
 				'fields' => [
-					$LinkedModel->escapeField('*'),
+					'*',
 				],
 				'recursive' => -1,
 				'conditions' => [
