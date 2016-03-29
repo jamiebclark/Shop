@@ -10,7 +10,7 @@ $this->Html->css('Shop.catalog_item_view', null, ['inline' => false]);
 <?php endif; ?>
 
 <div class="catalogitem-view">
-<?php echo $this->Form->create('OrderProduct', ['action' => 'add']); ?>
+<?php echo $this->Form->create('OrderProduct', ['url' => ['action' => 'add']]); ?>
 	<div class="row">
 		<div class="col-sm-offset-3 col-sm-9">
 			<div class="catalogitem-view-heading">

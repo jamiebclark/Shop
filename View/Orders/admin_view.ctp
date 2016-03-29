@@ -52,18 +52,23 @@ $info = array(
 		<h2>Order Contents</h2>
 		<?php
 		echo $this->element('orders/cart', ['shipping' => true, 'delete' => true]);
-		if (empty($order['Order']['archived'])) {
-			echo $this->Form->create('OrderProduct', ['action' => 'add', 'type' => 'GET']);
-			echo $this->Layout->fieldset('Add a product to the order');
-			echo $this->Form->inputs([
-				'fieldset' => false,
-				'order_id' => ['type' => 'hidden', 'value' => $order['Order']['id']],
-				'product_id' => ['options' => $products],
-			]);
-			echo $this->FormLayout->submit('Add Product to order');
-			echo "</fieldset>\n";
+		if (empty($order['Order']['archived'])):
+			echo $this->Form->create('OrderProduct', ['url' => ['action' => 'add'], 'type' => 'GET']);
+			?>
+			<fieldset>
+				<legend>Add a product to the order</legend>
+				<?php 
+				echo $this->Form->inputs([
+					'fieldset' => false,
+					'order_id' => ['type' => 'hidden', 'value' => $order['Order']['id']],
+					'product_id' => ['options' => $products],
+				]);
+				echo $this->FormLayout->submit('Add Product to order');
+				?>
+			</fieldset>
+			<?php
 			echo $this->Form->end();
-		}
+		endif;
 
 		$info = [];
 		if ($canceled) {

@@ -48,7 +48,7 @@ if ($title) {
 			<span class="panel-title"><?php echo $title; ?></span>
 		</div><?php
 		if ($form) {
-			echo $this->Form->create('Order', ['action' => 'edit']);
+			echo $this->Form->create('Order', ['url' => ['action' => 'edit']]);
 			echo $this->Form->hidden('id', ['value' => $order['Order']['id']]);
 		}
 		$this->Table->reset();
