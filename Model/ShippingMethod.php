@@ -11,7 +11,7 @@ class ShippingMethod extends ShopAppModel {
 	
 	var $validate = array(
 		'title' => array(
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please name your shipping method',
 		)
 	);

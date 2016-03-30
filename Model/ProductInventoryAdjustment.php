@@ -13,15 +13,15 @@ class ProductInventoryAdjustment extends ShopAppModel {
 	
 	public $validate = [
 		'product_id' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select a product first',
 		],
 		'quantity' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select an amount to add',
 		],
 		'available' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please let us know when the inventory will be available',
 		]
 	];

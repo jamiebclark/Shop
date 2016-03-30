@@ -20,15 +20,15 @@ class CatalogItemPackage extends ShopAppModel {
 
 	public $validate = [
 		'catalog_item_parent_id' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select a catalog item parent',
 		],
 		'catalog_item_child_id' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select a catalog item child',
 		],
 		'quantity' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select a quantity',
 		]
 	];

@@ -28,7 +28,7 @@ class CatalogItemImage extends ShopAppModel {
 	
 	public $validate = [
 		'catalog_item_id' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please select a product',
 		]
 	];

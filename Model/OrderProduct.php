@@ -36,7 +36,7 @@ class OrderProduct extends ShopAppModel {
 	
 	public $validate = [
 		'product_id' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'You must select a product to add to your shopping cart',
 		],
 		'quantity' => [
@@ -44,8 +44,8 @@ class OrderProduct extends ShopAppModel {
 				'rule' => 'numeric',
 				'message' => 'Please enter only a number',
 			],
-			'notEmpty' => [
-				'rule' => 'notEmpty',
+			'notBlank' => [
+				'rule' => 'notBlank',
 				'message' => 'Please enter a quantity',
 			]
 		]

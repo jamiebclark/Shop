@@ -38,16 +38,16 @@ class Invoice extends ShopAppModel {
 	
 	public $validate = [
 		'first_name' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please enter a first name',
 		],
 		'last_name' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please enter a last name',
 		],
 		'amt' => [
-			'notEmpty' => [
-				'rule' => 'notEmpty',
+			'notBlank' => [
+				'rule' => 'notBlank',
 				'message' => 'Please enter a donation amount',
 			],
 			'numeric' => [
@@ -56,8 +56,8 @@ class Invoice extends ShopAppModel {
 			]
 		],
 		'email' => [
-			'notEmpty' => [
-				'rule' => 'notEmpty',
+			'notBlank' => [
+				'rule' => 'notBlank',
 				'message' => 'Please enter your email address',
 			],
 			'email' => [

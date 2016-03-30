@@ -21,7 +21,7 @@ class CatalogItemOption extends ShopAppModel {
 	
 	public $validate = [
 		'title' => [
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please give this option a title',
 		]
 	];

@@ -23,7 +23,7 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 			<div class="panel-heading"><span class="panel-title">About</span></div><?php
 			echo $this->Layout->infoResultTable($catalogItem['CatalogItem'], [
 					'price' => ['format' => 'cash'],
-					'sale' => ['format' => 'cash', 'notEmpty', 'class' => 'sale'],
+					'sale' => ['format' => 'cash', 'notBlank', 'class' => 'sale'],
 					'stock' => [
 						'label' => 'Currently In Stock',
 						'format' => 'number',

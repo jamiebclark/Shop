@@ -44,11 +44,11 @@ class CatalogItem extends ShopAppModel {
 	
 	var $validate = array(
 		'title' => array(
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please give your item a title',
 		),
 		'price' => array(
-			'rule' => 'notEmpty',
+			'rule' => 'notBlank',
 			'message' => 'Please enter a price for the item',
 		)
 	);
@@ -308,7 +308,9 @@ class CatalogItem extends ShopAppModel {
 	function findPackageChildren($id) {
 		return $this->CatalogItemPackageChild->CatalogItemChild->find('all', array(
 			'fields' => array('*'),
-			'link' => array(				'Shop.CatalogItemPackageChild' => array('Shop.CatalogItemParent' => array('table' => 'catalog_items'))			),
+			'link' => array(
+				'Shop.CatalogItemPackageChild' => array('Shop.CatalogItemParent' => array('table' => 'catalog_items'))
+			),
 			'conditions' => array('CatalogItemParent.id' => $id)
 		));
 	}
