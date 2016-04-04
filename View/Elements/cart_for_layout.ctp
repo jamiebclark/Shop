@@ -22,13 +22,11 @@ if (empty($shoppingCart) && isset($blankEmpty)) {
 		);
 		echo $this->Html->link(
 			$this->Iconic->icon('x'),
-			array('unset_cart' => 1),
-			array(
-				'escape' => false,
-				'title' => 'Empty your shopping cart',
-				'class' => 'btn btn-default',
-			),
-			'Empty your cart?'
-		);
+			array('unset_cart' => 1),[
+	'escape' => false,
+	'title' => 'Empty your shopping cart',
+	'class' => 'btn btn-default',
+	'confirm' => 'Empty your cart?'
+]);
 	?></div>
 <?php endif; ?>
