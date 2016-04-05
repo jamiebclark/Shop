@@ -11,6 +11,7 @@ class ShopAppController extends AppController {
 		'FormData.FormData' => array('plugin' => 'Shop'),
 		'Layout.FormLayout',
 		'Session',
+		'Flash',
 	);
 	
 	public $helpers = array(
@@ -48,16 +49,15 @@ class ShopAppController extends AppController {
 	
 	public function redirectMsg($redirect = true, $msg = null, $success = null) {
 		if (!empty($msg)) {
-			$type = 'info';
+			$element = 'alert';
 			if ($success === false) {
-				$type = 'danger';
+				$element = 'danger';
 			} else if ($success == true) {
-				$type = 'success';
+				$element = 'success';
 			}
-			$this->Session->setFlash(__($msg), 'default', array(
-				'class' => 'alert alert-' . $type
-			));
+			$this->Flash->set(__($msg), compact('element'));
 		}
+		
 		if ($redirect !== false) {
 			if ($redirect === true) {
 				$redirect = $this->referer();

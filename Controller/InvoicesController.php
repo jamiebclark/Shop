@@ -129,16 +129,16 @@ class InvoicesController extends ShopAppController {
 
 		if ($success === false) {
 			$msg = 'Invoice not found';
-			$class = 'alert-error';
+			$element = 'error';
 			$redirect = ['action' => 'index'];
 		} else if (empty($success)) {
 			$msg = 'PayPal payment not found';
-			$class = 'alert-warning';
+			$element = 'warning';
 		} else {
 			$msg = 'Synced PayPal information';
-			$class = 'alert-success';
+			$element = 'success';
 		}
-		$this->Session->setFlash($msg, 'default', compact('class'));
+		$this->Flash->set($msg, compact('element'));
 		$this->redirect($redirect);
 	}
 	

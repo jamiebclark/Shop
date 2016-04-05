@@ -58,7 +58,7 @@ class CatalogItemsController extends ShopAppController {
 				$msg = 'No Admin Emails set, so nothing is being sent';
 			}
 		}
-		$this->Session->setFlash($msg);
+		$this->Flash->alert($msg);
 	}
 	
 	public function index($categoryId = null) {

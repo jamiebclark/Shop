@@ -60,7 +60,7 @@ class OrdersController extends ShopAppController {
 			} catch (Exception $e) {
 				$this->Flash->error($e->getMessage(), compact('redirect'));
 			}
-			$this->Session->setFlash('Added promo code: ' . $promoCode);
+			$this->Flash->alert('Added promo code: ' . $promoCode);
 			$this->redirect($redirect);
 		}
 
@@ -136,7 +136,7 @@ class OrdersController extends ShopAppController {
 	public function admin_index() {
 		$this->Order->deleteOldEmptyOrders();
 		if ($deletedCount = $this->Order->getAffectedRows()) {
-			$this->Session->setFlash(sprintf('Deleted %d old empty orders', $deletedCount));
+			$this->Flash->alert(sprintf('Deleted %d old empty orders', $deletedCount));
 		}
 		
 		if (!empty($this->request->data['Order']['id'])) {
