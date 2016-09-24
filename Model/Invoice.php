@@ -212,6 +212,7 @@ class Invoice extends ShopAppModel {
  *
  **/
 	public function fixTotals() {
+		/*
 		$Pdo = getModelPDO($this);
 		$Sth = $Pdo->query('SELECT id, model, model_id, paid, amt FROM `invoices` WHERE amt = 0');
 		$startCount = $Sth->rowCount();
@@ -245,6 +246,48 @@ class Invoice extends ShopAppModel {
 			}
 		}
 
+		$result = $this->find('all', ['conditions' => [
+			'Invoice.id' => $ids,
+			'Invoice.amt' => 0,
+		]]);
+		$endCount = count($result);
+		if ($startCount != $endCount) {
+			debug("$endCount Found after initially finding $startCount");
+		}
+		*/
+		$result = $this->find('all', [
+			'fields' => ['id', 'model', 'model_id', 'paid', 'amt'],
+			'recursive' => -1,
+			'conditions' => ['amt' => 0]
+		]);
+		$ids = [];
+		$startCount = count($result);
+		foreach ($result as $row) {
+			$row = $row[$this->alias];
+			$deleteId = null;
+			$ids[] = $row['id'];
+			if (!empty($row['model']) && !empty($row['model_id'])) {
+				$Model = ClassRegistry::init($row['model'], true);
+				if (!empty($Model)) {
+					//If Invoice has been paid or the Model exists, sync the totals, otherwise delete it
+					$result = $Model->read(null, $row['model_id']);
+					$isFound = !empty($result);
+					$isPaid = $row['amt'] > 0 && !empty($row['paid']);
+					if ($isPaid || $isFound) {
+						$Model->create();
+						$Model->copyModelToInvoice($row['model_id']);
+					} else {
+						$deleteId = $row['id'];
+					}
+				}
+			} else {
+				$deleteId = $row['id'];
+			}
+			if (!empty($deleteId)) {
+				debug(sprintf('ID #%d should be deleted', $deleteId));
+				$this->delete($row['id']);
+			}
+		}
 		$result = $this->find('all', ['conditions' => [
 			'Invoice.id' => $ids,
 			'Invoice.amt' => 0,
