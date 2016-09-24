@@ -210,6 +210,11 @@ class PaypalIpn {
 
 	public static function getLogFiles() {
 		$logDir = self::getLogDir();
+		if (!is_dir($logDir)) {
+			if (!mkdir($logDir, 0755, true)) {
+				throw new Exception("Could not create IPN Log directory");
+			}
+		}
 		if (!($folder = opendir($logDir))) {
 			throw new Exception('Could not open directory: ' . $logDir);
 		}
