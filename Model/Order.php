@@ -67,7 +67,7 @@ class Order extends ShopAppModel {
 	
 	public function beforeFind($query) {
 		$oQuery = $query;
-		if (!empty($query['fields']) && ($key = array_search('id', $query['fields'])) !== false) {
+		if (!empty($query['fields']) && is_array($query['fields']) && ($key = array_search('id', $query['fields'])) !== false) {
 			unset($query['fields'][$key]);
 		}
 
