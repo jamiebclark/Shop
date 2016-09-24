@@ -1,6 +1,7 @@
 <?php
 App::uses('InvoiceEmail', 'Shop.Network/Email');
 App::uses('ShopAppModel', 'Shop.Model');
+App::uses('CakeEventListener', 'Event');
 
 class Invoice extends ShopAppModel {
 	public $name = 'Invoice';
@@ -68,14 +69,22 @@ class Invoice extends ShopAppModel {
 	];
 
 	public $syncedModels = [];
+	public $_paidTrack = false;
 	
 	public function beforeSave($options = []) {
 		$data =& $this->getData();
-
 		// Makes sure net amount is set
 		if (isset($data['amt']) && isset($data['net']) && empty($data['net'])) {
 			$data['net'] = $data['amt'];
 		}
+
+		if (!empty($data['id'])) {
+			$oData = $data;
+			$result = $this->read(['paid', 'paid_email'], $data['id']);
+			$this->_paidTrack = $result[$this->alias];
+			$this->data = [$this->alias => $oData];
+		}
+
 		return parent::beforeSave($options);
 	}
 
@@ -95,6 +104,20 @@ class Invoice extends ShopAppModel {
 			$this->copyToModels($id);
 		}
 		*/
+
+		if (true || !empty($this->_paidTrack)) {
+			$result = $this->read(null, $id);
+			$result = $result[$this->alias];
+
+			// Triggers afterPaid Invoice event
+			if (!empty($result['paid']) && ($result['paid'] != $this->_paidTrack['paid'])) {
+				$event = new CakeEvent('Model.Invoice.afterPaid', $this, ['invoice' => $result]);
+				$this->getEventManager()->dispatch($event);
+			}
+
+			$this->_paidTrack = null;
+		}
+
 		// Fires if Payment information has changed
 		$appModels = [];
 		$lookForModels = ['models'];
