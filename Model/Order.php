@@ -263,6 +263,8 @@ class Order extends ShopAppModel {
 	}
 	
 	public function updateHandling($id = null) {
+		$order = $this->read(['sub_total', 'shipping'], $id);
+
 		//Removes de-activated or deleted handling rules
 		$this->OrdersHandlingMethod->removeUnused();
 		
@@ -272,6 +274,16 @@ class Order extends ShopAppModel {
 			'conditions' => ['OrdersHandlingMethod.order_id' => $id]
 		]);
 
+		// Doesn't apply handling to orders with no shipping or totals
+		if (empty($order['Order']['sub_total']) && empty($order['Order']['shipping'])) {
+			if (!empty($handlingIds)) {
+				return $this->OrdersHandlingMethod->deleteAll(['OrdersHandlingMethod.id' => $handlingIds]);
+			} else {
+				return true;
+			}
+		}
+
+		// Applies all active handling methods
 		$handlingMethods = $this->HandlingMethod->find('all', [
 			'conditions' => ['HandlingMethod.active' => 1]
 		]);

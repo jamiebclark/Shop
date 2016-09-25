@@ -1,14 +1,14 @@
 <?php
 class OrdersHandlingMethod extends ShopAppModel {
-	var $name = 'OrdersHandlingMethod';
-	var $actsAs = array('Shop.BlankDelete' => array('and' => array('amt', 'pct')));
-	var $belongsTo = array('Shop.HandlingMethod', 'Shop.Order');
+	public $name = 'OrdersHandlingMethod';
+	public $actsAs = array('Shop.BlankDelete' => array('and' => array('amt', 'pct')));
+	public $belongsTo = array('Shop.HandlingMethod', 'Shop.Order');
 	
 /**
  * Removes de-activated or deleted handling rules
  *
  **/
-	function removeUnused() {
+	public function removeUnused() {
 		$obsolete = $this->find('list', array(
 			'link' => array('Shop.HandlingMethod'),
 			'conditions' => array(
