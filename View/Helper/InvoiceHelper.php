@@ -1,5 +1,7 @@
 <?php
 App::uses('ModelViewHelper', 'Layout.View/Helper');
+App::uses('Prefix', 'Layout.Lib');
+
 class InvoiceHelper extends ModelViewHelper {
 	public $name = 'Invoice';
 	public $modelPlugin = 'Shop';
@@ -154,6 +156,8 @@ class InvoiceHelper extends ModelViewHelper {
 	
 	function checkPaymentSteps($invoice) {
 		$memo = 'Invoice #' . $invoice['id'];
+		App::uses('Prefix', 'Layout.Lib');
+
 		$steps = array(
 			'Make check payable to <strong>' . $this->companyName . '</strong>',
 			'Payment should be the amount of <strong>$' . number_format($invoice['amt'],2) . '</strong>',
