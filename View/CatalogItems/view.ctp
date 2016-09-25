@@ -95,7 +95,9 @@ $this->Html->css('Shop.catalog_item_view', null, ['inline' => false]);
 
 								echo $this->Form->hidden('Order.id');
 								echo $this->Form->hidden('Product.catalog_item_id', ['value' => $catalogItem['CatalogItem']['id']]);
-								echo $this->Form->hidden('Order.user_id', ['default' => $loggedUserId]);
+								if (!empty($loggedUserId)) {
+									echo $this->Form->hidden('Order.user_id', ['default' => $loggedUserId]);
+								}
 
 								echo $this->element('catalog_item_options/input', [
 									'prefix' => 'Product.',
