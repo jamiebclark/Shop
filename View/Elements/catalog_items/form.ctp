@@ -10,32 +10,35 @@ echo $this->FormLayout->inputs([
 	'description' => ['escape' => false, 'rows' => 10],
 ]);
 ?>
-<div class="form-horizontal"><?php
-	$inputDefaults = $this->Form->inputDefaults();
-	$this->Form->inputDefaults([
-		'label' => ['class' => 'control-label col col-sm-3'],
-		'wrapInput' => 'col col-sm-9',
-	], true);
-	echo $this->FormLayout->inputs([
-		'price' => ['label' => 'Price', 'type' => 'cash'],
-		'sale' => ['label' => 'Sale Price', 'type' => 'cash'],
-		'min_quantity' => ['label' => 'Minimum Quantity', 'type' => 'number'],
-		'quantity_per_pack' => ['type' => 'number'],
-	]);
-	$this->Form->inputDefaults($inputDefaults);
-	?>
-</div>
 <?php
+echo $this->FormLayout->inputs([
+	'price' => ['label' => 'Price', 'type' => 'cash'],
+	'sale' => [
+		'label' => 'Sale Price', 
+		'type' => 'cash',
+		'after' => '<span class="help-block">A temporary sale price</span>',
+	],
+	'min_quantity' => [
+		'label' => 'Minimum Quantity', 
+		'type' => 'number',
+		'after' => '<span class="help-block">The minimum amount required to count as an order</span>',
+	],
+	'quantity_per_pack' => [
+		'type' => 'number',
+		'after' => '<span class="help-block">How to subtract from inventory with every order placed</span>',
+	],
+]);
+
 echo $this->FormLayout->inputs([
 	'active' => [
 		'label' => 'Active',
 		'class' => 'checkbox',
-		'after' => '<span class="help-block">Whether item is available for sale</span>',
+		'after' => '<span class="help-block">Whether item is available in the store</span>',
 	],
 	'hidden' => [
 		'label' => 'Hidden',
 		'class' => 'checkbox',
-		'after' => '<span class="help-block">Hide this from catalog page while still being active</span>',
+		'after' => '<span class="help-block">This item is available for purchase, but it won\'t show up in the store</span>',
 	],
 	'unlimited' => [
 		'label' => 'Unlimited Inventory',

@@ -1,5 +1,5 @@
 <?php 
-$this->Html->script('Layout.element_input_list', ['inline' => false]);
+$this->element('Layout.form/element_input_list/assets');
 
 
 echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
@@ -42,6 +42,62 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 			); ?>
 		</div>
 
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Options / Sizes
+				<?php echo $this->Html->link('<i class="fa fa-plus"></i>', [
+						'controller' => 'catalog_item_options',
+						'action' => 'add',
+						$catalogItem['CatalogItem']['id'],
+					], [
+						'escape' => false, 
+						'class' => 'btn btn-default pull-right ajax-modal',
+						'data-modal-title' => 'Add option',
+					]
+				); ?>
+			</div>
+			<div class="panel-body">
+				<span class="help-block">If the catalog item requires the user to select options before purchase (like with clothing sizes), list them here.</span>
+				<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<?php echo $catalogItemOption['title']; ?>
+							<div class="pull-right btn-group">
+								<?php echo $this->Html->link(
+									'<i class="fa fa-edit"></i>', [
+										'controller' => 'catalog_item_options',
+										'action' => 'edit',
+										$catalogItemOption['id']
+									], [
+										'class' => 'btn btn-default ajax-modal',
+										'data-modal-title' => 'Edit Option',
+										'escape' => false,
+									]
+								); ?>
+								<?php echo $this->Html->link(
+									'<i class="fa fa-times"></i>', [
+										'controller' => 'catalog_item_options',
+										'action' => 'delete',
+										$catalogItemOption['id']
+									], [
+										'class' => 'btn btn-danger',
+										'escape' => false,
+									], 
+									'Delete this option and all of it\'s associated choices?'
+								); ?>
+							</div>
+						</div>
+						<ul class="list-group">
+						<?php foreach ($catalogItemOption['ProductOptionChoice'] as $productOptionChoice): ?>
+							<li class="list-group-item"><?php echo $productOptionChoice['title']; ?></li>
+						<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+
+
 		<?php
 		$this->Table->reset();
 		foreach ($catalogItem['ShippingRule'] as $shippingRule) {
@@ -83,64 +139,11 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 	<div class="col-sm-4">
 		<div class="panel panel-default">
 			<?php echo $this->CatalogItem->thumb($catalogItem['CatalogItem'], [
-				'dir' => 'mid', 
+				'size' => 'thumb', 
 				'class' => false,
 			]);?>
 		</div>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				Production Options
-				<?php echo $this->Html->link('<i class="fa fa-plus"></i>', [
-						'controller' => 'catalog_item_options',
-						'action' => 'add',
-						$catalogItem['CatalogItem']['id'],
-					], [
-						'escape' => false, 
-						'class' => 'btn btn-default pull-right ajax-modal',
-						'data-modal-title' => 'Add option',
-					]
-				); ?>
-			</div>
-			<div class="panel-body">
-				<?php foreach ($catalogItem['CatalogItemOption'] as $catalogItemOption): ?>			
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<?php echo $catalogItemOption['title']; ?>
-							<div class="pull-right btn-group">
-								<?php echo $this->Html->link(
-									'<i class="fa fa-edit"></i>', [
-										'controller' => 'catalog_item_options',
-										'action' => 'edit',
-										$catalogItemOption['id']
-									], [
-										'class' => 'btn btn-default ajax-modal',
-										'data-modal-title' => 'Edit Option',
-										'escape' => false,
-									]
-								); ?>
-								<?php echo $this->Html->link(
-									'<i class="fa fa-times"></i>', [
-										'controller' => 'catalog_item_options',
-										'action' => 'delete',
-										$catalogItemOption['id']
-									], [
-										'class' => 'btn btn-danger',
-										'escape' => false,
-									], 
-									'Delete this option and all of it\'s associated choices?'
-								); ?>
-							</div>
-						</div>
-						<ul class="list-group">
-						<?php foreach ($catalogItemOption['ProductOptionChoice'] as $productOptionChoice): ?>
-							<li class="list-group-item"><?php echo $productOptionChoice['title']; ?></li>
-						<?php endforeach; ?>
-						</ul>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
 
 		<div class="panel panel-default">
 			<div class="panel-heading"><span class="panel-title">Categories</span></div>
@@ -201,9 +204,9 @@ echo $this->Layout->defaultHeader($catalogItem['CatalogItem']['id'], null, [
 				<span class="panel-title">Photos
 			</span></div>
 			<?php
-				echo $this->CatalogItemImage->mediaList($catalogItem['CatalogItemImage'], [
-					'dir' => 'thumb',
-					'size' => 'thumb',
+				echo $this->CatalogItemImage->mediaList($catalogItemImages, [
+					'dir' => 'mid',
+					'size' => 'mid',
 					'title' => false,
 					'link' => true,
 					'actionMenu' => ['edit', 'delete', 'move_up', 'move_down'],

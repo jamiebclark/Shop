@@ -4,6 +4,13 @@ class CatalogItemImage extends ShopAppModel {
 	public $name = 'CatalogItemImage';
 	public $actsAs = [
 		'Shop.BlankDelete' => ['id', 'add_image'],
+		'Uploadable.FieldUpload' => [
+			'filename' => [
+				'plugin' => 'Shop',
+				'dir' => 'img/catalog_item_images',
+			]
+		],
+		/*
 		'Uploadable.ImageUploadable' => [
 			'plugin' => 'Shop',
 			'upload_var' => 'add_image',
@@ -16,6 +23,7 @@ class CatalogItemImage extends ShopAppModel {
 				'' => ['max' => [600, 400]]
 			]
 		],
+		*/
 		//'Shop.BlankDelete' => ['title'],
 		'Layout.Removable',
 		'Shop.FieldOrder' => [

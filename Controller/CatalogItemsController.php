@@ -213,11 +213,16 @@ class CatalogItemsController extends ShopAppController {
 					'CatalogItemChild'
 				],
 				'CatalogItemOption' => ['ProductOptionChoice'],
-				'CatalogItemImage', 
 				'ShippingRule',
 				'CatalogItemCategory',
 			]
 		]);
+		$catalogItemImages = $this->CatalogItem->CatalogItemImage->find('all', [
+			'conditions' => [
+				'CatalogItemImage.catalog_item_id' => $id,
+			]
+		]);
+
 		$productInventoryAdjustments = $this->CatalogItem->Product->ProductInventoryAdjustment->find('all', [
 			'fields' => '*',
 			'link' => ['Shop.Product' => ['Shop.CatalogItem']],
@@ -244,7 +249,7 @@ class CatalogItemsController extends ShopAppController {
 		*/
 		$catalogItemCategories = $this->CatalogItem->findCategories($id);
 		
-		$this->set(compact('catalogItem', 'catalogItemCategories', 'productInventoryAdjustments'));
+		$this->set(compact('catalogItem', 'catalogItemImages', 'catalogItemCategories', 'productInventoryAdjustments'));
 	}
 	
 	public function admin_packages($id = null) {

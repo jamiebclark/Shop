@@ -17,4 +17,9 @@
 
 .catalogitem-view {
 	margin-top: 40px;
+	> form {
+		max-width: none;
+	}
 }
+
+

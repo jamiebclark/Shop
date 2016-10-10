@@ -7,16 +7,25 @@ echo $this->Form->hidden('catalog_item_id');
 	<legend>About</legend>
 	<div class="row">
 		<div class="col-sm-9">
-			<?php echo $this->Form->input('title', ['label' => 'Name']); ?>
+			<?php echo $this->Form->input('title', [
+				'label' => 'Name',
+				'default' => 'Size',
+				'after' => '<span class="help-block">Give a name to this grouping of options</span>'
+			]); ?>
 		</div>
 		<div class="col-sm-3">
-			<?php echo $this->Form->input('index', ['type' => 'number', 'label' => 'Numerical Order']); ?>
+			<?php echo $this->Form->input('index', [
+				'type' => 'number', 
+				'label' => 'Numerical Order',
+				'after' => '<span class="help-block">If multiple options, decide their order</span>',
+			]); ?>
 		</div>
 	</div>
 </fieldset>
 
 <fieldset>
 	<legend>Choices</legend>
+	<span class="help-block">List all of the different options available</span>
 	<?php
 	echo $this->element('Layout.form/element_input_list', [
 		'function' => function($count) {
