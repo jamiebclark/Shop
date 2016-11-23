@@ -14,4 +14,5 @@ echo $this->Form->input('per_page', array(
 	'label' => ' Per-Page: ',
 	'style' => 'width: auto;',
 ));
-echo $this->Form->end('Go');
+echo $this->Form->button('Go', ['class' => 'btn btn-primary', 'type' => 'submit']);
+echo $this->Form->end();
