@@ -80,8 +80,9 @@ class Invoice extends ShopAppModel {
 
 		if (!empty($data['id'])) {
 			$oData = $data;
-			$result = $this->read(['paid', 'paid_email'], $data['id']);
-			$this->_paidTrack = $result[$this->alias];
+			if ($result = $this->read(['paid', 'paid_email'], $data['id'])) {
+				$this->_paidTrack = $result[$this->alias];
+			}
 			$this->data = [$this->alias => $oData];
 		}
 
