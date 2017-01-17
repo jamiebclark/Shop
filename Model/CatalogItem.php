@@ -81,7 +81,7 @@ class CatalogItem extends ShopAppModel {
 		if (empty($result[$this->alias]['filename'])) {
 			$this->setThumbnail($id);
 		}
-		return parent::afterSave($created);	
+		return parent::afterSave($created, $options);	
 	}
 	
 	function beforeFind($queryData) {

@@ -30,7 +30,10 @@ class ProductsController extends ShopAppController {
 		$products = $this->paginate();
 		$this->set(compact('products'));
 		
-//		$this->Product->updateMissingCatalogItemOptions();
+		//TODO: Turning this off for now because it's creating blank options in current catalog items
+		// Perhaps add "active" field to catalog_item_options?
+		// $this->Product->updateMissingCatalogItemOptions();
+
 		$this->Product->combine();
 	}
 	
