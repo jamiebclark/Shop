@@ -30,7 +30,7 @@ class ProductsController extends ShopAppController {
 		$products = $this->paginate();
 		$this->set(compact('products'));
 		
-		$this->Product->updateMissingCatalogItemOptions();
+//		$this->Product->updateMissingCatalogItemOptions();
 		$this->Product->combine();
 	}
 	
