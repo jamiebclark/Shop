@@ -2,6 +2,8 @@
 if (empty($prefix)) {
 	$prefix = !empty($class) ? $class . '.' : '';
 }
+debug($catalogItem);
+debug($catalogItemOptions);
 
 $index = 1;
 foreach ($catalogItemOptions as $row):
@@ -15,7 +17,7 @@ foreach ($catalogItemOptions as $row):
 		'type' => 'select',
 		'options' => $options,
 		'label' => $title,
-		'class' => 'element-input-list-key',
+		'class' => 'form-control element-input-list-key',
 	));
 	$index++;
 endforeach;
