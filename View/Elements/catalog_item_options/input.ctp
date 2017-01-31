@@ -2,8 +2,6 @@
 if (empty($prefix)) {
 	$prefix = !empty($class) ? $class . '.' : '';
 }
-debug($catalogItem);
-debug($catalogItemOptions);
 
 $index = 1;
 foreach ($catalogItemOptions as $row):
