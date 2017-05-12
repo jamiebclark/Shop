@@ -1,4 +1,6 @@
 <?php
+App::uses('InvoicePaypalForm', 'Shop.Lib/PaypalForm');
+
 class InvoicesController extends ShopAppController {
 	public $name = 'Invoices';
 
@@ -53,6 +55,20 @@ class InvoicesController extends ShopAppController {
 		$this->set(compact('invoice'));
 	}
 	
+/**
+ * Redirects to the PayPal payment form of an invoice
+ *
+ * @param int $id The invoice id
+ * @return void;
+ **/
+	public function paypal($id) {
+		$result = $this->Invoice->read(null, $id);
+		$InvoicePaypalForm = new InvoicePaypalForm();
+		$InvoicePaypalForm->setModelResult($result['Invoice']);
+		$url = $InvoicePaypalForm->getUrl();
+		$this->redirect($url);
+	}
+
 	public function admin_index() {
 	//	$this->Invoice->fixDuplicates();
 		$this->Invoice->fixTotals();

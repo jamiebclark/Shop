@@ -1,6 +1,7 @@
 <?php
 App::uses('ModelViewHelper', 'Layout.View/Helper');
 App::uses('Prefix', 'Layout.Lib');
+App::uses('InvoicePaypalForm', 'Shop.Lib/PaypalForm');
 
 class InvoiceHelper extends ModelViewHelper {
 	public $name = 'Invoice';
@@ -182,6 +183,19 @@ class InvoiceHelper extends ModelViewHelper {
 		return $this->mailingAddress;
 	}
 	
+	public function paypalLink($text, $invoice, $options = []) {
+		return $this->Html->link($text, $this->paypalUrl($invoice),	$options);
+	}
+
+	public function paypalUrl($invoice, $settings = []) {
+		return Router::url([
+			'controller' => 'invoices',
+			'plugin' => 'shop',
+			'action' => 'paypal',
+			$invoice['id'],
+		], true);
+	}
+
 	public function paymentForm($invoice, $options = []) {
 		$options = array_merge([
 			'paypal' => true,
@@ -189,17 +203,19 @@ class InvoiceHelper extends ModelViewHelper {
 		], $options);
 		extract($options);
 		
-		$paypalForm = $this->paypalForm(
-			$invoice, 
-			$this->Form->submit ('Pay with Credit Card or PayPal', ['class' => 'btn btn-lg btn-primary'])
-		);
 		$payments = [];
-		
 		if (!empty($paypal)) {
+			ob_start();
+			echo '<p class="help-block">Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment</p>';
+			echo $this->paypalLink(
+				'<i class="fa fa-credit-card"></i> <i class="fa fa-paypal"></i> Pay with Credit Card or PayPal',
+				$invoice,
+				['class' => 'btn btn-primary btn-lg', 'escape' => false]
+			);
+
 			$payments[] = [
 				'<i class="fa fa-credit-card"></i> Pay with Credit Card / PayPal',
-				$paypalForm,
-				'<p class="help-block">Using PayPal, you can pay for your order using a major credit card or your PayPal account. This method will 	generally ship faster. Note: a PayPal account is NOT necessary to use their credit card payment</p>',
+				ob_get_clean(),				
 			];
 		}
 		
