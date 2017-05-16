@@ -55,6 +55,15 @@ class InvoicesController extends ShopAppController {
 		$this->set(compact('invoice'));
 	}
 	
+
+
+	public function model_view($id) {
+		if (!empty($this->request->query['cancel_pending'])) {
+			$this->Invoice->setPending($id, false);
+		}
+		return $this->redirectModelView($id);
+	}
+
 /**
  * Redirects to the PayPal payment form of an invoice
  *
@@ -63,6 +72,8 @@ class InvoicesController extends ShopAppController {
  **/
 	public function paypal($id) {
 		$result = $this->Invoice->read(null, $id);
+		$this->Invoice->setPending($id);
+
 		$InvoicePaypalForm = new InvoicePaypalForm();
 		$InvoicePaypalForm->setModelResult($result['Invoice']);
 		$url = $InvoicePaypalForm->getUrl();
@@ -191,5 +202,22 @@ class InvoicesController extends ShopAppController {
 		$this->set('countries', $this->Invoice->Country->selectList());
 		$this->set('invoicePaymentMethods', $this->Invoice->InvoicePaymentMethod->selectList());
 		//$this->set('models', ['' => ' --- No Model --- '] + $this->Invoice->syncedModels);
+	}
+
+	protected function redirectModelView($id) {
+		$result = $this->Invoice->read($id);
+		$result = $result['Invoice'];
+		if (empty($result['model'])) {
+			return $this->redirect(['action' => 'view', $id]);
+		}
+
+		list($plugin, $model) = pluginSplit($result['model']);
+		$url = [
+			'controller' => Inflector::tableize($model),
+			'action' => !empty($result['model_action']) ? $result['model_action'] : 'view',
+			$result['model_id'],
+			'plugin' => Inflector::underscore($plugin),
+		];
+		return $this->redirect($url);
 	}
 }

@@ -42,6 +42,8 @@ class InvoiceHelper extends ModelViewHelper {
 				$paid .= " (<em>{$result['InvoicePaymentMethod']['title']}</em>)";
 			}
 			return $paid;
+		} else if ($invoice['payment_pending']) {
+			return '<em>PENDING</em>';
 		} else {
 			return false;
 		}
@@ -231,14 +233,13 @@ class InvoiceHelper extends ModelViewHelper {
 		}
 		
 		//Begin Output
-		$col = 12 / count($payments);
 		ob_start();
 		?>
-		<div class="invoice-payments row">
+		<div class="invoice-payments">
 		<?php foreach ($payments as $k => $payment) :
 			list($title, $action, $info) = $payment + [null, null, null];
 			?>
-			<div class="invoice-payment col-md-<?php echo $col; ?>">
+			<div class="invoice-payment">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<span class="panel-title"><?php echo $title; ?></span>

@@ -36,13 +36,7 @@ class InvoicePaypalForm extends PaypalForm {
 		if (!empty($result['model_title'])) {
 			$settings['item_name'] = "{$result['model_title']} #{$result['model_id']}";
 			$settings['item_number'] = $result['model_id'];
-			list($plugin, $model) = pluginSplit($result['model']);
-			$url = [
-				'controller' => Inflector::tableize($model),
-				'action' => !empty($result['model_action']) ? $result['model_action'] : 'view',
-				$result['model_id'],
-				'plugin' => Inflector::underscore($plugin),
-			];
+			$url['action'] = 'model_view';
 		} else {
 			$settings['item_name'] = !empty($result['title']) ? $result['title'] : 'Invoice';
 			$settings['item_number'] = $result['id'];
@@ -51,10 +45,11 @@ class InvoicePaypalForm extends PaypalForm {
 		if (!empty($this->request->prefix)) {
 			$url[$this->request->prefix] = false;
 		}
-		$url = Router::url($url, true);
 
-		$settings['return'] = $url;
-		$settings['cancel_return'] = $url;
+		$cancelUrl = $url + ['?' => ['cancel_pending' => 1]];
+
+		$settings['return'] = Router::url($url, true);
+		$settings['cancel_return'] = Router::url($cancelUrl, true);
 
 		// Recurring payments
 		$recurUnit = 'M';

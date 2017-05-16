@@ -112,6 +112,8 @@ class Invoice extends ShopAppModel {
 
 			// Triggers afterPaid Invoice event
 			if (!empty($result['paid']) && ($result['paid'] != $this->_paidTrack['paid'])) {
+				$this->setPending($id, false);
+				
 				$event = new CakeEvent('Model.Invoice.afterPaid', $this, ['invoice' => $result]);
 				$this->getEventManager()->dispatch($event);
 			}
@@ -157,6 +159,17 @@ class Invoice extends ShopAppModel {
 	}
 	
 	
+/**
+ * Sets an invoice as "PENDING" or not
+ *
+ * @param int $id The Invoice ID
+ * @param bool $pendingValue Whether we should set pending on or off
+ * @return bool;
+ **/
+	public function setPending($id, $pendingValue = true) {
+		return $this->save(['id' => $id, 'payment_pending' => $pendingValue], ['callbacks' => false]);
+	}
+
 /**
  * Finds any related models using the InvoiceSyncBehavior and updates them with the new Invoice information
  *
