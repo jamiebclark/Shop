@@ -154,8 +154,8 @@ class PaypalIpn {
 			"POST /cgi-bin/webscr HTTP/1.1",
 			"Content-Type: application/x-www-form-urlencoded",
 			"Content-Length: " . strlen($requestVars),
-			//"Host: www.paypal.com",
-			//"Connection: close"
+			"Host: www.paypal.com",
+			"Connection: close"
 		];
 		$header = implode(self::$eol, $headerLines) . self::$eol . self::$eol;
 
@@ -245,7 +245,7 @@ class PaypalIpn {
 		self::logLine('Opening Log');
 		return true;
 	}
-		
+
 	protected static function logClose() {
 		if (!empty(self::$logResource)) {
 			self::logLine('Closing Log');
